@@ -1,21 +1,39 @@
-export interface TableColumn {
-	key: string;
-	label: string;
+import { type ReactNode } from 'react'
+
+interface TableColumnBase {
+	key: string
+	label: ReactNode
 }
 
+export interface TableRowHeaderColumn extends TableColumnBase {
+	kind: 'row-header'
+	sticky?: 'left'
+}
+
+export interface TableDataColumn extends TableColumnBase {
+	kind: 'data'
+}
+
+export type HierarchicalTableColumns = readonly [
+	TableRowHeaderColumn,
+	...TableDataColumn[],
+]
+
+export type TableNodeId = string | number
+
 export interface TableNode<TValue = number> {
-	id: string;
-	name: string;
-	imageUrl?: string;
-	values: TValue[];
-	children: TableNode<TValue>[];
+	id: TableNodeId
+	name: string
+	imageUrl?: string
+	values: TValue[]
+	children: TableNode<TValue>[]
 }
 
 export interface TableRow<TValue = number> extends Omit<
 	TableNode<TValue>,
-	"children"
+	'children'
 > {
-	depth: number;
-	hasChildren: boolean;
-	ancestorIds: string[];
+	depth: number
+	hasChildren: boolean
+	ancestorIds: TableNodeId[]
 }
