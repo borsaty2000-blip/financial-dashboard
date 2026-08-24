@@ -1,14 +1,25 @@
-import useFinancialReport from "@client/modules/financial-report/application/use-financial-report";
-import { FinancialBarChart } from "@client/modules/financial-report/ui/FinancialBarChart";
-import { FinancialTable } from "@client/modules/financial-report/ui/FinancialTable";
+import { useFinancialReport } from '@client/modules/financial-report/ui/hooks/use-financial-report'
+import { FinancialBarChart } from '@client/modules/financial-report/ui/FinancialBarChart'
+import { FinancialTable } from '@client/modules/financial-report/ui/FinancialTable'
+
+function FinancialChartSkeleton() {
+	return (
+		<div
+			aria-hidden="true"
+			className="h-107.5 w-full rounded-lg bg-white px-2 py-4 sm:px-4 sm:py-6"
+		>
+			<div className="bg-ink-subtle motion-reduce:animate-none h-full w-full animate-pulse rounded" />
+		</div>
+	)
+}
 
 export default function FinancialReportSection() {
-	const { report, chartData, reportState } = useFinancialReport();
+	const reportState = useFinancialReport()
 
 	return (
 		<section
 			aria-labelledby="financial-report-title"
-			aria-busy={reportState === "loading"}
+			aria-busy={reportState.status === 'loading'}
 			className="flex flex-col gap-4 py-6"
 		>
 			<h1
@@ -18,20 +29,31 @@ export default function FinancialReportSection() {
 				Clients
 			</h1>
 
-			{reportState === "loading" && (
+			{reportState.status === 'loading' && (
 				<p role="status" className="sr-only">
 					Loading financial report...
 				</p>
 			)}
 
-			{reportState === "error" ? (
-				<p role="alert">Failed to load financial report</p>
-			) : (
+			{reportState.status === 'error' ? (
+				<div className="flex items-center gap-4">
+					<p role="alert">Failed to load financial report</p>
+					<button
+						type="button"
+						onClick={reportState.reload}
+						className="focus-ring cursor-pointer rounded px-2 py-1"
+					>
+						Try again
+					</button>
+				</div>
+			) : reportState.status === 'success' ? (
 				<>
-					<FinancialBarChart data={chartData} />
-					{report && <FinancialTable report={report} />}
+					<FinancialBarChart {...reportState.data.financialChart} />
+					<FinancialTable data={reportState.data.financialTableData} />
 				</>
+			) : (
+				<FinancialChartSkeleton />
 			)}
 		</section>
-	);
+	)
 }
