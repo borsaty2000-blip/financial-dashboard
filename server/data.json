@@ -1,0 +1,304 @@
+{
+	"periods": [
+		"2024-02-01",
+		"2024-03-01",
+		"2024-04-01",
+		"2024-05-01",
+		"2024-06-01",
+		"2024-07-01",
+		"2024-08-01",
+		"2024-09-01",
+		"2024-10-01",
+		"2024-11-01",
+		"2024-12-01",
+		"2025-01-01"
+	],
+	"company": {
+		"id": "d6e00056-dce4-4ef4-b034-d6467db6187d",
+		"name": "Company",
+		"values": [250, 267, 284, 301, 317, 334, 350, 250, 250, 250, 250, 350],
+		"children": [
+			{
+				"id": "d6b668e1-89a4-4467-bdf6-c9ebaf2cea5f",
+				"name": "Branch 1",
+				"values": [147, 157, 166, 178, 188, 201, 214, 147, 147, 147, 147, 214],
+				"children": [
+					{
+						"id": "e3c4637b-2f21-4b7e-883e-b13ae1a6df6a",
+						"name": "Anna Blackwood",
+						"imageUrl": "/api/avatars/anna-blackwood.png",
+						"values": [25, 26, 28, 31, 32, 34, 38, 27, 27, 27, 27, 38],
+						"children": [
+							{
+								"id": "716e7c30-b7c3-45c5-aa64-cbcf483917e0",
+								"name": "Existing clients",
+								"values": [24, 24, 27, 29, 31, 32, 35, 26, 26, 26, 25, 35],
+								"children": []
+							},
+							{
+								"id": "bc5cd63a-668b-4c37-854d-69c1bd5fcbcd",
+								"name": "New organic",
+								"values": [1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2],
+								"children": []
+							},
+							{
+								"id": "abbf873a-a0eb-46b8-b4cf-dc58e5f7a2d7",
+								"name": "New paid",
+								"values": [0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1],
+								"children": []
+							}
+						]
+					},
+					{
+						"id": "afe9ebc0-6c35-4690-80b0-20e9bc0d8c7d",
+						"name": "James Walker",
+						"imageUrl": "/api/avatars/james-walker.png",
+						"values": [12, 13, 14, 14, 15, 15, 16, 12, 12, 12, 12, 17],
+						"children": [
+							{
+								"id": "11566b44-ca1e-4879-a6e9-98e6bf5649ab",
+								"name": "Existing clients",
+								"values": [11, 13, 13, 14, 15, 14, 16, 12, 12, 11, 11, 17],
+								"children": []
+							},
+							{
+								"id": "25c9c2c6-c5ed-48ea-bab4-26162ac373f2",
+								"name": "New organic",
+								"values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+								"children": []
+							},
+							{
+								"id": "836c3410-2a89-4683-99ec-3105760df3ee",
+								"name": "New paid",
+								"values": [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+								"children": []
+							}
+						]
+					},
+					{
+						"id": "bb012770-02d3-4999-aa08-c11a9065235d",
+						"name": "Maria Gutierrez",
+						"imageUrl": "/api/avatars/maria-gutierrez.png",
+						"values": [36, 39, 41, 44, 46, 48, 51, 35, 35, 35, 35, 52],
+						"children": [
+							{
+								"id": "25720558-2589-45d6-900b-40bb7fae7d7c",
+								"name": "Existing clients",
+								"values": [34, 36, 38, 41, 42, 45, 48, 33, 32, 32, 33, 49],
+								"children": []
+							},
+							{
+								"id": "ead74ac9-6e90-4cd8-a2af-7fb5783332ee",
+								"name": "New organic",
+								"values": [1, 1, 2, 2, 3, 2, 2, 1, 1, 2, 1, 2],
+								"children": []
+							},
+							{
+								"id": "f5fcdbcc-becd-40d1-9ac7-9322878835ea",
+								"name": "New paid",
+								"values": [1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1],
+								"children": []
+							}
+						]
+					},
+					{
+						"id": "61cd9425-2d8e-456f-b228-f7e7c6a76e5d",
+						"name": "Robert Chen",
+						"imageUrl": "/api/avatars/robert-chen.png",
+						"values": [42, 43, 46, 47, 51, 55, 56, 41, 41, 41, 41, 54],
+						"children": [
+							{
+								"id": "8ac63d42-123f-4efa-aedb-b8084406edf0",
+								"name": "Existing clients",
+								"values": [38, 40, 43, 43, 48, 52, 53, 37, 37, 38, 38, 51],
+								"children": []
+							},
+							{
+								"id": "bc20f052-856a-4061-8835-17e4549f8da0",
+								"name": "New organic",
+								"values": [2, 2, 2, 3, 2, 2, 2, 2, 3, 2, 2, 2],
+								"children": []
+							},
+							{
+								"id": "d9978634-dbcc-467a-9d0e-eb1a9ca7dc62",
+								"name": "New paid",
+								"values": [2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1],
+								"children": []
+							}
+						]
+					},
+					{
+						"id": "3e4efd29-e7e4-4695-a1dc-6f3b0853c19d",
+						"name": "Sarah Smith",
+						"imageUrl": "/api/avatars/sarah-smith.png",
+						"values": [32, 36, 37, 42, 44, 49, 53, 32, 32, 32, 32, 53],
+						"children": [
+							{
+								"id": "80cc22d9-1401-473a-bea7-3cf7649b0115",
+								"name": "Existing clients",
+								"values": [31, 34, 34, 39, 41, 46, 49, 30, 31, 31, 31, 50],
+								"children": []
+							},
+							{
+								"id": "8a630918-2bfb-42d5-873a-e0a27bc3411e",
+								"name": "New organic",
+								"values": [1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 2],
+								"children": []
+							},
+							{
+								"id": "fb6d9064-8184-42bf-922b-c0b1cd4279f6",
+								"name": "New paid",
+								"values": [0, 1, 1, 1, 1, 1, 2, 0, 0, 0, 0, 1],
+								"children": []
+							}
+						]
+					}
+				]
+			},
+			{
+				"id": "71da0b06-5785-4a60-9273-4df2be619ee4",
+				"name": "Branch 2",
+				"values": [76, 80, 84, 87, 90, 92, 94, 75, 75, 75, 75, 91],
+				"children": [
+					{
+						"id": "9574b366-6167-4718-978a-c1e9d8f92705",
+						"name": "Emily Carter",
+						"imageUrl": "/api/avatars/default-user.png",
+						"values": [30, 32, 34, 35, 36, 37, 38, 30, 30, 30, 30, 36],
+						"children": [
+							{
+								"id": "b302e777-50b1-4544-bf21-1e7715dddd2c",
+								"name": "Existing clients",
+								"values": [29, 30, 32, 33, 34, 34, 35, 29, 29, 29, 29, 33],
+								"children": []
+							},
+							{
+								"id": "d186b39a-88f7-449c-be50-3a574e13904f",
+								"name": "New organic",
+								"values": [1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2],
+								"children": []
+							},
+							{
+								"id": "ef59a833-e362-40ec-9113-4c7205140802",
+								"name": "New paid",
+								"values": [0, 0, 1, 1, 1, 2, 1, 0, 0, 0, 0, 1],
+								"children": []
+							}
+						]
+					},
+					{
+						"id": "78e5829e-1d80-4af7-8cff-538e83ae304e",
+						"name": "Daniel Kim",
+						"imageUrl": "/api/avatars/default-user.png",
+						"values": [25, 26, 27, 29, 30, 30, 31, 25, 25, 25, 25, 30],
+						"children": [
+							{
+								"id": "e680f152-23fc-4298-b2e6-b62a70ff38f5",
+								"name": "Existing clients",
+								"values": [23, 25, 26, 28, 28, 28, 30, 24, 24, 24, 23, 28],
+								"children": []
+							},
+							{
+								"id": "38aa5279-89a2-4bb7-af33-99ef8851106c",
+								"name": "New organic",
+								"values": [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1],
+								"children": []
+							},
+							{
+								"id": "47b83da8-baf9-4028-a261-e2feebb296a0",
+								"name": "New paid",
+								"values": [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+								"children": []
+							}
+						]
+					},
+					{
+						"id": "1f857533-42f6-4eef-b7b3-c39b80cec53c",
+						"name": "Priya Shah",
+						"imageUrl": "/api/avatars/default-user.png",
+						"values": [21, 22, 23, 23, 24, 25, 25, 20, 20, 20, 20, 25],
+						"children": [
+							{
+								"id": "48c87f03-1ca2-40bb-bd40-e2445dc07b3d",
+								"name": "Existing clients",
+								"values": [20, 21, 22, 21, 22, 24, 24, 19, 19, 18, 18, 24],
+								"children": []
+							},
+							{
+								"id": "ed2a0718-1d6d-424c-8c9d-4a46dfe3e730",
+								"name": "New organic",
+								"values": [1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1],
+								"children": []
+							},
+							{
+								"id": "3bbc4746-c295-4511-ac42-e371e425ee47",
+								"name": "New paid",
+								"values": [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
+								"children": []
+							}
+						]
+					}
+				]
+			},
+			{
+				"id": "63b01d42-922f-43ff-b0f8-2f3484e74c43",
+				"name": "Branch 3",
+				"values": [27, 30, 34, 36, 39, 41, 42, 28, 28, 28, 28, 45],
+				"children": [
+					{
+						"id": "fd48f6dd-4702-41c1-8715-f4cf7c8af332",
+						"name": "Oliver Bennett",
+						"imageUrl": "/api/avatars/default-user.png",
+						"values": [15, 16, 18, 19, 21, 22, 22, 15, 15, 15, 15, 24],
+						"children": [
+							{
+								"id": "cdc320dd-4582-4cc7-920d-32199925a794",
+								"name": "Existing clients",
+								"values": [15, 16, 17, 18, 20, 21, 21, 15, 14, 14, 15, 23],
+								"children": []
+							},
+							{
+								"id": "753ae292-7e4b-4b67-9534-1b60d10ad557",
+								"name": "New organic",
+								"values": [0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1],
+								"children": []
+							},
+							{
+								"id": "20f507de-9cfa-46ba-a893-c67c75915cd4",
+								"name": "New paid",
+								"values": [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+								"children": []
+							}
+						]
+					},
+					{
+						"id": "d54c20f6-1b28-4c20-8cee-03b97fdf63e0",
+						"name": "Sofia Rossi",
+						"imageUrl": "/api/avatars/default-user.png",
+						"values": [12, 14, 16, 17, 18, 19, 20, 13, 13, 13, 13, 21],
+						"children": [
+							{
+								"id": "56b0007f-905e-4d3f-bf92-b8b9e1f2e942",
+								"name": "Existing clients",
+								"values": [12, 13, 15, 17, 18, 19, 19, 12, 12, 13, 13, 20],
+								"children": []
+							},
+							{
+								"id": "0e54e2be-5682-48d3-92b4-fbf7962b79d3",
+								"name": "New organic",
+								"values": [0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+								"children": []
+							},
+							{
+								"id": "5eca4156-1ce9-49f4-a8a2-525829d12079",
+								"name": "New paid",
+								"values": [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+								"children": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

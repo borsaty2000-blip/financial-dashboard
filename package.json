@@ -1,0 +1,28 @@
+{
+	"name": "financial-dashboard",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"client": "npm --prefix client run dev",
+		"server": "tsx server/index.ts",
+		"build": "npm run typecheck && npm --prefix client run build",
+		"typecheck": "tsc --noEmit",
+		"lint": "npm --prefix client run lint",
+		"test": "npm --prefix client run test",
+		"test:watch": "npm --prefix client run test:watch",
+		"coverage": "npm --prefix client run coverage",
+		"format": "prettier --write .",
+		"format:check": "prettier --check ."
+	},
+	"dependencies": {
+		"express": "^4.22.2"
+	},
+	"devDependencies": {
+		"@types/express": "^4.17.21",
+		"@types/node": "^24.13.3",
+		"prettier": "^3.9.6",
+		"tsx": "^4.23.8",
+		"typescript": "~6.0.2"
+	}
+}
