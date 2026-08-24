@@ -2,6 +2,22 @@
 
 Financial reporting dashboard built with React, TypeScript, and Node.js.
 
+## Preview
+
+### Desktop
+
+![Financial Dashboard desktop preview](./DESK_PREVIEW.png)
+
+### Mobile
+
+<p align="center">
+	<img
+		src="./MOBILE_PREVIEW.png"
+		alt="Financial Dashboard mobile preview"
+		width="375"
+	/>
+</p>
+
 ## Tech stack
 
 - React
@@ -9,6 +25,7 @@ Financial reporting dashboard built with React, TypeScript, and Node.js.
 - Vite
 - Tailwind CSS
 - Recharts
+- Zod
 - Vitest
 - React Testing Library
 - Node.js
@@ -16,16 +33,15 @@ Financial reporting dashboard built with React, TypeScript, and Node.js.
 
 ## Architecture
 
-The financial-report module is split into `application`, `services`, `types`, `ui`, and `utils` layers. Generic
-hierarchical table components and utilities live in `shared/kit/table`. The report returned by the API remains the single source of truth for both the chart and table. The report tree is flattened before rendering, expansion state is stored separately, and visible rows are derived from their ancestor identifiers. Vitest reuses the Vite configuration so tests and the application share the same import aliases and transformations.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the complete runtime flow and dependency boundaries.
 
-## Notes
+## Decision notes
 
-- The local Node.js server exposes the report and avatar files through REST endpoints.
-- The mock dataset contains the complete hierarchy used by the dashboard.
-- The table remains usable on narrow screens through horizontal scrolling, and expandable rows support keyboard interaction.
+See the [architecture decision notes](./decision-notes/README.md) for how a deliberately simple initial implementation evolved after concrete reliability, validation, maintainability, reuse, lifecycle, accessibility, and testing concerns emerged.
 
 ## Installation
+
+Use Node.js `^20.19.0` or `>=22.12.0`, as required by Vite 8.
 
 Install the backend and root tooling dependencies:
 
@@ -83,6 +99,7 @@ npm run coverage
 npm run typecheck
 npm run lint
 npm run build
+npm run format:check
 ```
 
 The production client bundle is written to `client/dist`.
