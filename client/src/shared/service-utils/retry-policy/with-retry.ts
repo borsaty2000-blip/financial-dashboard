@@ -39,10 +39,9 @@ export const withRetry = async <T>(
 
 		if (result.timedOut) {
 			if (isLastAttempt) {
-				throw new Error(
-					`Operation timed out after ${options.timeoutMs}ms`,
-					{ cause: result.error }
-				)
+				throw new Error(`Operation timed out after ${options.timeoutMs}ms`, {
+					cause: result.error,
+				})
 			}
 
 			continue

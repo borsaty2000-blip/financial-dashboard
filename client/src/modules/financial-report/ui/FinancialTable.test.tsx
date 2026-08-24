@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { createFinancialTableDataView } from '@client/modules/financial-report/application/create-financial-table-data-view'
 import { financialReportFixture } from '@client/test/fixtures/financial-report'
-import { FinancialTable } from './FinancialTable'
+import { FinancialTable } from '@client/modules/financial-report/ui/FinancialTable'
 
 describe('FinancialTable', () => {
 	it('shows and hides descendants when their parent row is toggled', async () => {

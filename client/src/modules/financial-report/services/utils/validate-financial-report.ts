@@ -11,15 +11,11 @@ const validatePeriods = (periods: string[]): void => {
 			Number.isNaN(date.valueOf()) ||
 			date.toISOString().slice(0, 10) !== period
 		) {
-			throw new Error(
-				`Financial report period "${period}" is invalid`
-			)
+			throw new Error(`Financial report period "${period}" is invalid`)
 		}
 
 		if (uniquePeriods.has(period)) {
-			throw new Error(
-				`Financial report period "${period}" is duplicated`
-			)
+			throw new Error(`Financial report period "${period}" is duplicated`)
 		}
 
 		uniquePeriods.add(period)
@@ -34,16 +30,14 @@ const validateNode = (
 	const renderedId = String(node.id)
 
 	if (seenIds.has(renderedId)) {
-		throw new Error(
-			`Financial report node ID "${renderedId}" is duplicated`
-		)
+		throw new Error(`Financial report node ID "${renderedId}" is duplicated`)
 	}
 
 	seenIds.add(renderedId)
 
 	if (node.values.length !== periodsCount) {
 		throw new Error(
-			`Financial report node "${renderedId}" has ${node.values.length} values for ${periodsCount} periods`
+			`Financial report node "${renderedId}" has ${node.values.length} values for ${periodsCount} periods`,
 		)
 	}
 
@@ -63,7 +57,7 @@ const validateNode = (
 
 		if (node.values[periodIndex] !== childrenTotal) {
 			throw new Error(
-				`Financial report node "${renderedId}" total does not equal the sum of its direct children for period index ${periodIndex}`
+				`Financial report node "${renderedId}" total does not equal the sum of its direct children for period index ${periodIndex}`,
 			)
 		}
 	}

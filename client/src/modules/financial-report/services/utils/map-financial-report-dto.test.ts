@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { type FinancialReportDto } from '@client/modules/financial-report/services/utils/financial-report.schema'
-import { mapFinancialReportDto } from './map-financial-report-dto'
+import { mapFinancialReportDto } from '@client/modules/financial-report/services/utils/map-financial-report-dto'
 
 describe('mapFinancialReportDto', () => {
 	it('maps the complete DTO tree to a new financial report tree', () => {

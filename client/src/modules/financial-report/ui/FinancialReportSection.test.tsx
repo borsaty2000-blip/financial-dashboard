@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { type FinancialChartView } from '@client/modules/financial-report/application/create-financial-chart-view'
 import { type FinancialTableData } from '@client/modules/financial-report/application/types/financial-table'
 import { financialReportFixture } from '@client/test/fixtures/financial-report'
-import FinancialReportSection from './FinancialReportSection'
+import FinancialReportSection from '@client/modules/financial-report/ui/FinancialReportSection'
 
 vi.mock('@client/modules/financial-report/ui/FinancialBarChart', () => {
 	function FinancialBarChart({ data }: FinancialChartView) {

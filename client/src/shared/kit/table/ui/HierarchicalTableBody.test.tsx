@@ -8,7 +8,7 @@ import {
 	type TableRow,
 	type TableRowHeaderColumn,
 } from '@client/shared/kit/table/table-types'
-import HierarchicalTableBody from './HierarchicalTableBody'
+import HierarchicalTableBody from '@client/shared/kit/table/ui/HierarchicalTableBody'
 
 const rowHeaderColumn: TableRowHeaderColumn = {
 	key: 'entity',

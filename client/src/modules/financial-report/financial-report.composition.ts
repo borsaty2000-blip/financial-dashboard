@@ -3,4 +3,5 @@ import { financialReportApiAdapter } from '@client/modules/financial-report/serv
 
 const { getFinancialReport } = financialReportApiAdapter()
 
-export const loadFinancialReportView = createLoadFinancialReportView(getFinancialReport)
+export const loadFinancialReportView =
+	createLoadFinancialReportView(getFinancialReport)

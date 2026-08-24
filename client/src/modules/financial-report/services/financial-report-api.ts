@@ -10,16 +10,14 @@ export const financialReportApi = () => {
 			rawResponse = await fetch('/api/financial-report', { signal })
 		} catch (cause) {
 			if (cause instanceof DOMException && cause.name === 'AbortError') {
-				throw createHttpError(
-					'abort',
-					'Financial report request was aborted',
-					{ cause })
+				throw createHttpError('abort', 'Financial report request was aborted', {
+					cause,
+				})
 			}
 
-			throw createHttpError(
-				'network',
-				'Failed to fetch financial report',
-				{ cause })
+			throw createHttpError('network', 'Failed to fetch financial report', {
+				cause,
+			})
 		}
 
 		if (!rawResponse.ok) {
@@ -42,10 +40,9 @@ export const financialReportApi = () => {
 				signal.aborted ||
 				(cause instanceof DOMException && cause.name === 'AbortError')
 			) {
-				throw createHttpError(
-					'abort',
-					'Financial report request was aborted',
-					{ cause })
+				throw createHttpError('abort', 'Financial report request was aborted', {
+					cause,
+				})
 			}
 
 			if (!(cause instanceof SyntaxError)) {

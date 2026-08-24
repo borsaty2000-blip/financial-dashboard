@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createFinancialChartView } from './create-financial-chart-view'
+import { createFinancialChartView } from '@client/modules/financial-report/application/create-financial-chart-view'
 import { type FinancialReport } from '@client/modules/financial-report/types/financial-report'
 import { financialReportFixture } from '@client/test/fixtures/financial-report'
 

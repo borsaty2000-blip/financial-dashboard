@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { type FinancialCompany } from '@client/modules/financial-report/types/financial-node'
-import { flattenFinancialReportData } from './flatten-financial-report-data'
+import { flattenFinancialReportData } from '@client/modules/financial-report/application/utils/flatten-financial-report-data'
 
 const input: FinancialCompany = {
 	id: 'company',
