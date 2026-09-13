@@ -37,63 +37,53 @@ analysisRoutes.get('/:symbol/statistical', async (request, response) => {
 	try {
 		return response.json(await analyze(prices))
 	} catch (error) {
-		return response
-			.status(502)
-			.json({
-				status: 'error',
-				message:
-					error instanceof Error
-						? error.message
-						: 'Statistical service unavailable',
-			})
+		return response.status(502).json({
+			status: 'error',
+			message:
+				error instanceof Error
+					? error.message
+					: 'Statistical service unavailable',
+		})
 	}
 })
 
 analysisRoutes.get('/:symbol/forecast/arima', async (request, response) => {
 	const prices = queryPrices(request.query.prices)
 	if (prices.length < 20)
-		return response
-			.status(503)
-			.json({
-				status: 'unavailable',
-				message: 'At least 20 prices are required',
-			})
+		return response.status(503).json({
+			status: 'unavailable',
+			message: 'At least 20 prices are required',
+		})
 	try {
 		return response.json(
 			await forecastARIMA(prices, querySteps(request.query.steps)),
 		)
 	} catch (error) {
-		return response
-			.status(502)
-			.json({
-				status: 'error',
-				message:
-					error instanceof Error ? error.message : 'ARIMA service unavailable',
-			})
+		return response.status(502).json({
+			status: 'error',
+			message:
+				error instanceof Error ? error.message : 'ARIMA service unavailable',
+		})
 	}
 })
 
 analysisRoutes.get('/:symbol/forecast/lstm', async (request, response) => {
 	const prices = queryPrices(request.query.prices)
 	if (prices.length < 20)
-		return response
-			.status(503)
-			.json({
-				status: 'unavailable',
-				message: 'At least 20 prices are required',
-			})
+		return response.status(503).json({
+			status: 'unavailable',
+			message: 'At least 20 prices are required',
+		})
 	try {
 		return response.json(
 			await forecastLSTM(prices, querySteps(request.query.steps)),
 		)
 	} catch (error) {
-		return response
-			.status(502)
-			.json({
-				status: 'error',
-				message:
-					error instanceof Error ? error.message : 'LSTM service unavailable',
-			})
+		return response.status(502).json({
+			status: 'error',
+			message:
+				error instanceof Error ? error.message : 'LSTM service unavailable',
+		})
 	}
 })
 

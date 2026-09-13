@@ -483,3 +483,17 @@ level = floor(XP / 100) + 1
 تعمل الخدمة على المنفذ 8001 افتراضياً عبر `uvicorn main:app` وتوفر `GET /health` و`POST /analyze/elliott` و`POST /analyze/gann`. تم تصحيح اختلاف فعلي في SciPy: `find_peaks` يستخدم `distance` وليس `order`. نجحت اختبارات الدوال والحالات الحدية واختبارات HTTP وأعادت الخدمة JSON صحيحاً.
 
 تم ربط Node.js عبر `PYTHON_SERVICE_URL` وإضافة `GET /api/analysis/:symbol/elliott` و`GET /api/analysis/:symbol/gann`. اختبار COMI محلياً عبر Node إلى Python نجح HTTP 200 لكلا المسارين. تم حفظ العمل في commits: `6c5fd6e` لمحرك Elliott، `82775b8` لمحرك Gann، `26925d7` لتكامل Node/Python، و`63b3d89` لتجاهل ملفات البيئة المؤقتة. لم يتم النشر.
+
+## ملحق تنفيذ المتطلبات الإضافية — 13 سبتمبر 2026
+
+تم بناء Statistical Engine في `services/statistical.py` ويحسب المتوسط والانحراف المعياري والتباين والالتواء والتفرطح وPDF/CDF وVaR 95% وSharpe وGARCH(1,1). أضيف `POST /analyze/statistical`، ونجح اختبار الدالة والـHTTP بعد تثبيت `arch` و`statsmodels`.
+
+تم بناء ARIMA(1,1,1) وLSTM صغير باستخدام TensorFlow في `services/forecasting.py` مع `POST /forecast/arima` و`POST /forecast/lstm`. حدث تعارض NumPy/Pandas عند تثبيت TensorFlow، وتم إصلاحه بتثبيت NumPy 1.26.3 وPandas 2.2.0 وSciPy 1.12.0، ثم نجحت اختبارات الدوال وHTTP لكلا النموذجين.
+
+تم ربط Node.js بالمسارات `GET /api/analysis/:symbol/statistical` و`GET /api/analysis/:symbol/forecast/arima` و`GET /api/analysis/:symbol/forecast/lstm` عبر `statistical.service.ts`. نجحت اختبارات التكامل HTTP 200 للمسارات الثلاثة.
+
+تمت إضافة `POST /api/tradingview/webhook` مع Socket.io وSignal Bus. لا يقبل Webhook إلا توقيع HMAC-SHA256 مبنياً على `TRADINGVIEW_WEBHOOK_SECRET`; الاختبار غير الموثق أعاد 401 والموثق أعاد 202. لم يتم نشر WebSocket خارجياً.
+
+تمت إضافة `services/databricks.py` باستخدام `databricks-sql-connector`، مع قراءة `DATABRICKS_SERVER_HOSTNAME` و`DATABRICKS_HTTP_PATH` و`DATABRICKS_TOKEN` من البيئة، وحظر أي استعلام غير read-only. تم اختبار الحماية وغياب الاعتمادات دون إجراء اتصال خارجي.
+
+Commits هذه المرحلة: `6d214b8` للإحصاء، `3ee6038` للتنبؤ، `5084062` لتكامل Node، `6f35634` لـTradingView، و`92bc607` لـDatabricks. لم يتم النشر.
