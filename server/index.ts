@@ -1,8 +1,13 @@
+import 'dotenv/config'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import express from 'express'
+import { authRoutes } from './src/routes/auth.routes.js'
+import { publicRateLimit } from './src/middleware/rateLimit.js'
 
 const app = express()
+app.use(express.json())
+app.use(publicRateLimit)
 const port = Number(process.env.PORT ?? 4000)
 const allowedOrigins = (process.env.CORS_ORIGINS ?? '*')
 	.split(',')
@@ -20,8 +25,11 @@ app.use((request, response, next) => {
 			allowedOrigins.includes('*') ? '*' : (origin as string),
 		)
 	}
-	response.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS')
-	response.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+	response.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+	response.setHeader(
+		'Access-Control-Allow-Headers',
+		'Content-Type,Authorization',
+	)
 	if (request.method === 'OPTIONS') {
 		response.sendStatus(204)
 		return
@@ -50,6 +58,8 @@ app.get('/api/financial-report', (_request, response) => {
 app.get('/api/health', (_request, response) => {
 	response.json({ ok: true, service: 'financial-dashboard-api' })
 })
+
+app.use('/api/auth', authRoutes)
 
 export default app
 
