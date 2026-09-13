@@ -415,3 +415,19 @@ level = floor(XP / 100) + 1
 3. `3761f1d feat(ui): add market pulse menus avatar upload and toast UX`
 
 لم يتم نشر Backend أو Frontend خلال هذه المرحلة.
+
+## ملحق مراجعة المتطلبات الشاملة — 13 سبتمبر 2026
+
+### ما تم تنفيذه في هذه المراجعة
+
+تمت إضافة صفحات عربية مستقلة للمسارات `/terms` و`/privacy` و`/disclaimer`، إضافة إلى صفحة 404، وربطها بالـRouter الداخلي. كما تم استكمال SEO عبر title وdescription وkeywords وOpen Graph وTwitter metadata وmanifest وrobots وsitemap. أضيف Service Worker محدود لا يخزن طلبات API، وNetlify `_redirects` لدعم الروابط المباشرة في SPA. نجح TypeScript وBuild وFormat Check، وتم التأكد من نسخ ملفات PWA وSEO إلى `client/dist`.
+
+### البنود التي لم تُنفذ خارجياً
+
+لم يتم تنفيذ نشر Vercel أو تعديل DNS في Cloudflare لأن موصلي Vercel وCloudflare غير مفعّلين، ولا توجد جلسة مصادقة خارجية صالحة. لا يمكن إنشاء Backend URL حقيقي أو تأكيد `borsatyai.com` دون إتمام ذلك من حساب المستخدم.
+
+كما أن `financial-dashboard` الحالي لا يحتوي على مسارات Backend للسوق مثل `/api/market/summary` أو `/api/market/egx/summary`؛ لذلك لم يتم اختلاق بيانات سوقية أو ربط مصادر وهمية. يلزم أولاً تحديد Backend سوقي حقيقي أو إضافة خدمة سوق مستقلة مع أسرارها وعقدها.
+
+لم تتم إضافة Google Analytics لعدم توفر `GA_MEASUREMENT_ID`. ولم تتم إضافة Sentry SDK في هذه المراجعة لأن وجود `SENTRY_DSN` وحده لا يكفي لتأكيد إعداد المشروع، ولأن تفعيل المراقبة يحتاج اختيار بيئة الإنتاج وسياسة إرسال الأخطاء. OAuth الاجتماعي اختياري ويتطلب Client IDs وRedirect URLs من مزودي الخدمة.
+
+آخر commit لهذه المراجعة هو `74e0fd9 feat: complete legal seo and pwa foundations`، وأصبح المستودع متزامناً مع `origin/main`.
