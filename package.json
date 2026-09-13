@@ -20,13 +20,16 @@
 		"seed": "tsx prisma/seed.ts"
 	},
 	"dependencies": {
+		"@neabytelab/trading-lib": "github:borsaty2000-blip/Trading-Lib",
 		"@prisma/client": "^6.17.1",
 		"bcryptjs": "^3.0.3",
 		"dotenv": "^17.4.2",
 		"express": "^4.22.2",
+		"finmagic": "^1.0.4",
 		"jose": "^6.2.12",
 		"multer": "^2.3.0",
 		"nodemailer": "^10.0.9",
+		"trading-signals": "^8.3.0",
 		"zod": "^4.6.4"
 	},
 	"devDependencies": {

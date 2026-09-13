@@ -9,6 +9,7 @@ import { profileRoutes } from './src/routes/profile.routes.js'
 import { preferencesRoutes } from './src/routes/preferences.routes.js'
 import { achievementsRoutes } from './src/routes/achievements.routes.js'
 import { marketRoutes } from './src/routes/market.routes.js'
+import { analysisRoutes } from './src/routes/analysis.routes.js'
 
 const app = express()
 app.use(express.json())
@@ -69,6 +70,7 @@ app.get('/api/health', (_request, response) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/market', marketRoutes)
+app.use('/api/analysis', analysisRoutes)
 app.use(
 	'/uploads',
 	express.static(path.join(process.cwd(), 'server', 'uploads')),

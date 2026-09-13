@@ -457,3 +457,9 @@ level = floor(XP / 100) + 1
 تم تثبيت SDK الرسمي `sahmk` وفحص واجهاته. أضيف Adapter يستخدم المسارات الرسمية `market_summary` و`quote` و`companies` مع ترويسة `X-API-Key` وEnvelope موحد يتضمن `data` و`source` و`timestamp` و`freshness` و`delay_minutes` و`available`. أثناء اختبار مستقل أعاد SAHMK HTTP 429 بسبب استهلاك حد الخطة المجانية اليومي: 100 طلب/يوم. لا يتم إظهار أرقام وهمية؛ الرد يرجع `available:false` وسبب الخطأ.
 
 المسارات الجديدة: `/api/market/egx/summary` و`/api/market/egx/companies` و`/api/market/egx/quote/:symbol` و`/api/market/tasi/summary` و`/api/market/tasi/quote/:symbol` و`/api/market/tasi/companies`. TypeScript وBuild و4 اختبارات Auth و91 اختبار واجهة وFormat Check ناجحة. لم يتم النشر.
+
+## ملحق pasted_content_20 — Part 2: Technical Analysis Layer
+
+تمت قراءة README للمكتبات الثلاث. تم تثبيت `trading-signals` و`finmagic`، وإنشاء `server/src/services/analysis/indicators.service.ts` مع RSI وMACD وSMA وEMA وBollinger Bands وATR، إضافة إلى Sharpe وPosition Sizing من finmagic. أضيف Endpoint `GET /api/analysis/:symbol/indicators` ويقبل أسعاراً اختبارية عبر query parameter `prices` عند عدم توفر مصدر شموع حي.
+
+تم تثبيت Trading-Lib من fork وبناء مصدره الرسمي مرة واحدة، لكن package exports تشير إلى `dist/index.js` بينما build الرسمي ينتج `dist/src/index.js`، لذلك تعذر استيراده كحزمة دون تعديل مكتبة خارجية. لم يتم اختراع workaround أو نسخ كودها. الاختبارات الحسابية عبر trading-signals وfinmagic أعادت HTTP 200 بنتائج RSI وMACD وSMA وBollinger وSharpe. TypeScript وBuild ناجحان.
