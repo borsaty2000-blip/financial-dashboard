@@ -7,6 +7,15 @@ import {
 	getCurrentUser,
 } from '../services/auth/auth.service.js'
 import { loginSchema, registerSchema } from '../validators/auth.validator.js'
+import {
+	forgotPasswordSchema,
+	resetPasswordSchema,
+} from '../validators/auth.validator.js'
+import {
+	requestReset,
+	resetPassword,
+	validateResetToken,
+} from '../services/auth/passwordReset.service.js'
 
 const meta = (req: Request) => ({
 	userAgent: req.get('user-agent'),
@@ -66,5 +75,31 @@ export async function meController(
 		res.json({ user })
 	} catch (error) {
 		next(error)
+	}
+}
+
+export async function forgotPasswordController(req: Request, res: Response) {
+	try {
+		const { email } = forgotPasswordSchema.parse(req.body)
+		res.json(await requestReset(email))
+	} catch (error) {
+		res.status(400).json({
+			error: error instanceof Error ? error.message : 'تعذر تنفيذ الطلب',
+		})
+	}
+}
+
+export async function verifyResetTokenController(req: Request, res: Response) {
+	res.json(await validateResetToken(req.params.token))
+}
+
+export async function resetPasswordController(req: Request, res: Response) {
+	try {
+		const { token, newPassword } = resetPasswordSchema.parse(req.body)
+		res.json(await resetPassword(token, newPassword))
+	} catch (error) {
+		res.status(400).json({
+			error: error instanceof Error ? error.message : 'تعذر تغيير كلمة المرور',
+		})
 	}
 }

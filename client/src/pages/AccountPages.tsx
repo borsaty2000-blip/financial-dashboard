@@ -8,12 +8,15 @@ import {
 import { api } from '../lib/api'
 import { navigate } from '../router'
 import { useAuth } from '../contexts/AuthContext'
+import AvatarUploader from '../components/AvatarUploader'
 
 function Shell({ children }: { children: ReactNode }) {
 	const { user, logout } = useAuth()
 	const [dark, setDark] = useState(
 		() => localStorage.getItem('borsaty_theme') === 'dark',
 	)
+	const [menuOpen, setMenuOpen] = useState(false)
+	const [notificationsOpen, setNotificationsOpen] = useState(false)
 	useEffect(() => {
 		document.body.classList.toggle('dark-mode', dark)
 		localStorage.setItem('borsaty_theme', dark ? 'dark' : 'light')
@@ -39,15 +42,53 @@ function Shell({ children }: { children: ReactNode }) {
 					</button>
 					{user ? (
 						<>
-							<button className="icon-button" aria-label="الإشعارات">
+							<button
+								className="icon-button"
+								aria-label="الإشعارات"
+								onClick={() => setNotificationsOpen((v) => !v)}
+							>
 								🔔<b>3</b>
 							</button>
+							{notificationsOpen && (
+								<div className="top-dropdown notifications-dropdown">
+									<strong>الإشعارات</strong>
+									<p>لديك 3 تنبيهات مخصصة جديدة.</p>
+									<button
+										className="link-button"
+										onClick={() => setNotificationsOpen(false)}
+									>
+										عرض الكل
+									</button>
+								</div>
+							)}
 							<button
 								className="user-chip"
-								onClick={() => navigate('/profile/me')}
+								onClick={() => setMenuOpen((v) => !v)}
 							>
 								{user.fullName || user.username} <span>⌄</span>
 							</button>
+							{menuOpen && (
+								<div className="top-dropdown user-dropdown">
+									<div className="dropdown-user">
+										<b>{user.fullName || user.username}</b>
+										<small>{user.email}</small>
+										<small>مستوى متوسط · 245 XP</small>
+									</div>
+									<button onClick={() => navigate('/profile/me')}>
+										👤 الملف الشخصي
+									</button>
+									<button onClick={() => navigate('/dashboard')}>
+										📊 Dashboard
+									</button>
+									<button onClick={() => navigate('/achievements')}>
+										🏆 إنجازاتي
+									</button>
+									<button onClick={() => navigate('/profile/me')}>
+										⚙️ الإعدادات
+									</button>
+									<button onClick={() => void logout()}>🚪 تسجيل خروج</button>
+								</div>
+							)}
 							<button className="ghost-button" onClick={() => void logout()}>
 								خروج
 							</button>
@@ -442,15 +483,28 @@ export function RegisterPage() {
 }
 export function ForgotPage() {
 	const [sent, setSent] = useState(false)
+	const [email, setEmail] = useState('')
+	const [loading, setLoading] = useState(false)
+	const [error, setError] = useState('')
+	const submit = async (e: FormEvent) => {
+		e.preventDefault()
+		setLoading(true)
+		setError('')
+		try {
+			await api('/api/auth/forgot-password', {
+				method: 'POST',
+				body: JSON.stringify({ email }),
+			})
+			setSent(true)
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'تعذر تنفيذ الطلب')
+		} finally {
+			setLoading(false)
+		}
+	}
 	return (
 		<div className="simple-auth">
-			<form
-				className="auth-card"
-				onSubmit={(e) => {
-					e.preventDefault()
-					setSent(true)
-				}}
-			>
+			<form className="auth-card" onSubmit={submit}>
 				<span className="eyebrow">استعادة الحساب</span>
 				<h2>نسيت كلمة المرور؟</h2>
 				{sent ? (
@@ -460,9 +514,16 @@ export function ForgotPage() {
 				) : (
 					<>
 						<p className="muted">أدخل بريدك وسنرسل لك تعليمات آمنة.</p>
-						<Field label="البريد الإلكتروني" type="email" required />
-						<button className="primary-button full">
-							إرسال رابط الاستعادة
+						<Field
+							label="البريد الإلكتروني"
+							type="email"
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							required
+						/>
+						{error && <div className="error-box">{error}</div>}
+						<button className="primary-button full" disabled={loading}>
+							{loading ? 'جارٍ الإرسال...' : 'إرسال رابط الاستعادة'}
 						</button>
 					</>
 				)}
@@ -496,6 +557,9 @@ function Metric({
 export function DashboardPage() {
 	const { user } = useAuth()
 	const [dashboard, setDashboard] = useState<any>(null)
+	const [market, setMarket] = useState<
+		Record<string, { value?: number; changePercent?: number }>
+	>({})
 	useEffect(() => {
 		void api('/api/preferences/dashboard')
 			.then(setDashboard)
@@ -508,6 +572,34 @@ export function DashboardPage() {
 					trending: [],
 				}),
 			)
+	}, [])
+	useEffect(() => {
+		let active = true
+		const loadMarket = async () => {
+			try {
+				const [summary, egx] = await Promise.all([
+					api<any>('/api/market/summary'),
+					api<any>('/api/market/egx/summary'),
+				])
+				if (active)
+					setMarket({
+						TASI: summary.tasi ?? summary.TASI,
+						GOLD: summary.gold,
+						SILVER: summary.silver,
+						EGX30: egx.egx30,
+						EGX70: egx.egx70,
+						EGX100: egx.egx100,
+					})
+			} catch {
+				if (active) setMarket({})
+			}
+		}
+		void loadMarket()
+		const timer = window.setInterval(loadMarket, 30000)
+		return () => {
+			active = false
+			window.clearInterval(timer)
+		}
 	}, [])
 	return (
 		<Shell>
@@ -567,10 +659,28 @@ export function DashboardPage() {
 						</button>
 					</div>
 					<div className="pulse-list">
-						<Metric label="EGX30" value="—" />
-						<Metric label="TASI" value="—" />
-						<Metric label="Gold" value="—" />
-						<Metric label="Silver" value="—" />
+						{['EGX30', 'EGX70', 'EGX100', 'TASI', 'GOLD', 'SILVER'].map(
+							(symbol) => (
+								<Metric
+									key={symbol}
+									label={symbol}
+									value={
+										market[symbol]?.value
+											? `${market[symbol].value.toLocaleString()} ${market[symbol].changePercent != null ? `${market[symbol].changePercent > 0 ? '+' : ''}${market[symbol].changePercent.toFixed(2)}%` : ''}`
+											: '—'
+									}
+									tone={
+										market[symbol]?.changePercent &&
+										market[symbol].changePercent > 0
+											? 'positive'
+											: market[symbol]?.changePercent &&
+												  market[symbol].changePercent < 0
+												? 'negative'
+												: ''
+									}
+								/>
+							),
+						)}
 					</div>
 				</section>
 				<section className="panel">
@@ -666,6 +776,10 @@ export function ProfilePage() {
 							إلغاء
 						</button>
 					</div>
+					<AvatarUploader
+						currentUrl={p?.avatarUrl}
+						onUploaded={(avatarUrl) => setProfile({ ...p, avatarUrl })}
+					/>
 					<Field
 						label="الاسم الكامل"
 						value={editData.fullName}
@@ -846,36 +960,75 @@ export function AchievementsPage() {
 
 export function ResetPage() {
 	const [done, setDone] = useState(false)
+	const [valid, setValid] = useState<boolean | null>(null)
+	const [password, setPassword] = useState('')
+	const [confirm, setConfirm] = useState('')
+	const [error, setError] = useState('')
+	const [loading, setLoading] = useState(false)
+	const token = window.location.pathname.split('/').pop() ?? ''
+	useEffect(() => {
+		void api<{ valid: boolean }>(`/api/auth/verify-reset-token/${token}`)
+			.then((result) => setValid(result.valid))
+			.catch(() => setValid(false))
+	}, [token])
+	const submit = async (e: FormEvent) => {
+		e.preventDefault()
+		if (password !== confirm) return setError('كلمتا المرور غير متطابقتين')
+		setLoading(true)
+		setError('')
+		try {
+			await api('/api/auth/reset-password', {
+				method: 'POST',
+				body: JSON.stringify({ token, newPassword: password }),
+			})
+			setDone(true)
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'الرابط غير صالح أو منتهي')
+		} finally {
+			setLoading(false)
+		}
+	}
 	return (
 		<div className="simple-auth">
-			<form
-				className="auth-card"
-				onSubmit={(e) => {
-					e.preventDefault()
-					setDone(true)
-				}}
-			>
+			<form className="auth-card" onSubmit={submit}>
 				<span className="eyebrow">حماية الحساب</span>
 				<h2>إعادة تعيين كلمة المرور</h2>
-				{done ? (
+				{valid === false ? (
+					<div className="error-box">
+						الرابط منتهي أو غير صالح. اطلب رابطاً جديداً.
+					</div>
+				) : done ? (
 					<div className="success-box">
 						تم تحديث كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن.
 					</div>
 				) : (
 					<>
-						<Field
-							label="كلمة المرور الجديدة"
-							type="password"
-							minLength={8}
-							required
-						/>
-						<Field
-							label="تأكيد كلمة المرور"
-							type="password"
-							minLength={8}
-							required
-						/>
-						<button className="primary-button full">إعادة تعيين</button>
+						{valid === null ? (
+							<div className="loading-screen">جارٍ التحقق من الرابط...</div>
+						) : (
+							<>
+								<Field
+									label="كلمة المرور الجديدة"
+									type="password"
+									value={password}
+									onChange={(e) => setPassword(e.target.value)}
+									minLength={8}
+									required
+								/>
+								<Field
+									label="تأكيد كلمة المرور"
+									type="password"
+									value={confirm}
+									onChange={(e) => setConfirm(e.target.value)}
+									minLength={8}
+									required
+								/>
+								{error && <div className="error-box">{error}</div>}
+								<button className="primary-button full" disabled={loading}>
+									{loading ? 'جارٍ الحفظ...' : 'إعادة تعيين'}
+								</button>
+							</>
+						)}
 					</>
 				)}
 				<button

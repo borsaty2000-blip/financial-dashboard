@@ -8,25 +8,26 @@ datasource db {
 }
 
 model User {
-  id           String            @id @default(uuid())
-  email        String            @unique
-  username     String            @unique
-  passwordHash String
-  fullName     String?
-  avatarUrl    String?
-  bio          String?           @db.VarChar(500)
-  country      String?           @default("EG")
-  language     String            @default("ar")
-  isVerified   Boolean           @default(false)
-  isActive     Boolean           @default(true)
-  lastLoginAt  DateTime?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  preference   UserPreference?
-  achievements UserAchievement[]
-  sessions     Session[]
-  following    Follow[]          @relation("Following")
-  followers    Follow[]          @relation("Followers")
+  id             String            @id @default(uuid())
+  email          String            @unique
+  username       String            @unique
+  passwordHash   String
+  fullName       String?
+  avatarUrl      String?
+  bio            String?           @db.VarChar(500)
+  country        String?           @default("EG")
+  language       String            @default("ar")
+  isVerified     Boolean           @default(false)
+  isActive       Boolean           @default(true)
+  lastLoginAt    DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  preference     UserPreference?
+  achievements   UserAchievement[]
+  sessions       Session[]
+  passwordResets PasswordReset[]
+  following      Follow[]          @relation("Following")
+  followers      Follow[]          @relation("Followers")
 
   @@index([email])
   @@index([username])
@@ -106,4 +107,18 @@ model Follow {
   @@unique([followerId, followingId])
   @@index([followingId])
   @@map("follows")
+}
+
+model PasswordReset {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@map("password_resets")
 }

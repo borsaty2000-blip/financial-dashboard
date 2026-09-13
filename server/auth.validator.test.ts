@@ -1,6 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { loginSchema, registerSchema } from './src/validators/auth.validator.js'
+import {
+	forgotPasswordSchema,
+	loginSchema,
+	registerSchema,
+	resetPasswordSchema,
+} from './src/validators/auth.validator.js'
 
 test('register accepts valid input and applies defaults', () => {
 	const result = registerSchema.parse({
@@ -25,5 +30,19 @@ test('login accepts email or username identifier', () => {
 	assert.deepEqual(
 		loginSchema.parse({ identifier: 'user_1', password: 'Test1234' }),
 		{ identifier: 'user_1', password: 'Test1234' },
+	)
+})
+
+test('forgot and reset validators accept valid input', () => {
+	assert.equal(
+		forgotPasswordSchema.parse({ email: 'USER@EXAMPLE.COM' }).email,
+		'user@example.com',
+	)
+	assert.equal(
+		resetPasswordSchema.parse({
+			token: 'a'.repeat(32),
+			newPassword: 'NewPass123',
+		}).token.length,
+		32,
 	)
 })

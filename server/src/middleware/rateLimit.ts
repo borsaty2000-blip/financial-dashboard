@@ -20,4 +20,6 @@ export function rateLimit(max: number, windowMs: number, name: string) {
 	}
 }
 export const authRateLimit = rateLimit(5, 15 * 60 * 1000, 'auth')
+export const forgotRateLimit = rateLimit(3, 60 * 60 * 1000, 'forgot')
+export const resetRateLimit = rateLimit(5, 60 * 60 * 1000, 'reset')
 export const publicRateLimit = rateLimit(100, 15 * 60 * 1000, 'public')
