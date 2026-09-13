@@ -10,6 +10,7 @@ import {
 	forecastARIMA,
 	forecastLSTM,
 } from '../services/analysis/statistical.service.js'
+import { ConsensusService } from '../services/analysis/consensus.service.js'
 
 export const analysisRoutes = Router()
 
@@ -27,6 +28,40 @@ function querySteps(value: unknown) {
 		? Math.max(1, Math.min(365, Math.trunc(steps)))
 		: 30
 }
+
+analysisRoutes.get('/:symbol/consensus', async (request, response) => {
+	const prices = queryPrices(request.query.prices)
+	const dates =
+		typeof request.query.dates === 'string'
+			? request.query.dates.split(',')
+			: []
+	if (prices.length < 30)
+		return response
+			.status(503)
+			.json({
+				status: 'unavailable',
+				message: 'At least 30 prices are required',
+			})
+	try {
+		return response.json(
+			await ConsensusService.calculate(
+				request.params.symbol.toUpperCase(),
+				prices,
+				dates,
+			),
+		)
+	} catch (error) {
+		return response
+			.status(502)
+			.json({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: 'Consensus service unavailable',
+			})
+	}
+})
 
 analysisRoutes.get('/:symbol/statistical', async (request, response) => {
 	const prices = queryPrices(request.query.prices)
