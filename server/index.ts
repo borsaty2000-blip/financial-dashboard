@@ -1,12 +1,35 @@
-import { readFile } from 'node:fs/promises'
+import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import express from 'express'
 
 const app = express()
-const port = 4000
+const port = Number(process.env.PORT ?? 4000)
+const allowedOrigins = (process.env.CORS_ORIGINS ?? '*')
+	.split(',')
+	.map((origin) => origin.trim())
+	.filter(Boolean)
 
-const rawData = await readFile(new URL('./data.json', import.meta.url), 'utf8')
+app.use((request, response, next) => {
+	const origin = request.headers.origin
+	if (
+		allowedOrigins.includes('*') ||
+		(origin && allowedOrigins.includes(origin))
+	) {
+		response.setHeader(
+			'Access-Control-Allow-Origin',
+			allowedOrigins.includes('*') ? '*' : (origin as string),
+		)
+	}
+	response.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS')
+	response.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+	if (request.method === 'OPTIONS') {
+		response.sendStatus(204)
+		return
+	}
+	next()
+})
 
+const rawData = readFileSync(new URL('./data.json', import.meta.url), 'utf8')
 const financialData: unknown = JSON.parse(rawData)
 const avatarsDirectory = fileURLToPath(new URL('./avatars', import.meta.url))
 
@@ -15,9 +38,7 @@ app.get('/api/avatars/:fileName', (request, response, next) => {
 		request.params.fileName,
 		{ root: avatarsDirectory },
 		(error) => {
-			if (error) {
-				next(error)
-			}
+			if (error) next(error)
 		},
 	)
 })
@@ -26,6 +47,14 @@ app.get('/api/financial-report', (_request, response) => {
 	response.json(financialData)
 })
 
-app.listen(port, () => {
-	console.log(`Server running at http://localhost:${port}`)
+app.get('/api/health', (_request, response) => {
+	response.json({ ok: true, service: 'financial-dashboard-api' })
 })
+
+export default app
+
+if (!process.env.VERCEL) {
+	app.listen(port, () => {
+		console.log(`Server running at http://localhost:${port}`)
+	})
+}

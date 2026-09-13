@@ -8,6 +8,7 @@ export default defineConfig({
 		tsconfigPaths: true,
 	},
 	server: {
+		allowedHosts: true,
 		proxy: {
 			'/api': {
 				target: 'http://localhost:4000',
