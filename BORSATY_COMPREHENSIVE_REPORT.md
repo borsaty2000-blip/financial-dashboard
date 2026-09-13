@@ -530,3 +530,19 @@ Commits المهمة: `f832258` لـWatchlist/Alerts/Notifications، `b1436bd` �
 تمت إضافة صفحة `/compare` بواجهة RTL متجاوبة وجدول مقارنة وبطاقات الفائزين. لم تُنفذ Economic Calendar أو Heatmap في هذه المرحلة لأن الملف المرفق يذكر العناوين فقط دون عقد بيانات أو حقول أو مصدر محدد؛ Notification Center الأساسي كان قد نُفذ سابقاً ضمن `/api/notifications` وواجهة القوائم والتنبيهات.
 
 Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
+
+## ملحق pasted_content_26 — Mobile UX Audit
+
+تم تنفيذ تدقيق Mobile-first عند 320px و375px و428px باستخدام Chromium headless، مع مراجعة إضافية عند 1280px. لم يظهر overflow أفقي في الصفحات المختبرة، وتحوّلت حقول المقارنة ونماذج Backtesting إلى تخطيط عمودي عند 320px، كما تحولت مقارنة الأسهم إلى بطاقات مكدسة بدلاً من جدول عريض على الهاتف.
+
+تمت إضافة نظام Fluid Typography عبر `clamp()`، وأهداف لمس لا تقل عن 44px لعناصر الهاتف، ومسافات آمنة للمحتوى أسفل BottomNav، ومعالجة safe-area السفلية. أضيفت نقاط breakpoint عملية لـ320 و375 و428 و768 و1024 و1440px.
+
+تمت إضافة `MobileChrome` الموحد، ويشمل TopBar للهاتف، BottomNav بخمسة عناصر، زر بحث مركزي، Hamburger Drawer من اليمين المتوافق مع RTL، إغلاق بالنقر خارج القائمة، ومنع تمرير body أثناء فتح Drawer. أضيف دعم Swipe لفتح/إغلاق Drawer وPull-to-Refresh من أعلى الصفحة، مع مؤشر مرئي، إضافة إلى Search Modal بملء الشاشة على الهاتف وفتح من TopBar أو BottomNav أو Ctrl+K.
+
+تم تحسين الرسم `GannElliottChart` لارتفاع 280px على الهاتف مع pinch zoom وhorizontal touch drag وتعطيل mouse-wheel، وتحديث PWA Manifest بإتجاه portrait وshortcuts، وإضافة metadata الخاصة بـiOS وapple-touch-icon وpreconnect.
+
+أثناء التدقيق ظهر خطأ حقيقي `Cannot read properties of null (reading 'useContext')` بعد تثبيت Lucide في الجذر؛ تم تشخيصه كنسختي React مختلفتين، ونُقلت `lucide-react` إلى `client/package.json` ثم أعيد تشغيل Vite، وعاد Home للعمل. هذه المعالجة محفوظة في سجل Git.
+
+الاختبار البصري أظهر أن Home بعرض 375px يبدأ أسفل TopBar وأن BottomNav لا يغطي المحتوى. صفحات Watchlists وAlerts وPortfolio أعادت إلى Login بشكل صحيح عند غياب الجلسة. لم يتم تجاوز المصادقة في اختبار القوائم حمايةً للعقد الأمني. Virtual scrolling لم يُضف لأن الجداول الحالية ليست قائمة ضخمة؛ استخدامه الآن سيضيف تعقيداً دون فائدة مقاسة.
+
+نتائج التحقق: TypeScript ناجح، Build ناجح، Format Check ناجح، و91 اختبار واجهة ناجح. لم يتم النشر. Commits الموبايل: `4b21132`، `4eb90d9`، `1db790c`، `dce91a0`، `1af72d9`، `4bc43dd`.
