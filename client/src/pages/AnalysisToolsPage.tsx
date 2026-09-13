@@ -95,16 +95,18 @@ export function BacktestPage() {
 	async function run() {
 		setError('')
 		setResult(null)
-		if (prices.length < 40)
-			return setError('أدخل 40 سعراً تاريخياً على الأقل مفصولة بفواصل.')
 		try {
 			const endpoint = strategy === 'indicators' ? 'indicators' : strategy
+			const manual =
+				prices.length >= 40
+					? `&prices=${encodeURIComponent(prices.join(','))}`
+					: ''
 			const response = await api<{ data: BacktestResult }>(
-				`/api/backtest/${symbol}/${endpoint}?prices=${encodeURIComponent(prices.join(','))}&lookback=${period === '3y' ? 90 : period === '2y' ? 60 : 30}`,
+				`/api/backtest/${symbol}/${endpoint}?lookback=${period === '3y' ? 90 : period === '2y' ? 60 : 30}${manual}`,
 			)
 			setResult(response.data)
 			const score = await api<ConsensusResult>(
-				`/api/analysis/${symbol}/consensus?prices=${encodeURIComponent(prices.join(','))}`,
+				`/api/analysis/${symbol}/consensus${manual ? `?prices=${encodeURIComponent(prices.join(','))}` : ''}`,
 			)
 			setConsensus(score)
 		} catch (cause) {
@@ -156,11 +158,11 @@ export function BacktestPage() {
 					</select>
 				</label>
 				<label className="wide-field">
-					الأسعار التاريخية
+					أسعار يدوية اختيارية
 					<input
 						value={pricesText}
 						onChange={(event) => setPricesText(event.target.value)}
-						placeholder="100,101.2,99.8,..."
+						placeholder="اتركها فارغة للجلب التلقائي"
 					/>
 				</label>
 				<button className="primary-button" onClick={run}>

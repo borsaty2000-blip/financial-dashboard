@@ -1,5 +1,9 @@
 import { Router, type Request, type Response } from 'express'
 import { runBacktest } from '../services/analysis/backtesting.python.js'
+import {
+	CandlesService,
+	type CandleMarket,
+} from '../services/market/candles.service.js'
 
 export const backtestRoutes = Router()
 
@@ -12,17 +16,30 @@ function numbers(value: unknown) {
 		: []
 }
 
+function market(value: unknown): CandleMarket {
+	return value === 'TASI' || value === 'GLOBAL' ? value : 'EGX'
+}
+
 async function handle(
 	strategy: 'elliott' | 'gann' | 'indicators',
 	request: Request,
 	response: Response,
 ) {
-	const prices = numbers(request.query.prices)
+	let prices = numbers(request.query.prices)
 	const lookback = Math.max(
 		5,
 		Math.min(365, Number(request.query.lookback ?? 30)),
 	)
 	const horizon = Math.max(1, Math.min(90, Number(request.query.horizon ?? 7)))
+	if (!prices.length) {
+		const candles = await CandlesService.getCandles(
+			request.params.symbol,
+			market(request.query.market),
+			'1d',
+			Math.max(lookback + horizon + 1, 250),
+		)
+		prices = candles.candles.map((candle) => candle.close)
+	}
 	if (prices.length < Math.max(lookback + horizon + 1, 40))
 		return response.status(503).json({
 			status: 'unavailable',
