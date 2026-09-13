@@ -1,13 +1,18 @@
 {
-	"name": "بورصتي - منصة التحليل المالي الذكية",
+	"name": "بورصتي - Borsaty",
 	"short_name": "بورصتي",
-	"description": "منصة عربية للتحليل المالي وإدارة الحسابات التعليمية",
-	"start_url": "/dashboard",
+	"description": "منصة التحليل المالي الذكية للأسواق العربية",
+	"start_url": "/",
 	"display": "standalone",
 	"dir": "rtl",
 	"lang": "ar",
-	"theme_color": "#0071bc",
-	"background_color": "#f8f9fa",
+	"orientation": "portrait",
+	"theme_color": "#171b20",
+	"background_color": "#ffffff",
+	"shortcuts": [
+		{ "name": "مقارنة الأسهم", "url": "/compare" },
+		{ "name": "المحفظة", "url": "/portfolio" }
+	],
 	"icons": [
 		{
 			"src": "/favicon.svg",
