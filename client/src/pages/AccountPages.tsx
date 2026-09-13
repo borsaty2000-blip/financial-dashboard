@@ -17,6 +17,17 @@ function Shell({ children }: { children: ReactNode }) {
 	)
 	const [menuOpen, setMenuOpen] = useState(false)
 	const [notificationsOpen, setNotificationsOpen] = useState(false)
+	const [search, setSearch] = useState('')
+	useEffect(() => {
+		const onShortcut = (event: KeyboardEvent) => {
+			if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+				event.preventDefault()
+				document.getElementById('global-search')?.focus()
+			}
+		}
+		window.addEventListener('keydown', onShortcut)
+		return () => window.removeEventListener('keydown', onShortcut)
+	}, [])
 	useEffect(() => {
 		document.body.classList.toggle('dark-mode', dark)
 		localStorage.setItem('borsaty_theme', dark ? 'dark' : 'light')
@@ -25,8 +36,19 @@ function Shell({ children }: { children: ReactNode }) {
 		<div className="app-shell" dir="rtl">
 			<header className="topbar">
 				<button className="brand" onClick={() => navigate('/dashboard')}>
-					بورصتي <span>Terminal</span>
+					بورصتي <span>BORSATY</span>
 				</button>
+				<label className="global-search">
+					<span aria-hidden="true">⌕</span>
+					<input
+						id="global-search"
+						value={search}
+						onChange={(event) => setSearch(event.target.value)}
+						placeholder="ابحث عن سهم..."
+						aria-label="ابحث عن سهم"
+					/>
+					<kbd>Ctrl K</kbd>
+				</label>
 				<nav>
 					<button onClick={() => navigate('/dashboard')}>الرئيسية</button>
 					<button onClick={() => navigate('/profile/me')}>الملف الشخصي</button>

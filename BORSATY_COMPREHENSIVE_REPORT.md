@@ -431,3 +431,11 @@ level = floor(XP / 100) + 1
 لم تتم إضافة Google Analytics لعدم توفر `GA_MEASUREMENT_ID`. ولم تتم إضافة Sentry SDK في هذه المراجعة لأن وجود `SENTRY_DSN` وحده لا يكفي لتأكيد إعداد المشروع، ولأن تفعيل المراقبة يحتاج اختيار بيئة الإنتاج وسياسة إرسال الأخطاء. OAuth الاجتماعي اختياري ويتطلب Client IDs وRedirect URLs من مزودي الخدمة.
 
 آخر commit لهذه المراجعة هو `74e0fd9 feat: complete legal seo and pwa foundations`، وأصبح المستودع متزامناً مع `origin/main`.
+
+## ملحق إعادة الهندسة البصرية — 13 سبتمبر 2026
+
+تم تنفيذ المرحلة الأولى من إعادة التصميم بمستوى Bloomberg/TradingView داخل الواجهة الحالية دون تغيير Backend أو اختلاق بيانات سوقية. أُنشئ ملف `client/src/styles/design-tokens.css` ويحتوي على Type Scale من 11px إلى 48px، أوزان الخطوط، 8px spacing grid، ألوان الأسواق، وخصائص tabular numbers للأرقام المالية. تم ربطه بالـCSS العام.
+
+تم تحديث TopBar إلى ارتفاع 64px مع شعار BORSATY، شريط بحث بعرض متجاوب واختصار `Ctrl+K`، تحسين محاذاة RTL، أحجام النقر، وحالات Hover/Focus. كما تم تطبيق تحسينات على Hero وCards وPanels والأزرار والأرقام المالية، إضافة إلى transitions قصيرة ورفع البطاقات ودعم `prefers-reduced-motion` وتحسين Dark Mode.
+
+نتائج التحقق: TypeScript ناجح، 4 اختبارات Auth ناجحة، 19 ملف اختبار و91 اختباراً ناجحاً، Build ناجح، وFormat Check ناجح. لم يتم النشر.

@@ -1,0 +1,56 @@
+:root {
+	--font-ar: 'Cairo', sans-serif;
+	--font-ui: 'Inter', sans-serif;
+	--font-number: 'JetBrains Mono', monospace;
+	--text-xs: 11px;
+	--text-sm: 13px;
+	--text-base: 15px;
+	--text-lg: 17px;
+	--text-xl: 20px;
+	--text-2xl: 24px;
+	--text-3xl: 30px;
+	--text-4xl: 36px;
+	--text-5xl: 48px;
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 20px;
+	--space-6: 24px;
+	--space-8: 32px;
+	--space-10: 40px;
+	--space-12: 48px;
+	--space-16: 64px;
+	--space-20: 80px;
+	--space-24: 96px;
+	--gray-50: #f9fafb;
+	--gray-100: #f3f4f6;
+	--gray-200: #e5e7eb;
+	--gray-300: #d1d5db;
+	--gray-400: #9ca3af;
+	--gray-500: #6b7280;
+	--gray-600: #4b5563;
+	--gray-700: #374151;
+	--gray-800: #1f2937;
+	--gray-900: #111827;
+	--primary-500: #0071bc;
+	--primary-600: #005a96;
+	--success-500: #00a651;
+	--danger-500: #e74c3c;
+	--warning-500: #f39c12;
+	--market-egx: #c8102e;
+	--market-tasi: #006c35;
+	--market-gold: #d7a400;
+	--market-silver: #8d99a6;
+}
+
+.financial-number,
+.metric strong,
+.metric-value,
+.stock-card b,
+.news-date {
+	font-family: var(--font-number);
+	font-variant-numeric: tabular-nums;
+	font-feature-settings: 'tnum';
+	letter-spacing: 0.02em;
+}
