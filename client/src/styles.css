@@ -402,8 +402,21 @@ select:focus-visible {
 	color: #1a1a1a;
 }
 .field input:focus,
-.field select:focus {
+.field select:focus,
+.field textarea:focus {
 	border-color: var(--primary);
+}
+.field textarea {
+	min-height: 90px;
+	border: 1px solid var(--border);
+	border-radius: 7px;
+	padding: 10px 12px;
+	resize: vertical;
+	background: #fff;
+	color: #1a1a1a;
+}
+.edit-profile-panel {
+	margin-top: 16px;
 }
 .form-row,
 .form-actions {

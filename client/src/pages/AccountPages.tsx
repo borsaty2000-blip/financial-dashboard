@@ -614,9 +614,23 @@ export function ProfilePage() {
 	const username = window.location.pathname.split('/').pop()
 	const [profile, setProfile] = useState<any>(null)
 	const [tab, setTab] = useState('overview')
+	const [editing, setEditing] = useState(false)
+	const [editData, setEditData] = useState({
+		fullName: '',
+		bio: '',
+		country: '',
+	})
 	useEffect(() => {
 		void api(username === 'me' ? '/api/profile' : `/api/profile/${username}`)
-			.then((r: any) => setProfile(r.profile ?? r))
+			.then((r: any) => {
+				const next = r.profile ?? r
+				setProfile(next)
+				setEditData({
+					fullName: next.fullName ?? '',
+					bio: next.bio ?? '',
+					country: next.country ?? '',
+				})
+			})
 			.catch(() => setProfile(user))
 	}, [username])
 	const p = profile || user
@@ -633,7 +647,9 @@ export function ProfilePage() {
 				</div>
 				<button
 					className="primary-button"
-					onClick={() => navigate('/dashboard')}
+					onClick={() =>
+						username === 'me' ? setEditing((v) => !v) : undefined
+					}
 				>
 					{username === 'me'
 						? 'تخصيص الملف'
@@ -642,6 +658,53 @@ export function ProfilePage() {
 							: 'متابعة'}
 				</button>
 			</div>
+			{editing && username === 'me' && (
+				<section className="panel edit-profile-panel">
+					<div className="panel-title">
+						<h2>تعديل الملف</h2>
+						<button className="link-button" onClick={() => setEditing(false)}>
+							إلغاء
+						</button>
+					</div>
+					<Field
+						label="الاسم الكامل"
+						value={editData.fullName}
+						onChange={(e) =>
+							setEditData({ ...editData, fullName: e.target.value })
+						}
+					/>
+					<label className="field">
+						<span>نبذة عنك</span>
+						<textarea
+							value={editData.bio}
+							maxLength={500}
+							onChange={(e) =>
+								setEditData({ ...editData, bio: e.target.value })
+							}
+						/>
+					</label>
+					<Field
+						label="الدولة"
+						value={editData.country}
+						onChange={(e) =>
+							setEditData({ ...editData, country: e.target.value })
+						}
+					/>
+					<button
+						className="primary-button"
+						onClick={async () => {
+							const result = await api<any>('/api/profile', {
+								method: 'PUT',
+								body: JSON.stringify(editData),
+							})
+							setProfile(result.profile ?? result)
+							setEditing(false)
+						}}
+					>
+						حفظ التغييرات
+					</button>
+				</section>
+			)}
 			<div className="stats-bar">
 				<Metric label="المتابعون" value="—" />
 				<Metric label="يتابع" value="—" />
