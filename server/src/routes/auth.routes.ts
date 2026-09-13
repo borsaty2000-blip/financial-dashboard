@@ -13,12 +13,13 @@ import { requireAuth } from '../middleware/auth.js'
 import {
 	authRateLimit,
 	forgotRateLimit,
+	loginRateLimit,
 	resetRateLimit,
 } from '../middleware/rateLimit.js'
 
 export const authRoutes = Router()
 authRoutes.post('/register', authRateLimit, registerController)
-authRoutes.post('/login', authRateLimit, loginController)
+authRoutes.post('/login', loginRateLimit, loginController)
 authRoutes.post('/logout', logoutController)
 authRoutes.post('/refresh', refreshController)
 authRoutes.get('/me', requireAuth, meController)

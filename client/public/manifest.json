@@ -8,5 +8,12 @@
 	"lang": "ar",
 	"theme_color": "#0071bc",
 	"background_color": "#f8f9fa",
-	"icons": []
+	"icons": [
+		{
+			"src": "/favicon.svg",
+			"sizes": "64x64",
+			"type": "image/svg+xml",
+			"purpose": "any maskable"
+		}
+	]
 }

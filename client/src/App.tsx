@@ -2,6 +2,7 @@ import FinancialReportSection from '@client/modules/financial-report/ui/Financia
 import { AuthProvider } from './contexts/AuthContext'
 import { ToastProvider } from './contexts/ToastContext'
 import ProtectedRoute from './components/ProtectedRoute'
+import InstallPrompt from './components/InstallPrompt'
 import { useLocation } from './router'
 import {
 	AchievementsPage,
@@ -13,6 +14,7 @@ import {
 	ResetPage,
 } from './pages/AccountPages'
 import {
+	AboutPage,
 	DisclaimerPage,
 	NotFoundPage,
 	PrivacyPage,
@@ -29,6 +31,7 @@ function RoutedApp() {
 	if (path === '/terms') return <TermsPage />
 	if (path === '/privacy') return <PrivacyPage />
 	if (path === '/disclaimer') return <DisclaimerPage />
+	if (path === '/about') return <AboutPage />
 	if (
 		path === '/dashboard' ||
 		path === '/achievements' ||
@@ -57,6 +60,7 @@ export function App() {
 		<AuthProvider>
 			<ToastProvider>
 				<RoutedApp />
+				<InstallPrompt />
 			</ToastProvider>
 		</AuthProvider>
 	)
