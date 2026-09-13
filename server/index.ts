@@ -13,6 +13,7 @@ import { marketRoutes } from './src/routes/market.routes.js'
 import { analysisRoutes } from './src/routes/analysis.routes.js'
 import { shariahRoutes } from './src/routes/shariah.routes.js'
 import { tradingViewRoutes } from './src/routes/tradingview.routes.js'
+import { backtestRoutes } from './src/routes/backtest.routes.js'
 import { attachSignalSocket } from './src/services/tradingview/signal-bus.js'
 
 const app = express()
@@ -77,6 +78,7 @@ app.use('/api/market', marketRoutes)
 app.use('/api/analysis', analysisRoutes)
 app.use('/api/shariah', shariahRoutes)
 app.use('/api/tradingview/webhook', tradingViewRoutes)
+app.use('/api/backtest', backtestRoutes)
 app.use(
 	'/uploads',
 	express.static(path.join(process.cwd(), 'server', 'uploads')),
