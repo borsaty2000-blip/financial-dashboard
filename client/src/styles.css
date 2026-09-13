@@ -1756,3 +1756,102 @@ body.dark-mode {
 	display: block;
 	padding: 9px 4px 2px;
 }
+
+.error-page {
+	min-height: 100vh;
+	display: grid;
+	place-items: center;
+	padding: 24px;
+	background: var(--soft);
+}
+.error-card {
+	width: min(440px, 100%);
+	display: grid;
+	gap: 12px;
+	padding: 28px;
+	border: 1px solid var(--border);
+	border-radius: 14px;
+	background: var(--surface);
+	box-shadow: var(--shadow);
+	text-align: center;
+}
+.error-card strong {
+	font-size: 22px;
+}
+.error-card p,
+.error-card small {
+	color: var(--muted);
+}
+.skeleton-list,
+.skeleton-analysis {
+	display: grid;
+	gap: 10px;
+}
+.skeleton-row {
+	min-height: 52px;
+	display: grid;
+	grid-template-columns: 34px 1fr 70px;
+	gap: 12px;
+	align-items: center;
+}
+.skeleton-row i,
+.skeleton-row span,
+.skeleton-row b,
+.skeleton-analysis i,
+.skeleton-metrics i,
+.skeleton-detail i,
+.skeleton-detail span,
+.skeleton-detail b {
+	display: block;
+	border-radius: 7px;
+	background: linear-gradient(90deg, #eef1f4, #fafafa, #eef1f4);
+	background-size: 200% 100%;
+	animation: skeleton-pulse 1.2s ease-in-out infinite;
+}
+.skeleton-row i {
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+}
+.skeleton-row span {
+	height: 12px;
+}
+.skeleton-row b {
+	height: 18px;
+}
+.skeleton-metrics {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 12px;
+}
+.skeleton-metrics i {
+	height: 82px;
+}
+.skeleton-analysis i {
+	height: 90px;
+}
+.skeleton-detail {
+	display: grid;
+	gap: 12px;
+}
+.skeleton-detail i {
+	width: 72px;
+	height: 72px;
+	border-radius: 50%;
+}
+.skeleton-detail span {
+	height: 18px;
+	width: 70%;
+}
+.skeleton-detail b {
+	height: 34px;
+	width: 40%;
+}
+@keyframes skeleton-pulse {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}

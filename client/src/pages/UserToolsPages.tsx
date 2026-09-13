@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
 import { navigate } from '../router'
+import { StockListSkeleton } from '../components/Skeletons'
 
 type Item = { symbol: string; market: string }
 type Watchlist = { id: string; name: string; items: Item[] }
@@ -64,7 +65,9 @@ export function WatchlistsPage() {
 	const [notifications, setNotifications] = useState<Notification[]>([])
 	const [symbol, setSymbol] = useState('')
 	const [error, setError] = useState('')
+	const [loading, setLoading] = useState(true)
 	async function load() {
+		setLoading(true)
 		try {
 			const [watchlists, notes] = await Promise.all([
 				api<Watchlist[]>('/api/watchlists'),
@@ -74,6 +77,8 @@ export function WatchlistsPage() {
 			setNotifications(notes)
 		} catch (cause) {
 			setError(cause instanceof Error ? cause.message : 'تعذر تحميل القوائم')
+		} finally {
+			setLoading(false)
 		}
 	}
 	useEffect(() => {
@@ -118,27 +123,31 @@ export function WatchlistsPage() {
 					</button>
 				</div>
 				{error && <div className="analysis-error">{error}</div>}
-				{lists.map((list) => (
-					<article className="tool-card" key={list.id}>
-						<h2>{list.name}</h2>
-						{list.items.length ? (
-							list.items.map((item) => (
-								<div className="tool-row" key={item.symbol}>
-									<b>{item.symbol}</b>
-									<span>{item.market}</span>
-									<button
-										className="link-button"
-										onClick={() => navigate(`/stock/${item.symbol}`)}
-									>
-										التفاصيل
-									</button>
-								</div>
-							))
-						) : (
-							<p className="muted">لم تضف أسهماً بعد.</p>
-						)}
-					</article>
-				))}
+				{loading ? (
+					<StockListSkeleton />
+				) : (
+					lists.map((list) => (
+						<article className="tool-card" key={list.id}>
+							<h2>{list.name}</h2>
+							{list.items.length ? (
+								list.items.map((item) => (
+									<div className="tool-row" key={item.symbol}>
+										<b>{item.symbol}</b>
+										<span>{item.market}</span>
+										<button
+											className="link-button"
+											onClick={() => navigate(`/stock/${item.symbol}`)}
+										>
+											التفاصيل
+										</button>
+									</div>
+								))
+							) : (
+								<p className="muted">لم تضف أسهماً بعد.</p>
+							)}
+						</article>
+					))
+				)}
 			</section>
 		</main>
 	)
@@ -150,13 +159,19 @@ export function AlertsPage() {
 	const [target, setTarget] = useState('100')
 	const [condition, setCondition] = useState('ABOVE')
 	const [notifications, setNotifications] = useState<Notification[]>([])
+	const [loading, setLoading] = useState(true)
 	async function load() {
-		const [data, notes] = await Promise.all([
-			api<Alert[]>('/api/alerts'),
-			api<Notification[]>('/api/notifications'),
-		])
-		setAlerts(data)
-		setNotifications(notes)
+		setLoading(true)
+		try {
+			const [data, notes] = await Promise.all([
+				api<Alert[]>('/api/alerts'),
+				api<Notification[]>('/api/notifications'),
+			])
+			setAlerts(data)
+			setNotifications(notes)
+		} finally {
+			setLoading(false)
+		}
 	}
 	useEffect(() => {
 		void load()
@@ -202,27 +217,31 @@ export function AlertsPage() {
 						إنشاء تنبيه
 					</button>
 				</div>
-				<article className="tool-card">
-					{alerts.map((alert) => (
-						<div className="tool-row" key={alert.id}>
-							<b>{alert.symbol}</b>
-							<span>
-								{alert.condition} {alert.targetValue}
-							</span>
-							<span>{alert.isActive ? 'نشط' : 'تم التفعيل'}</span>
-							<button
-								className="link-button"
-								onClick={() =>
-									api(`/api/alerts/${alert.id}`, { method: 'DELETE' }).then(
-										() => load(),
-									)
-								}
-							>
-								حذف
-							</button>
-						</div>
-					))}
-				</article>
+				{loading ? (
+					<StockListSkeleton />
+				) : (
+					<article className="tool-card">
+						{alerts.map((alert) => (
+							<div className="tool-row" key={alert.id}>
+								<b>{alert.symbol}</b>
+								<span>
+									{alert.condition} {alert.targetValue}
+								</span>
+								<span>{alert.isActive ? 'نشط' : 'تم التفعيل'}</span>
+								<button
+									className="link-button"
+									onClick={() =>
+										api(`/api/alerts/${alert.id}`, { method: 'DELETE' }).then(
+											() => load(),
+										)
+									}
+								>
+									حذف
+								</button>
+							</div>
+						))}
+					</article>
+				)}
 			</section>
 		</main>
 	)

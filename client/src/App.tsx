@@ -24,6 +24,7 @@ import { BacktestPage, CandlestickPage } from './pages/AnalysisToolsPage'
 import { AlertsPage, WatchlistsPage } from './pages/UserToolsPages'
 import { PortfolioPage } from './pages/PortfolioPage'
 import GlobalSearch from './components/GlobalSearch'
+import ErrorBoundary from './components/ErrorBoundary'
 
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
@@ -83,12 +84,14 @@ function RoutedApp() {
 }
 export function App() {
 	return (
-		<AuthProvider>
-			<ToastProvider>
-				<RoutedApp />
-				<GlobalSearch />
-				<InstallPrompt />
-			</ToastProvider>
-		</AuthProvider>
+		<ErrorBoundary>
+			<AuthProvider>
+				<ToastProvider>
+					<RoutedApp />
+					<GlobalSearch />
+					<InstallPrompt />
+				</ToastProvider>
+			</AuthProvider>
+		</ErrorBoundary>
 	)
 }
