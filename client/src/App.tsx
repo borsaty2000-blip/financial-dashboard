@@ -1,4 +1,4 @@
-import FinancialReportSection from '@client/modules/financial-report/ui/FinancialReportSection'
+import { lazy, Suspense } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import { ToastProvider } from './contexts/ToastContext'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -20,6 +20,10 @@ import {
 	PrivacyPage,
 	TermsPage,
 } from './pages/LegalPages'
+
+const FinancialReportSection = lazy(
+	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
+)
 
 function RoutedApp() {
 	const location = useLocation()
@@ -51,7 +55,11 @@ function RoutedApp() {
 	if (path !== '/') return <NotFoundPage />
 	return (
 		<main className="legacy-page">
-			<FinancialReportSection />
+			<Suspense
+				fallback={<div className="loading-screen">جارٍ تحميل التقرير...</div>}
+			>
+				<FinancialReportSection />
+			</Suspense>
 		</main>
 	)
 }

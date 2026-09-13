@@ -770,7 +770,11 @@ export function ProfilePage() {
 		<Shell>
 			<div className="profile-cover">
 				<div className="profile-avatar">
-					{p?.fullName?.[0] || p?.username?.[0] || 'ب'}
+					{p?.avatarUrl ? (
+						<img src={p.avatarUrl} alt="الصورة الشخصية" />
+					) : (
+						p?.fullName?.[0] || p?.username?.[0] || 'ب'
+					)}
 				</div>
 				<div className="profile-head">
 					<h1>{p?.fullName || p?.username}</h1>

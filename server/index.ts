@@ -66,6 +66,14 @@ app.get('/api/health', (_request, response) => {
 	response.json({ ok: true, service: 'financial-dashboard-api' })
 })
 
+app.get('/api/market/summary', (_request, response) => {
+	response.json({ ok: true, available: false, data: {} })
+})
+
+app.get('/api/market/egx/summary', (_request, response) => {
+	response.json({ ok: true, available: false, data: {} })
+})
+
 app.use('/api/auth', authRoutes)
 app.use(
 	'/uploads',

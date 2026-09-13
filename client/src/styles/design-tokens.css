@@ -1,15 +1,23 @@
 :root {
-	--font-ar: 'Cairo', sans-serif;
-	--font-ui: 'Inter', sans-serif;
+	--font-ar: 'Cairo', system-ui, sans-serif;
+	--font-ui: 'Inter', system-ui, sans-serif;
 	--font-number: 'JetBrains Mono', monospace;
 	--text-xs: 11px;
+	--leading-xs: 16px;
 	--text-sm: 13px;
+	--leading-sm: 20px;
 	--text-base: 15px;
+	--leading-base: 24px;
 	--text-lg: 17px;
+	--leading-lg: 26px;
 	--text-xl: 20px;
+	--leading-xl: 30px;
 	--text-2xl: 24px;
+	--leading-2xl: 32px;
 	--text-3xl: 30px;
+	--leading-3xl: 38px;
 	--text-4xl: 36px;
+	--leading-4xl: 44px;
 	--text-5xl: 48px;
 	--space-1: 4px;
 	--space-2: 8px;
@@ -44,6 +52,26 @@
 	--market-silver: #8d99a6;
 }
 
+body {
+	font-family: var(--font-ar);
+	font-size: var(--text-base);
+	line-height: var(--leading-base);
+	color: var(--gray-900);
+	-webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--font-ar);
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+.numeric,
 .financial-number,
 .metric strong,
 .metric-value,
@@ -53,4 +81,37 @@
 	font-variant-numeric: tabular-nums;
 	font-feature-settings: 'tnum';
 	letter-spacing: 0.02em;
+}
+
+.card-standard,
+.panel,
+.metric,
+.stock-card {
+	border: 1px solid #e4e8ec;
+	border-radius: 12px;
+	box-shadow: 0 1px 3px rgb(0 0 0 / 4%);
+	transition:
+		box-shadow 150ms ease,
+		transform 150ms ease;
+}
+
+.card-standard:hover,
+.panel:hover,
+.stock-card:hover {
+	box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		scroll-behavior: auto !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+
+.dark-mode {
+	--gray-50: #101418;
+	--gray-100: #171c22;
+	--gray-900: #f5f7fa;
 }
