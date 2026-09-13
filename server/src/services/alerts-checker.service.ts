@@ -15,13 +15,21 @@ async function checkAlerts() {
 				2,
 			)
 			const latest = candles.candles.at(-1)?.close
+			const previous = candles.candles.at(-2)?.close
 			if (!latest) continue
+			const changePercent = previous
+				? ((latest - previous) / previous) * 100
+				: 0
 			const triggered =
 				alert.condition === 'ABOVE'
 					? latest >= alert.targetValue
 					: alert.condition === 'BELOW'
 						? latest <= alert.targetValue
-						: false
+						: alert.condition === 'PERCENT_UP'
+							? changePercent >= alert.targetValue
+							: alert.condition === 'PERCENT_DOWN'
+								? changePercent <= -Math.abs(alert.targetValue)
+								: false
 			if (!triggered) continue
 			const notification = await prisma.$transaction(async (tx) => {
 				const updated = await tx.priceAlert.updateMany({

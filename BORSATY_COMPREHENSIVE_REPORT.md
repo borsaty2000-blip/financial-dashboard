@@ -508,3 +508,17 @@ Commits هذه المرحلة: `6d214b8` للإحصاء، `3ee6038` للتنبؤ
 
 البيانات التاريخية ليست مخترعة: أضيف `CandlesService` مع cache لمدة خمس دقائق وتسلسل fallback: Yahoo Finance ثم Stooq ثم Twelve Data ثم Finnhub. أصبحت الواجهة تجلب الشموع تلقائياً، مع إبقاء إدخال الأسعار اليدوي اختيارياً للاختبار. عند فشل كل المصادر يعاد 404 وحالة `unavailable` بدلاً من أرقام وهمية. TypeScript وBuild وFormat Check و91 اختبار واجهة و4 اختبارات Auth واختبارات Python وHTTP للمحركات الثلاثة ناجحة. لم يتم النشر.
 تمت إضافة `server/src/routes/backtest.routes.ts` و`backtesting.python.ts` لربط صفحة `/backtest` فعلياً بخدمة Python عبر `/api/backtest/:symbol/elliott` و`/api/backtest/:symbol/gann` و`/api/backtest/:symbol/indicators`. اختبار Node → Python لمسار Gann نجح HTTP 200. آخر commit لهذه الإضافة هو `2c4f307`.
+
+## ملحق pasted_content_24 — User Tools and Reliability
+
+تمت إضافة نماذج Prisma لـWatchlist وWatchlistItem وPriceAlert وNotification وPortfolio وPosition وOrder، مع علاقات User وقيود uniqueness والفهارس المطلوبة. نجح `prisma generate` وتولدت migration SQL في `prisma/migrations/20260913220500_add_watchlist_alerts_notifications/`. لم تُطبّق migration على قاعدة البيانات لأن `DATABASE_URL` المتاح في البيئة الحالية لا يبدأ بـ`postgresql://` أو `postgres://`؛ لذلك لا يمكن تنفيذ اتصال آمن بقاعدة البيانات من هذه المهمة.
+
+تمت إضافة المسارات المحمية `/api/watchlists` و`/api/alerts` و`/api/notifications`، وخدمة Alert Checker تعمل كل 60 ثانية وتستخدم CandlesService، وتدعم ABOVE وBELOW وPERCENT_UP وPERCENT_DOWN، وتنشئ Notification عند التفعيل وتبث حدث Socket.io.
+
+تمت إضافة Paper Trading في `/api/trading/buy` و`/api/trading/sell` و`/api/trading/portfolio` و`/api/trading/positions` و`/api/trading/orders` و`/api/trading/performance`، مع صفحة `/portfolio` ورصيد ابتدائي افتراضي وقواعد تحقق للشراء والبيع.
+
+تمت إضافة `GET /api/search?q=` مع بحث الرموز والأسماء ونتائج الأسعار والتغير من CandlesService، ومكوّن Global Search يعمل عبر Ctrl+K والتنقل بالأسهم وEnter. أضيفت صفحات `/watchlists` و`/alerts` مع notification dropdown وآخر الإشعارات.
+
+تمت إضافة React Error Boundary برسالة عربية وزر Retry، ومكونات StockListSkeleton وStockDetailSkeleton وPortfolioSkeleton وAnalysisSkeleton، ودمج Skeleton في صفحات أدوات المستخدم. نجح TypeScript وBuild وFormat Check والاختبارات الأمامية.
+
+Commits المهمة: `f832258` لـWatchlist/Alerts/Notifications، `b1436bd` لـPaper Trading، `74cd7a7` لـSearch، و`37a7898` لـError Boundary وSkeleton Loaders. لم يتم النشر.
