@@ -15,3 +15,8 @@ yarn-debug.log*
 yarn-error.log*
 *.log
 *.min.js
+
+.env
+.env.*
+!.env.example
+server/.env

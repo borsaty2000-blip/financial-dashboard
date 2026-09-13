@@ -15,6 +15,9 @@
 		"format": "prettier --write .",
 		"format:check": "prettier --check ."
 	},
+	"prisma": {
+		"seed": "tsx prisma/seed.ts"
+	},
 	"dependencies": {
 		"@prisma/client": "^6.17.1",
 		"express": "^4.22.2"
