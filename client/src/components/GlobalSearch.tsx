@@ -33,6 +33,11 @@ export default function GlobalSearch() {
 		return () => window.removeEventListener('keydown', handler)
 	}, [open, results, selected])
 	useEffect(() => {
+		const openSearch = () => setOpen(true)
+		window.addEventListener('borsaty-open-search', openSearch)
+		return () => window.removeEventListener('borsaty-open-search', openSearch)
+	}, [])
+	useEffect(() => {
 		if (!query.trim()) return setResults([])
 		const timer = window.setTimeout(() => {
 			void api<Result[]>(`/api/search?q=${encodeURIComponent(query)}`)
