@@ -11,6 +11,7 @@ import {
 	forecastLSTM,
 } from '../services/analysis/statistical.service.js'
 import { ConsensusService } from '../services/analysis/consensus.service.js'
+import { analyzeCandlesticks } from '../services/analysis/candlestick.python.js'
 
 export const analysisRoutes = Router()
 
@@ -29,6 +30,49 @@ function querySteps(value: unknown) {
 		: 30
 }
 
+function queryNumbers(value: unknown) {
+	return typeof value === 'string'
+		? value
+				.split(',')
+				.map(Number)
+				.filter((number) => Number.isFinite(number))
+		: []
+}
+
+analysisRoutes.get('/:symbol/candlestick', async (request, response) => {
+	const opens = queryNumbers(request.query.opens)
+	const highs = queryNumbers(request.query.highs)
+	const lows = queryNumbers(request.query.lows)
+	const closes = queryNumbers(request.query.closes)
+	const dates =
+		typeof request.query.dates === 'string'
+			? request.query.dates.split(',')
+			: []
+	if (
+		opens.length < 2 ||
+		opens.length !== highs.length ||
+		opens.length !== lows.length ||
+		opens.length !== closes.length
+	)
+		return response.status(503).json({
+			status: 'unavailable',
+			message: 'Matching OHLC arrays are required',
+		})
+	try {
+		return response.json(
+			await analyzeCandlesticks(opens, highs, lows, closes, dates),
+		)
+	} catch (error) {
+		return response.status(502).json({
+			status: 'error',
+			message:
+				error instanceof Error
+					? error.message
+					: 'Candlestick service unavailable',
+		})
+	}
+})
+
 analysisRoutes.get('/:symbol/consensus', async (request, response) => {
 	const prices = queryPrices(request.query.prices)
 	const dates =
@@ -36,12 +80,10 @@ analysisRoutes.get('/:symbol/consensus', async (request, response) => {
 			? request.query.dates.split(',')
 			: []
 	if (prices.length < 30)
-		return response
-			.status(503)
-			.json({
-				status: 'unavailable',
-				message: 'At least 30 prices are required',
-			})
+		return response.status(503).json({
+			status: 'unavailable',
+			message: 'At least 30 prices are required',
+		})
 	try {
 		return response.json(
 			await ConsensusService.calculate(
@@ -51,15 +93,13 @@ analysisRoutes.get('/:symbol/consensus', async (request, response) => {
 			),
 		)
 	} catch (error) {
-		return response
-			.status(502)
-			.json({
-				status: 'error',
-				message:
-					error instanceof Error
-						? error.message
-						: 'Consensus service unavailable',
-			})
+		return response.status(502).json({
+			status: 'error',
+			message:
+				error instanceof Error
+					? error.message
+					: 'Consensus service unavailable',
+		})
 	}
 })
 

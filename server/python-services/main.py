@@ -8,6 +8,7 @@ from services.gann import analyze_gann
 from services.statistical import calculate_statistics
 from services.forecasting import forecast_arima, forecast_lstm
 from services.backtesting import backtest_elliott, backtest_gann, backtest_indicators
+from services.candlestick import detect_candlestick_patterns
 from utils.data_prep import prepare_dates, prepare_prices
 
 app = FastAPI(title="Borsaty Analysis Service", version="1.0.0")
@@ -37,6 +38,14 @@ class BacktestData(BaseModel):
     lookback: int = Field(default=30, ge=5, le=365)
     horizon: int = Field(default=7, ge=1, le=90)
     strategy: str = "rsi_macd"
+
+
+class CandlestickData(BaseModel):
+    opens: List[float] = Field(min_length=2)
+    highs: List[float] = Field(min_length=2)
+    lows: List[float] = Field(min_length=2)
+    closes: List[float] = Field(min_length=2)
+    dates: List[str] | None = None
 
 
 @app.get("/health")
@@ -116,5 +125,13 @@ async def backtest_gann_endpoint(data: BacktestData) -> dict:
 async def backtest_indicators_endpoint(data: BacktestData) -> dict:
     try:
         return {"status": "success", "data": backtest_indicators(prepare_prices(data.prices), data.strategy, data.lookback, data.horizon)}
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@app.post("/analyze/candlestick")
+async def candlestick_endpoint(data: CandlestickData) -> dict:
+    try:
+        return {"status": "success", "data": detect_candlestick_patterns(data.opens, data.highs, data.lows, data.closes, data.dates)}
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error

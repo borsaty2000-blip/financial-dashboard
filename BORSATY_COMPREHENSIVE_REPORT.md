@@ -497,3 +497,13 @@ level = floor(XP / 100) + 1
 تمت إضافة `services/databricks.py` باستخدام `databricks-sql-connector`، مع قراءة `DATABRICKS_SERVER_HOSTNAME` و`DATABRICKS_HTTP_PATH` و`DATABRICKS_TOKEN` من البيئة، وحظر أي استعلام غير read-only. تم اختبار الحماية وغياب الاعتمادات دون إجراء اتصال خارجي.
 
 Commits هذه المرحلة: `6d214b8` للإحصاء، `3ee6038` للتنبؤ، `5084062` لتكامل Node، `6f35634` لـTradingView، و`92bc607` لـDatabricks. لم يتم النشر.
+
+## ملحق الميزات المجانية عالية التأثير — 13 سبتمبر 2026
+
+تم بناء Backtesting Engine في `server/python-services/services/backtesting.py` بثلاث استراتيجيات: Elliott وGann وRSI+MACD. يحسب إجمالي الصفقات والرابحة والخاسرة ونسبة النجاح ومتوسط العائد ومتوسط الخسارة وSharpe وMax Drawdown ومنحنى رأس المال، مع أفق افتراضي سبعة أيام وLookback قابل للتعديل. أضيفت endpoints `/backtest/elliott` و`/backtest/gann` و`/backtest/indicators`، واختبرت محلياً على 180 سعراً.
+
+تمت إضافة `ConsensusService` الذي يجمع Elliott وGann والمؤشرات وARIMA بأوزان 30% و20% و30% و20%، ويعيد score من 0 إلى 100 وsignal وconfidence وbreakdown وتوصية تعليمية. المسار الجديد هو `GET /api/analysis/:symbol/consensus`، ونجح اختبار COMI محلياً بدرجة توافق وHTTP 200.
+
+تم بناء Candlestick Engine من الصفر لكشف Doji وHammer وShooting Star وBullish Engulfing وBearish Engulfing من OHLC. أضيف `POST /analyze/candlestick` في Python و`GET /api/analysis/:symbol/candlestick` في Node، مع التحقق من اتساق مصفوفات OHLC. أضيفت واجهتا `/backtest` و`/candlestick` بتصميم RTL متجاوب، ومنحنى Equity Curve وConsensus breakdown وتنبيه تعليمي.
+
+البيانات التاريخية ليست مخترعة: الواجهة تطلب إدخال سلسلة أسعار حقيقية حالياً لأن Market API الحالي لا يوفر عقد شموع موحداً لكل الرموز. TypeScript وBuild وFormat Check و91 اختبار واجهة و4 اختبارات Auth واختبارات Python وHTTP للمحركات الثلاثة ناجحة. لم يتم النشر.
