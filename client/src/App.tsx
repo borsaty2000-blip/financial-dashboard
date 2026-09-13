@@ -1,9 +1,50 @@
 import FinancialReportSection from '@client/modules/financial-report/ui/FinancialReportSection'
+import { AuthProvider } from './contexts/AuthContext'
+import ProtectedRoute from './components/ProtectedRoute'
+import { useLocation } from './router'
+import {
+	AchievementsPage,
+	DashboardPage,
+	ForgotPage,
+	LoginPage,
+	ProfilePage,
+	RegisterPage,
+	ResetPage,
+} from './pages/AccountPages'
 
-export function App() {
+function RoutedApp() {
+	const location = useLocation()
+	const path = location.split('?')[0]
+	if (path === '/login') return <LoginPage />
+	if (path === '/register') return <RegisterPage />
+	if (path === '/forgot-password') return <ForgotPage />
+	if (path.startsWith('/reset-password/')) return <ResetPage />
+	if (
+		path === '/dashboard' ||
+		path === '/achievements' ||
+		path.startsWith('/profile/')
+	)
+		return (
+			<ProtectedRoute>
+				{path === '/dashboard' ? (
+					<DashboardPage />
+				) : path === '/achievements' ? (
+					<AchievementsPage />
+				) : (
+					<ProfilePage />
+				)}
+			</ProtectedRoute>
+		)
 	return (
-		<main className="bg-page flex min-h-screen flex-col px-4">
+		<main className="legacy-page">
 			<FinancialReportSection />
 		</main>
+	)
+}
+export function App() {
+	return (
+		<AuthProvider>
+			<RoutedApp />
+		</AuthProvider>
 	)
 }
