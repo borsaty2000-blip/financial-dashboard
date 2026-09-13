@@ -18,6 +18,7 @@ import { attachSignalSocket } from './src/services/tradingview/signal-bus.js'
 import { userToolsRoutes } from './src/routes/user-tools.routes.js'
 import { startAlertChecker } from './src/services/alerts-checker.service.js'
 import { tradingRoutes } from './src/routes/trading.routes.js'
+import { searchRoutes } from './src/routes/search.routes.js'
 
 const app = express()
 app.use(express.json())
@@ -84,6 +85,7 @@ app.use('/api/tradingview/webhook', tradingViewRoutes)
 app.use('/api/backtest', backtestRoutes)
 app.use('/api', userToolsRoutes)
 app.use('/api/trading', tradingRoutes)
+app.use('/api/search', searchRoutes)
 app.use(
 	'/uploads',
 	express.static(path.join(process.cwd(), 'server', 'uploads')),

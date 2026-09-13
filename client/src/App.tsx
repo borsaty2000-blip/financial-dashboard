@@ -23,6 +23,7 @@ import {
 import { BacktestPage, CandlestickPage } from './pages/AnalysisToolsPage'
 import { AlertsPage, WatchlistsPage } from './pages/UserToolsPages'
 import { PortfolioPage } from './pages/PortfolioPage'
+import GlobalSearch from './components/GlobalSearch'
 
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
@@ -85,6 +86,7 @@ export function App() {
 		<AuthProvider>
 			<ToastProvider>
 				<RoutedApp />
+				<GlobalSearch />
 				<InstallPrompt />
 			</ToastProvider>
 		</AuthProvider>
