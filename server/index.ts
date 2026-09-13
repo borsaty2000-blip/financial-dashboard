@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import { createServer } from 'node:http'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -11,6 +12,8 @@ import { achievementsRoutes } from './src/routes/achievements.routes.js'
 import { marketRoutes } from './src/routes/market.routes.js'
 import { analysisRoutes } from './src/routes/analysis.routes.js'
 import { shariahRoutes } from './src/routes/shariah.routes.js'
+import { tradingViewRoutes } from './src/routes/tradingview.routes.js'
+import { attachSignalSocket } from './src/services/tradingview/signal-bus.js'
 
 const app = express()
 app.use(express.json())
@@ -73,6 +76,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/market', marketRoutes)
 app.use('/api/analysis', analysisRoutes)
 app.use('/api/shariah', shariahRoutes)
+app.use('/api/tradingview/webhook', tradingViewRoutes)
 app.use(
 	'/uploads',
 	express.static(path.join(process.cwd(), 'server', 'uploads')),
@@ -84,7 +88,9 @@ app.use('/api/achievements', achievementsRoutes)
 export default app
 
 if (!process.env.VERCEL) {
-	app.listen(port, () => {
+	const httpServer = createServer(app)
+	attachSignalSocket(httpServer)
+	httpServer.listen(port, () => {
 		console.log(`Server running at http://localhost:${port}`)
 	})
 }

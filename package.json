@@ -32,6 +32,7 @@
 		"lightweight-charts-drawing": "github:borsaty2000-blip/lightweight-charts-drawing",
 		"multer": "^2.3.0",
 		"nodemailer": "^10.0.9",
+		"socket.io": "^4.8.3",
 		"trading-signals": "^8.3.0",
 		"zod": "^4.6.4"
 	},
