@@ -26,6 +26,7 @@ import { PortfolioPage } from './pages/PortfolioPage'
 import { ComparisonPage } from './pages/ComparisonPage'
 import GlobalSearch from './components/GlobalSearch'
 import ErrorBoundary from './components/ErrorBoundary'
+import MobileChrome from './components/MobileChrome'
 
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
@@ -90,6 +91,7 @@ export function App() {
 			<AuthProvider>
 				<ToastProvider>
 					<RoutedApp />
+					<MobileChrome />
 					<GlobalSearch />
 					<InstallPrompt />
 				</ToastProvider>
