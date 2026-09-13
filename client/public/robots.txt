@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /reset-password/
+Sitemap: https://borsatyai.com/sitemap.xml

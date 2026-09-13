@@ -1,0 +1,12 @@
+{
+	"name": "بورصتي - منصة التحليل المالي الذكية",
+	"short_name": "بورصتي",
+	"description": "منصة عربية للتحليل المالي وإدارة الحسابات التعليمية",
+	"start_url": "/dashboard",
+	"display": "standalone",
+	"dir": "rtl",
+	"lang": "ar",
+	"theme_color": "#0071bc",
+	"background_color": "#f8f9fa",
+	"icons": []
+}

@@ -7,3 +7,7 @@ document.documentElement.dir = 'rtl'
 const rootElement = document.getElementById('app')
 if (!rootElement) throw new Error('Root element "#app" was not found')
 createRoot(rootElement).render(<App />)
+
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+	navigator.serviceWorker.register('/sw.js').catch(() => undefined)
+}

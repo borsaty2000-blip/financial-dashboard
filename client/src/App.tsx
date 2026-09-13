@@ -12,6 +12,12 @@ import {
 	RegisterPage,
 	ResetPage,
 } from './pages/AccountPages'
+import {
+	DisclaimerPage,
+	NotFoundPage,
+	PrivacyPage,
+	TermsPage,
+} from './pages/LegalPages'
 
 function RoutedApp() {
 	const location = useLocation()
@@ -20,6 +26,9 @@ function RoutedApp() {
 	if (path === '/register') return <RegisterPage />
 	if (path === '/forgot-password') return <ForgotPage />
 	if (path.startsWith('/reset-password/')) return <ResetPage />
+	if (path === '/terms') return <TermsPage />
+	if (path === '/privacy') return <PrivacyPage />
+	if (path === '/disclaimer') return <DisclaimerPage />
 	if (
 		path === '/dashboard' ||
 		path === '/achievements' ||
@@ -36,6 +45,7 @@ function RoutedApp() {
 				)}
 			</ProtectedRoute>
 		)
+	if (path !== '/') return <NotFoundPage />
 	return (
 		<main className="legacy-page">
 			<FinancialReportSection />
