@@ -469,3 +469,9 @@ level = floor(XP / 100) + 1
 تمت قراءة README لمستودع ElliottWaves ومستودع lightweight-charts-drawing. مستودع ElliottWaves الحالي عبارة عن Notebook/سكريبت يعتمد pandas وmatplotlib وواجهته `ElliottWaveFindPattern` تطبع النتائج ولا تعيد عقد JSON مستقراً؛ لذلك لم يتم تحويله إلى Microservice تخميني. كما أن مستودع `Combining-Elliott-Wave-LSTM` غير موجود على GitHub بالمسار المطلوب، وفشلت محاولة الجلب مرة واحدة ولم تتكرر.
 
 تم تثبيت `lightweight-charts` بنجاح، لكن حزمة drawing fork تفتقد ملفات `dist` المشار إليها في exports، ففشل استيرادها دون تعديل المكتبة الخارجية. أضيف مكوّن `GannElliottChart.tsx` يستخدم lightweight-charts الرسمي لعرض شموع وطبقات Elliott وGann 1x1 وFibonacci عند تمرير بيانات حقيقية، دون اختلاق بيانات أو ادعاء اكتمال أدوات الرسم المفقودة. TypeScript وBuild وFormat Check ناجحة.
+
+## ملحق pasted_content_20 — Part 4: Shariah Compatibility
+
+تمت قراءة README لـ halalterminal-sdk-js وhalalterminal-mcp. SDK الرسمي يعرّف `screen()` و`getQuote()` و`scanPortfolio()`، بينما طلب المهمة استخدم أسماء غير موجودة مثل `screenStock()` و`getMethodologies()`. كما أن حزمة SDK من الـfork تفتقد `dist/index.mjs` و`tsconfig.json`، وفشل بناؤها مرة واحدة.
+
+تم تنفيذ طبقة HTTP موثقة تعتمد عقد Halal Terminal الرسمي كـfallback، مع `/api/shariah/screen/:symbol` و`/api/shariah/methodologies` و`/api/shariah/batch-screen`. تعرض المنهجيات الخمس AAOIFI وDJIM وFTSE وMSCI وS&P، وتعيد أخطاء 502 صريحة عند غياب المفتاح أو تجاوز الحصة. اختبار methodologies نجح HTTP 200، ولم يتم إجراء screening فعلياً لعدم توفر API Key وعدم استهلاك الحصة المجانية. TypeScript وBuild وFormat Check ناجحة.
