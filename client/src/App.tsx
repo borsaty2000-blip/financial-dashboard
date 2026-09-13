@@ -23,6 +23,7 @@ import {
 import { BacktestPage, CandlestickPage } from './pages/AnalysisToolsPage'
 import { AlertsPage, WatchlistsPage } from './pages/UserToolsPages'
 import { PortfolioPage } from './pages/PortfolioPage'
+import { ComparisonPage } from './pages/ComparisonPage'
 import GlobalSearch from './components/GlobalSearch'
 import ErrorBoundary from './components/ErrorBoundary'
 
@@ -55,6 +56,7 @@ function RoutedApp() {
 				<PortfolioPage />
 			</ProtectedRoute>
 		)
+	if (path === '/compare') return <ComparisonPage />
 	if (
 		path === '/dashboard' ||
 		path === '/achievements' ||
