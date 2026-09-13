@@ -869,3 +869,128 @@ select:focus-visible {
 		color: #edf4f8;
 	}
 }
+
+.avatar-uploader {
+	display: grid;
+	justify-items: center;
+	gap: 8px;
+	padding: 14px;
+	border: 1px dashed var(--primary);
+	border-radius: 12px;
+	background: #f8fbff;
+	margin-bottom: 16px;
+}
+.avatar-preview {
+	width: 96px;
+	height: 96px;
+	border-radius: 50%;
+	border: 2px solid var(--primary);
+	background: #e7f1fa;
+	overflow: hidden;
+	cursor: pointer;
+}
+.avatar-preview img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.avatar-uploader p {
+	font-size: 11px;
+	color: var(--muted);
+	margin: 0;
+}
+.avatar-uploader progress {
+	width: 180px;
+}
+.error-text {
+	color: var(--danger);
+}
+.top-dropdown {
+	position: absolute;
+	top: 48px;
+	left: 0;
+	z-index: 20;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	box-shadow: 0 14px 32px #12263d20;
+	padding: 10px;
+	min-width: 230px;
+	display: grid;
+	gap: 6px;
+}
+.top-dropdown button {
+	background: none;
+	border: 0;
+	text-align: right;
+	padding: 8px;
+	border-radius: 6px;
+	color: var(--text);
+	cursor: pointer;
+}
+.top-dropdown button:hover {
+	background: var(--soft);
+}
+.user-dropdown {
+	left: 0;
+}
+.dropdown-user {
+	display: grid;
+	gap: 3px;
+	padding: 8px;
+	border-bottom: 1px solid var(--border);
+}
+.dropdown-user small {
+	color: var(--muted);
+	font-size: 11px;
+}
+.notifications-dropdown {
+	left: 52px;
+}
+.top-actions {
+	position: relative;
+}
+.toast-stack {
+	position: fixed;
+	top: 18px;
+	left: 18px;
+	z-index: 100;
+	display: grid;
+	gap: 8px;
+	width: min(340px, calc(100vw - 36px));
+}
+.toast {
+	padding: 12px 14px;
+	border-radius: 9px;
+	color: #fff;
+	box-shadow: 0 8px 20px #12263d25;
+	font-size: 13px;
+}
+.toast-success {
+	background: #008f45;
+}
+.toast-error {
+	background: #d94235;
+}
+.toast-warning {
+	background: #d97706;
+}
+.toast-info {
+	background: #0071bc;
+}
+.pulse-list {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 8px;
+}
+.pulse-list .metric {
+	padding: 8px;
+	border: 1px solid var(--border);
+	border-radius: 7px;
+}
+.positive {
+	color: var(--success);
+}
+.negative {
+	color: var(--danger);
+}

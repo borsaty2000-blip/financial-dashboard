@@ -1,5 +1,6 @@
 import FinancialReportSection from '@client/modules/financial-report/ui/FinancialReportSection'
 import { AuthProvider } from './contexts/AuthContext'
+import { ToastProvider } from './contexts/ToastContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useLocation } from './router'
 import {
@@ -44,7 +45,9 @@ function RoutedApp() {
 export function App() {
 	return (
 		<AuthProvider>
-			<RoutedApp />
+			<ToastProvider>
+				<RoutedApp />
+			</ToastProvider>
 		</AuthProvider>
 	)
 }
