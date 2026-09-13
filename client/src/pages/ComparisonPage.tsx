@@ -124,6 +124,41 @@ export function ComparisonPage() {
 								))}
 							</tbody>
 						</table>
+						<div className="comparison-cards">
+							{result.data.map((row) => (
+								<article
+									className="comparison-card"
+									key={`mobile-${row.symbol}`}
+								>
+									<div className="comparison-card-head">
+										<b>{row.symbol}</b>
+										<strong>{row.currentPrice.toFixed(2)}</strong>
+									</div>
+									<div className="comparison-card-row">
+										<span>التغير</span>
+										<b
+											className={
+												row.changePercent >= 0 ? 'positive' : 'negative'
+											}
+										>
+											{row.changePercent.toFixed(2)}%
+										</b>
+									</div>
+									<div className="comparison-card-row">
+										<span>RSI</span>
+										<b>{row.rsi?.toFixed(1) ?? '—'}</b>
+									</div>
+									<div className="comparison-card-row">
+										<span>الاتجاه</span>
+										<b>{row.macd.signal}</b>
+									</div>
+									<div className="comparison-card-row">
+										<span>أداء شهر</span>
+										<b>{row.performance['1m'].toFixed(2)}%</b>
+									</div>
+								</article>
+							))}
+						</div>
 					</section>
 				</>
 			)}
