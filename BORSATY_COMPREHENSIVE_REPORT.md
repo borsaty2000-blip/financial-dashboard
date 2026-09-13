@@ -463,3 +463,9 @@ level = floor(XP / 100) + 1
 تمت قراءة README للمكتبات الثلاث. تم تثبيت `trading-signals` و`finmagic`، وإنشاء `server/src/services/analysis/indicators.service.ts` مع RSI وMACD وSMA وEMA وBollinger Bands وATR، إضافة إلى Sharpe وPosition Sizing من finmagic. أضيف Endpoint `GET /api/analysis/:symbol/indicators` ويقبل أسعاراً اختبارية عبر query parameter `prices` عند عدم توفر مصدر شموع حي.
 
 تم تثبيت Trading-Lib من fork وبناء مصدره الرسمي مرة واحدة، لكن package exports تشير إلى `dist/index.js` بينما build الرسمي ينتج `dist/src/index.js`، لذلك تعذر استيراده كحزمة دون تعديل مكتبة خارجية. لم يتم اختراع workaround أو نسخ كودها. الاختبارات الحسابية عبر trading-signals وfinmagic أعادت HTTP 200 بنتائج RSI وMACD وSMA وBollinger وSharpe. TypeScript وBuild ناجحان.
+
+## ملحق pasted_content_20 — Part 3: Elliott, Gann, and Drawing
+
+تمت قراءة README لمستودع ElliottWaves ومستودع lightweight-charts-drawing. مستودع ElliottWaves الحالي عبارة عن Notebook/سكريبت يعتمد pandas وmatplotlib وواجهته `ElliottWaveFindPattern` تطبع النتائج ولا تعيد عقد JSON مستقراً؛ لذلك لم يتم تحويله إلى Microservice تخميني. كما أن مستودع `Combining-Elliott-Wave-LSTM` غير موجود على GitHub بالمسار المطلوب، وفشلت محاولة الجلب مرة واحدة ولم تتكرر.
+
+تم تثبيت `lightweight-charts` بنجاح، لكن حزمة drawing fork تفتقد ملفات `dist` المشار إليها في exports، ففشل استيرادها دون تعديل المكتبة الخارجية. أضيف مكوّن `GannElliottChart.tsx` يستخدم lightweight-charts الرسمي لعرض شموع وطبقات Elliott وGann 1x1 وFibonacci عند تمرير بيانات حقيقية، دون اختلاق بيانات أو ادعاء اكتمال أدوات الرسم المفقودة. TypeScript وBuild وFormat Check ناجحة.

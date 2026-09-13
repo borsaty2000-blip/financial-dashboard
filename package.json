@@ -27,6 +27,8 @@
 		"express": "^4.22.2",
 		"finmagic": "^1.0.4",
 		"jose": "^6.2.12",
+		"lightweight-charts": "^5.2.1",
+		"lightweight-charts-drawing": "github:borsaty2000-blip/lightweight-charts-drawing",
 		"multer": "^2.3.0",
 		"nodemailer": "^10.0.9",
 		"trading-signals": "^8.3.0",
