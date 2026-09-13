@@ -522,3 +522,11 @@ Commits هذه المرحلة: `6d214b8` للإحصاء، `3ee6038` للتنبؤ
 تمت إضافة React Error Boundary برسالة عربية وزر Retry، ومكونات StockListSkeleton وStockDetailSkeleton وPortfolioSkeleton وAnalysisSkeleton، ودمج Skeleton في صفحات أدوات المستخدم. نجح TypeScript وBuild وFormat Check والاختبارات الأمامية.
 
 Commits المهمة: `f832258` لـWatchlist/Alerts/Notifications، `b1436bd` لـPaper Trading، `74cd7a7` لـSearch، و`37a7898` لـError Boundary وSkeleton Loaders. لم يتم النشر.
+
+## ملحق pasted_content_25 — Level 2 Comparison
+
+تم تنفيذ Stock Comparison في `server/src/services/comparison/comparison.service.ts` و`GET /api/comparison?symbols=COMI,ABUK&market=EGX`. يقبل 2–4 رموز، يجلب 250 شمعة تلقائياً، ويعيد السعر الحالي والتغير والحجم وRSI وMACD وSMA20/SMA50/SMA200 والتقلب السنوي وأداء 1D/1W/1M/3M/1Y، إضافة إلى الفائز في الأداء وRSI والاتجاه. اختبار API الفعلي لرمزي COMI وABUK نجح HTTP 200 وأعاد صفين.
+
+تمت إضافة صفحة `/compare` بواجهة RTL متجاوبة وجدول مقارنة وبطاقات الفائزين. لم تُنفذ Economic Calendar أو Heatmap في هذه المرحلة لأن الملف المرفق يذكر العناوين فقط دون عقد بيانات أو حقول أو مصدر محدد؛ Notification Center الأساسي كان قد نُفذ سابقاً ضمن `/api/notifications` وواجهة القوائم والتنبيهات.
+
+Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
