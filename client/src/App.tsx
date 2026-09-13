@@ -27,6 +27,7 @@ import { ComparisonPage } from './pages/ComparisonPage'
 import GlobalSearch from './components/GlobalSearch'
 import ErrorBoundary from './components/ErrorBoundary'
 import MobileChrome from './components/MobileChrome'
+import { StockDetailPage } from './pages/StockDetailPage'
 
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
@@ -58,6 +59,8 @@ function RoutedApp() {
 			</ProtectedRoute>
 		)
 	if (path === '/compare') return <ComparisonPage />
+	if (path.startsWith('/stock/'))
+		return <StockDetailPage symbol={path.slice('/stock/'.length)} />
 	if (
 		path === '/dashboard' ||
 		path === '/achievements' ||

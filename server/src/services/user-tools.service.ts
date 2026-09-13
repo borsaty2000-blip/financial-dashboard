@@ -101,3 +101,10 @@ export async function readAllNotifications(userId: string) {
 		data: { isRead: true },
 	})
 }
+export async function getUnreadNotificationCount(userId: string) {
+	return {
+		count: await prisma.notification.count({
+			where: { userId, isRead: false },
+		}),
+	}
+}

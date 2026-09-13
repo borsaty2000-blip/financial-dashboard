@@ -546,3 +546,15 @@ Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
 الاختبار البصري أظهر أن Home بعرض 375px يبدأ أسفل TopBar وأن BottomNav لا يغطي المحتوى. صفحات Watchlists وAlerts وPortfolio أعادت إلى Login بشكل صحيح عند غياب الجلسة. لم يتم تجاوز المصادقة في اختبار القوائم حمايةً للعقد الأمني. Virtual scrolling لم يُضف لأن الجداول الحالية ليست قائمة ضخمة؛ استخدامه الآن سيضيف تعقيداً دون فائدة مقاسة.
 
 نتائج التحقق: TypeScript ناجح، Build ناجح، Format Check ناجح، و91 اختبار واجهة ناجح. لم يتم النشر. Commits الموبايل: `4b21132`، `4eb90d9`، `1db790c`، `dce91a0`، `1af72d9`، `4bc43dd`.
+
+## ملحق pasted_content_27 — Watchlist + Alerts Completion
+
+تمت مراجعة التنفيذ السابق وإكمال البنود الناقصة بدلاً من إعادة بناء النماذج. نماذج `Watchlist` و`WatchlistItem` و`PriceAlert` و`Notification` موجودة في Prisma مع علاقات User وCascade وUnique constraint وفهارس المستخدم.
+
+تمت إضافة `GET /api/notifications/unread-count`، وتوسيع شروط التنبيه لتشمل `RSI_ABOVE` و`RSI_BELOW` بالإضافة إلى `ABOVE` و`BELOW` و`PERCENT_UP` و`PERCENT_DOWN`. أصبح Alert Checker يجلب 30 شمعة حتى يستطيع حساب RSI، ثم ينشئ Notification مرة واحدة ويوقف التنبيه بعد التفعيل ويبث الحدث عبر Socket.io.
+
+تمت إضافة `GET /api/market/candles/:symbol`، وصفحة `/stock/:symbol` التي تعرض السعر التاريخي المتاح، التغير، أعلى وأدنى قيمة، الحجم، رسم أداء مبسط، وزر `أضف إلى قائمتي`. عند عدم توفر البيانات يظهر تنبيه صريح بدلاً من رقم مختلق. اختبار الصفحة المحمول عند 375px نجح بصرياً دون overflow.
+
+اختبارات API: `/api/health` أعاد 200، وWatchlist وUnread Count أعادا 401 بدون Bearer Token كما هو مطلوب أمنياً، وMarket Candles أعاد 200 مع حالة البيانات المتاحة/غير المتاحة حسب المصدر. TypeScript وBuild وFormat Check و91 اختباراً ناجحة.
+
+تمت محاولة `npx prisma migrate dev --name add_watchlist_alerts`، لكنها توقفت بـPrisma P1012 لأن `DATABASE_URL` الحالي لا يبدأ بـ`postgresql://` أو `postgres://`. لم يتم اختلاق اتصال أو تطبيق migration على قاعدة غير صالحة.

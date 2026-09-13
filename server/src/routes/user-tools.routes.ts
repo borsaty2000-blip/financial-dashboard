@@ -9,6 +9,7 @@ import {
 	deleteWatchlist,
 	listAlerts,
 	listNotifications,
+	getUnreadNotificationCount,
 	listWatchlists,
 	readAllNotifications,
 	readNotification,
@@ -22,7 +23,14 @@ const symbol = z.string().trim().min(1).max(20)
 const alertSchema = z.object({
 	symbol,
 	market: z.string().optional(),
-	condition: z.enum(['ABOVE', 'BELOW', 'PERCENT_UP', 'PERCENT_DOWN']),
+	condition: z.enum([
+		'ABOVE',
+		'BELOW',
+		'PERCENT_UP',
+		'PERCENT_DOWN',
+		'RSI_ABOVE',
+		'RSI_BELOW',
+	]),
 	targetValue: z.number().finite(),
 })
 const guard =
@@ -100,6 +108,10 @@ userToolsRoutes.delete(
 userToolsRoutes.get(
 	'/notifications',
 	guard((req) => listNotifications(req.userId)),
+)
+userToolsRoutes.get(
+	'/notifications/unread-count',
+	guard((req) => getUnreadNotificationCount(req.userId)),
 )
 userToolsRoutes.put(
 	'/notifications/:id/read',

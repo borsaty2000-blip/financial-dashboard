@@ -1,4 +1,5 @@
 import { prisma } from '../lib/prisma.js'
+import { calculateRSI } from './analysis/indicators.service.js'
 import { CandlesService } from './market/candles.service.js'
 import { publishUserNotification } from './tradingview/signal-bus.js'
 
@@ -12,7 +13,7 @@ async function checkAlerts() {
 				alert.symbol,
 				alert.market === 'TASI' ? 'TASI' : 'EGX',
 				'1d',
-				2,
+				30,
 			)
 			const latest = candles.candles.at(-1)?.close
 			const previous = candles.candles.at(-2)?.close
@@ -20,6 +21,7 @@ async function checkAlerts() {
 			const changePercent = previous
 				? ((latest - previous) / previous) * 100
 				: 0
+			const rsi = calculateRSI(candles.candles)
 			const triggered =
 				alert.condition === 'ABOVE'
 					? latest >= alert.targetValue
@@ -29,7 +31,11 @@ async function checkAlerts() {
 							? changePercent >= alert.targetValue
 							: alert.condition === 'PERCENT_DOWN'
 								? changePercent <= -Math.abs(alert.targetValue)
-								: false
+								: alert.condition === 'RSI_ABOVE'
+									? rsi != null && rsi >= alert.targetValue
+									: alert.condition === 'RSI_BELOW'
+										? rsi != null && rsi <= alert.targetValue
+										: false
 			if (!triggered) continue
 			const notification = await prisma.$transaction(async (tx) => {
 				const updated = await tx.priceAlert.updateMany({

@@ -5,8 +5,30 @@ import {
 	getTasiQuote,
 	getTasiSummary,
 } from '../services/market/sahmk.adapter.js'
+import {
+	CandlesService,
+	type CandleMarket,
+} from '../services/market/candles.service.js'
 
 export const marketRoutes = Router()
+
+marketRoutes.get('/candles/:symbol', async (request, response) => {
+	const market: CandleMarket =
+		request.query.market === 'TASI' || request.query.market === 'GLOBAL'
+			? request.query.market
+			: 'EGX'
+	const days = Math.min(Math.max(Number(request.query.days ?? 120), 30), 500)
+	response.json(
+		await CandlesService.getCandles(
+			request.params.symbol,
+			market,
+			typeof request.query.interval === 'string'
+				? request.query.interval
+				: '1d',
+			days,
+		),
+	)
+})
 
 marketRoutes.get('/egx/summary', async (_request, response) => {
 	response.json(await getEgxSummary())

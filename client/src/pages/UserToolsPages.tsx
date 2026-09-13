@@ -207,6 +207,10 @@ export function AlertsPage() {
 					>
 						<option value="ABOVE">فوق</option>
 						<option value="BELOW">تحت</option>
+						<option value="PERCENT_UP">ارتفاع %</option>
+						<option value="PERCENT_DOWN">انخفاض %</option>
+						<option value="RSI_ABOVE">RSI فوق</option>
+						<option value="RSI_BELOW">RSI تحت</option>
 					</select>
 					<input
 						type="number"
