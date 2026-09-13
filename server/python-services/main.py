@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 
 from services.elliott_wave import analyze_elliott_wave
 from services.gann import analyze_gann
+from services.statistical import calculate_statistics
 from utils.data_prep import prepare_dates, prepare_prices
 
 app = FastAPI(title="Borsaty Analysis Service", version="1.0.0")
@@ -18,6 +19,10 @@ class PriceData(BaseModel):
 class GannData(BaseModel):
     prices: List[float] = Field(min_length=3)
     dates: List[str] = Field(min_length=3)
+
+
+class StatisticalData(BaseModel):
+    prices: List[float] = Field(min_length=3)
 
 
 @app.get("/health")
@@ -45,3 +50,13 @@ async def gann_endpoint(data: GannData) -> dict:
         raise HTTPException(status_code=422, detail=str(error)) from error
     except Exception as error:
         raise HTTPException(status_code=500, detail="Gann analysis failed") from error
+
+
+@app.post("/analyze/statistical")
+async def statistical_endpoint(data: StatisticalData) -> dict:
+    try:
+        return {"status": "success", "data": calculate_statistics(prepare_prices(data.prices))}
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    except Exception as error:
+        raise HTTPException(status_code=500, detail="Statistical analysis failed") from error
