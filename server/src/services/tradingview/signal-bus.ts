@@ -37,3 +37,7 @@ export function onTradingViewSignal(
 	bus.on('signal', listener)
 	return () => bus.off('signal', listener)
 }
+
+export function publishUserNotification(userId: string, notification: unknown) {
+	socketServer?.to(`user:${userId}`).emit('notification', notification)
+}

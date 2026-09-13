@@ -1579,3 +1579,128 @@ body.dark-mode {
 		flex: 1 1 140px;
 	}
 }
+
+.tool-header {
+	min-height: 64px;
+	display: flex;
+	align-items: center;
+	gap: 24px;
+	padding: 0 24px;
+	background: #171b20;
+	color: #fff;
+}
+.tool-header nav {
+	display: flex;
+	gap: 8px;
+	flex: 1;
+}
+.tool-header nav button {
+	padding: 8px 12px;
+	border-radius: 7px;
+	color: #ccd5dc;
+	background: transparent;
+}
+.tool-header nav button:hover {
+	background: #ffffff14;
+	color: #fff;
+}
+.light-icon {
+	margin-inline-start: auto;
+}
+.notification-wrap {
+	position: relative;
+}
+.notification-menu {
+	position: absolute;
+	z-index: 20;
+	top: 46px;
+	left: 0;
+	width: 280px;
+	padding: 16px;
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	background: var(--surface);
+	color: #1a1a1a;
+	box-shadow: var(--shadow);
+}
+.notification-menu p {
+	padding: 9px 0;
+	margin: 0;
+	border-bottom: 1px solid var(--border);
+	font-size: 12px;
+}
+.tools-page {
+	min-height: 100vh;
+	background: var(--soft);
+}
+.tools-container {
+	max-width: 1050px;
+	margin: auto;
+	padding: 38px 22px 70px;
+}
+.tools-container h1 {
+	margin: 4px 0 22px;
+	font-size: 32px;
+}
+.tool-add {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 18px;
+}
+.tool-add input,
+.tool-add select {
+	min-height: 44px;
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	padding: 8px 12px;
+	background: var(--surface);
+	color: inherit;
+}
+.tool-card {
+	margin-top: 16px;
+	padding: 20px;
+	border: 1px solid var(--border);
+	border-radius: 12px;
+	background: var(--surface);
+	box-shadow: var(--shadow);
+}
+.tool-card h2 {
+	margin-top: 0;
+}
+.tool-row {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 13px 0;
+	border-bottom: 1px solid var(--border);
+}
+.tool-row:last-child {
+	border-bottom: 0;
+}
+.tool-row span:first-of-type {
+	color: var(--muted);
+}
+.tool-row .link-button {
+	margin-inline-start: auto;
+}
+@media (max-width: 650px) {
+	.tool-header {
+		gap: 8px;
+		padding: 0 12px;
+	}
+	.tool-header nav button {
+		padding: 7px 6px;
+		font-size: 11px;
+	}
+	.tool-header .brand {
+		font-size: 15px;
+	}
+	.notification-menu {
+		position: fixed;
+		top: 70px;
+		left: 12px;
+		right: 12px;
+		width: auto;
+	}
+}

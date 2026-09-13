@@ -15,6 +15,8 @@ import { shariahRoutes } from './src/routes/shariah.routes.js'
 import { tradingViewRoutes } from './src/routes/tradingview.routes.js'
 import { backtestRoutes } from './src/routes/backtest.routes.js'
 import { attachSignalSocket } from './src/services/tradingview/signal-bus.js'
+import { userToolsRoutes } from './src/routes/user-tools.routes.js'
+import { startAlertChecker } from './src/services/alerts-checker.service.js'
 
 const app = express()
 app.use(express.json())
@@ -79,6 +81,7 @@ app.use('/api/analysis', analysisRoutes)
 app.use('/api/shariah', shariahRoutes)
 app.use('/api/tradingview/webhook', tradingViewRoutes)
 app.use('/api/backtest', backtestRoutes)
+app.use('/api', userToolsRoutes)
 app.use(
 	'/uploads',
 	express.static(path.join(process.cwd(), 'server', 'uploads')),
@@ -90,6 +93,7 @@ app.use('/api/achievements', achievementsRoutes)
 export default app
 
 if (!process.env.VERCEL) {
+	startAlertChecker()
 	const httpServer = createServer(app)
 	attachSignalSocket(httpServer)
 	httpServer.listen(port, () => {

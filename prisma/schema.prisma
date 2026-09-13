@@ -28,6 +28,11 @@ model User {
   passwordResets PasswordReset[]
   following      Follow[]          @relation("Following")
   followers      Follow[]          @relation("Followers")
+  watchlists     Watchlist[]
+  priceAlerts    PriceAlert[]
+  notifications  Notification[]
+  portfolio      Portfolio?
+  orders         Order[]
 
   @@index([email])
   @@index([username])
@@ -121,4 +126,109 @@ model PasswordReset {
   @@index([userId])
   @@index([token])
   @@map("password_resets")
+}
+
+model Watchlist {
+  id        String          @id @default(uuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String          @default("قائمتي")
+  isDefault Boolean         @default(false)
+  items     WatchlistItem[]
+  createdAt DateTime        @default(now())
+
+  @@index([userId])
+  @@map("watchlists")
+}
+
+model WatchlistItem {
+  id          String    @id @default(uuid())
+  watchlistId String
+  watchlist   Watchlist @relation(fields: [watchlistId], references: [id], onDelete: Cascade)
+  symbol      String
+  market      String    @default("EGX")
+  addedAt     DateTime  @default(now())
+
+  @@unique([watchlistId, symbol])
+  @@index([watchlistId])
+  @@map("watchlist_items")
+}
+
+model PriceAlert {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  symbol      String
+  market      String    @default("EGX")
+  condition   String
+  targetValue Float
+  isActive    Boolean   @default(true)
+  triggeredAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId, isActive])
+  @@index([symbol])
+  @@map("price_alerts")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model Portfolio {
+  id             String     @id @default(uuid())
+  userId         String     @unique
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance        Float      @default(100000)
+  initialCapital Float      @default(100000)
+  positions      Position[]
+  orders         Order[]
+  createdAt      DateTime   @default(now())
+
+  @@map("portfolios")
+}
+
+model Position {
+  id          String    @id @default(uuid())
+  portfolioId String
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  symbol      String
+  quantity    Int
+  avgPrice    Float
+  realizedPnl Float     @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([portfolioId, symbol])
+  @@map("positions")
+}
+
+model Order {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portfolioId String
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
+  symbol      String
+  side        String
+  orderType   String    @default("MARKET")
+  quantity    Int
+  price       Float
+  totalCost   Float
+  status      String    @default("FILLED")
+  executedAt  DateTime  @default(now())
+
+  @@index([userId, executedAt])
+  @@map("orders")
 }

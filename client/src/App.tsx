@@ -21,6 +21,7 @@ import {
 	TermsPage,
 } from './pages/LegalPages'
 import { BacktestPage, CandlestickPage } from './pages/AnalysisToolsPage'
+import { AlertsPage, WatchlistsPage } from './pages/UserToolsPages'
 
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
@@ -39,6 +40,12 @@ function RoutedApp() {
 	if (path === '/about') return <AboutPage />
 	if (path === '/backtest') return <BacktestPage />
 	if (path === '/candlestick') return <CandlestickPage />
+	if (path === '/watchlists' || path === '/alerts')
+		return (
+			<ProtectedRoute>
+				{path === '/watchlists' ? <WatchlistsPage /> : <AlertsPage />}
+			</ProtectedRoute>
+		)
 	if (
 		path === '/dashboard' ||
 		path === '/achievements' ||
