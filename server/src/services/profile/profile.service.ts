@@ -15,6 +15,7 @@ const profileSelect = {
 	country: true,
 	language: true,
 	isVerified: true,
+	isActive: true,
 	createdAt: true,
 	preference: true,
 	achievements: { include: { achievement: true } },
@@ -44,18 +45,24 @@ export async function uploadAvatar(userId: string, file: Express.Multer.File) {
 		select: profileSelect,
 	})
 	if (current?.avatarUrl?.startsWith('/uploads/avatars/')) {
-		const oldPath = `${process.cwd()}${current.avatarUrl}`
+		const oldPath = `${process.cwd()}/server${current.avatarUrl}`
 		await unlink(oldPath).catch(() => undefined)
 	}
 	return updated
 }
 export async function deleteAccount(userId: string) {
-	await prisma.user.delete({ where: { id: userId } })
+	await prisma.$transaction([
+		prisma.user.update({ where: { id: userId }, data: { isActive: false } }),
+		prisma.session.updateMany({
+			where: { userId, revokedAt: null },
+			data: { revokedAt: new Date() },
+		}),
+	])
 	return { success: true }
 }
 export async function getPublicProfile(username: string, viewerId?: string) {
 	const user = await prisma.user.findUnique({
-		where: { username },
+		where: { username, isActive: true },
 		select: {
 			id: true,
 			username: true,
@@ -82,7 +89,20 @@ export async function getPublicProfile(username: string, viewerId?: string) {
 		},
 	})
 	if (!user) return null
-	return { ...user, isSelf: viewerId === user.id }
+	const isFollowing = viewerId
+		? Boolean(
+				await prisma.follow.findUnique({
+					where: {
+						followerId_followingId: {
+							followerId: viewerId,
+							followingId: user.id,
+						},
+					},
+					select: { id: true },
+				}),
+			)
+		: false
+	return { ...user, isSelf: viewerId === user.id, isFollowing }
 }
 export async function updateInterests(
 	userId: string,

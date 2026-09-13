@@ -25,6 +25,8 @@ model User {
   preference   UserPreference?
   achievements UserAchievement[]
   sessions     Session[]
+  following    Follow[]          @relation("Following")
+  followers    Follow[]          @relation("Followers")
 
   @@index([email])
   @@index([username])
@@ -91,4 +93,17 @@ model Session {
 
   @@index([userId])
   @@map("sessions")
+}
+
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String
+  followingId String
+  follower    User     @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followingId])
+  @@map("follows")
 }

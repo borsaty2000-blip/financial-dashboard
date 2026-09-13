@@ -7,6 +7,7 @@ import { authRoutes } from './src/routes/auth.routes.js'
 import { publicRateLimit } from './src/middleware/rateLimit.js'
 import { profileRoutes } from './src/routes/profile.routes.js'
 import { preferencesRoutes } from './src/routes/preferences.routes.js'
+import { achievementsRoutes } from './src/routes/achievements.routes.js'
 
 const app = express()
 app.use(express.json())
@@ -63,9 +64,13 @@ app.get('/api/health', (_request, response) => {
 })
 
 app.use('/api/auth', authRoutes)
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
+app.use(
+	'/uploads',
+	express.static(path.join(process.cwd(), 'server', 'uploads')),
+)
 app.use('/api/profile', profileRoutes)
 app.use('/api/preferences', preferencesRoutes)
+app.use('/api/achievements', achievementsRoutes)
 
 export default app
 

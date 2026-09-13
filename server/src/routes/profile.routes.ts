@@ -12,7 +12,7 @@ import {
 } from '../controllers/profile.controller.js'
 import { requireAuth } from '../middleware/auth.js'
 
-const uploadDirectory = path.join(process.cwd(), 'uploads', 'avatars')
+const uploadDirectory = path.join(process.cwd(), 'server', 'uploads', 'avatars')
 mkdirSync(uploadDirectory, { recursive: true })
 const allowed = new Set(['image/jpeg', 'image/png', 'image/webp'])
 const upload = multer({
