@@ -24,8 +24,9 @@ export default function GannElliottChart({
 	const containerRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
 		if (!containerRef.current) return
+		const isMobile = window.matchMedia('(max-width: 767px)').matches
 		const chart = createChart(containerRef.current, {
-			height: 420,
+			height: isMobile ? 280 : 420,
 			layout: {
 				background: { type: ColorType.Solid, color: '#ffffff' },
 				textColor: '#374151',
@@ -35,7 +36,18 @@ export default function GannElliottChart({
 				horzLines: { color: '#eef1f4' },
 			},
 			rightPriceScale: { borderColor: '#d1d5db' },
-			timeScale: { borderColor: '#d1d5db' },
+			timeScale: { borderColor: '#d1d5db', rightOffset: 4 },
+			handleScroll: {
+				mouseWheel: false,
+				pressedMouseMove: true,
+				horzTouchDrag: true,
+				vertTouchDrag: false,
+			},
+			handleScale: {
+				axisPressedMouseMove: false,
+				mouseWheel: false,
+				pinch: true,
+			},
 		})
 		const series = chart.addSeries(CandlestickSeries, {
 			upColor: '#00a651',
