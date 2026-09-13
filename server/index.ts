@@ -13,23 +13,26 @@ const app = express()
 app.use(express.json())
 app.use(publicRateLimit)
 const port = Number(process.env.PORT ?? 4000)
-const allowedOrigins = (process.env.CORS_ORIGINS ?? '*')
-	.split(',')
+
+const allowedOrigins = [
+	'https://borsatyai.com',
+	'https://www.borsatyai.com',
+	'https://financial-dashboard-borsaty.netlify.app',
+	...(process.env.NODE_ENV === 'development' ? ['http://localhost:5173'] : []),
+	...(process.env.CORS_ORIGINS ?? '').split(','),
+]
 	.map((origin) => origin.trim())
 	.filter(Boolean)
-
 app.use((request, response, next) => {
 	const origin = request.headers.origin
-	if (
-		allowedOrigins.includes('*') ||
-		(origin && allowedOrigins.includes(origin))
-	) {
-		response.setHeader(
-			'Access-Control-Allow-Origin',
-			allowedOrigins.includes('*') ? '*' : (origin as string),
-		)
+	if (!origin || allowedOrigins.includes(origin)) {
+		if (origin) response.setHeader('Access-Control-Allow-Origin', origin)
 	}
-	response.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+	response.setHeader('Access-Control-Allow-Credentials', 'true')
+	response.setHeader(
+		'Access-Control-Allow-Methods',
+		'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+	)
 	response.setHeader(
 		'Access-Control-Allow-Headers',
 		'Content-Type,Authorization',
