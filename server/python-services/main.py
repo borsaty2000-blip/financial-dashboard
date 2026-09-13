@@ -7,6 +7,7 @@ from services.elliott_wave import analyze_elliott_wave
 from services.gann import analyze_gann
 from services.statistical import calculate_statistics
 from services.forecasting import forecast_arima, forecast_lstm
+from services.backtesting import backtest_elliott, backtest_gann, backtest_indicators
 from utils.data_prep import prepare_dates, prepare_prices
 
 app = FastAPI(title="Borsaty Analysis Service", version="1.0.0")
@@ -29,6 +30,13 @@ class StatisticalData(BaseModel):
 class ForecastData(BaseModel):
     prices: List[float] = Field(min_length=20)
     steps: int = Field(default=30, ge=1, le=365)
+
+
+class BacktestData(BaseModel):
+    prices: List[float] = Field(min_length=40)
+    lookback: int = Field(default=30, ge=5, le=365)
+    horizon: int = Field(default=7, ge=1, le=90)
+    strategy: str = "rsi_macd"
 
 
 @app.get("/health")
@@ -86,3 +94,27 @@ async def lstm_endpoint(data: ForecastData) -> dict:
         raise HTTPException(status_code=422, detail=str(error)) from error
     except Exception as error:
         raise HTTPException(status_code=500, detail="LSTM forecast failed") from error
+
+
+@app.post("/backtest/elliott")
+async def backtest_elliott_endpoint(data: BacktestData) -> dict:
+    try:
+        return {"status": "success", "data": backtest_elliott(prepare_prices(data.prices), data.lookback, data.horizon)}
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@app.post("/backtest/gann")
+async def backtest_gann_endpoint(data: BacktestData) -> dict:
+    try:
+        return {"status": "success", "data": backtest_gann(prepare_prices(data.prices), data.lookback, data.horizon)}
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@app.post("/backtest/indicators")
+async def backtest_indicators_endpoint(data: BacktestData) -> dict:
+    try:
+        return {"status": "success", "data": backtest_indicators(prepare_prices(data.prices), data.strategy, data.lookback, data.horizon)}
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
