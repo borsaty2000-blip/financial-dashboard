@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import { createServer } from 'node:http'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import express from 'express'
@@ -56,8 +56,15 @@ app.use((request, response, next) => {
 	next()
 })
 
-const rawData = readFileSync(new URL('./data.json', import.meta.url), 'utf8')
-const financialData: unknown = JSON.parse(rawData)
+const dataCandidates = [
+	fileURLToPath(new URL('./data.json', import.meta.url)),
+	path.join(process.cwd(), 'server', 'data.json'),
+	path.join(process.cwd(), 'data.json'),
+]
+const dataPath = dataCandidates.find((candidate) => existsSync(candidate))
+const financialData: unknown = dataPath
+	? JSON.parse(readFileSync(dataPath, 'utf8'))
+	: { periods: [], company: { id: '', name: '', values: [], children: [] } }
 const avatarsDirectory = fileURLToPath(new URL('./avatars', import.meta.url))
 
 app.get('/api/avatars/:fileName', (request, response, next) => {
