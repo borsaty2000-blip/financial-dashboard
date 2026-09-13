@@ -50,12 +50,12 @@ export async function getPersonalizedDashboard(userId: string) {
 		)
 		.slice(0, 6)
 	const recommendations = [
-		{
-			type: 'watchlist',
-			title: 'حدّث قائمة المتابعة',
-			description: `راجع أسهم ${markets.join(' و')} وفق أسلوبك ${preferences.investmentStyle}.`,
+		...markets.map((market) => ({
+			type: 'market',
+			title: `راجع أسهم ${market}`,
+			description: `فلتر أسهم ${market} وفق أسلوبك ${preferences.investmentStyle}.`,
 			priority: 'medium',
-		},
+		})),
 		{
 			type: 'learning',
 			title:
@@ -65,23 +65,27 @@ export async function getPersonalizedDashboard(userId: string) {
 			description: 'استخدم المحتوى التعليمي قبل اتخاذ أي قرار.',
 			priority: 'low',
 		},
-		...(preferences.dailyTimeCommitment === 'HIGH'
-			? [
-					{
-						type: 'review',
-						title: 'مراجعة يومية',
-						description: 'خصص وقتاً لمقارنة أداء الأسهم التي تتابعها.',
-						priority: 'medium',
-					},
-				]
-			: []),
-	]
-	const news = markets.map((market) => ({
-		market,
-		topic: `أخبار وتقارير سوق ${market}`,
-		available: false,
-		message: 'سيتم عرض الأخبار عند توفر مصدر موثوق.',
-	}))
+		{
+			type: 'risk',
+			title: 'راجع إدارة المخاطر',
+			description: 'حدد مستوى المخاطرة ونقطة الخروج قبل المتابعة.',
+			priority: 'high',
+		},
+	].slice(0, 5)
+	const news = [
+		...markets.map((market) => ({
+			market,
+			topic: `أخبار وتقارير سوق ${market}`,
+			available: false,
+			message: 'سيتم عرض الأخبار عند توفر مصدر موثوق.',
+		})),
+		...preferences.preferredSectors.map((sector) => ({
+			market: 'sector',
+			topic: `أخبار قطاع ${sector}`,
+			available: false,
+			message: 'سيتم عرض الأخبار عند توفر مصدر موثوق.',
+		})),
+	].slice(0, 3)
 	const alerts = [
 		{
 			type: 'preference',
@@ -99,5 +103,17 @@ export async function getPersonalizedDashboard(userId: string) {
 			enabled: true,
 		},
 	]
-	return { preferences, recommendations, news, suggestedStocks, alerts }
+	const trending = suggestedStocks.slice(0, 3).map((stock) => ({
+		...stock,
+		available: false,
+		message: 'بيانات الاتجاه اللحظي غير متاحة حالياً.',
+	}))
+	return {
+		preferences,
+		recommendations,
+		news,
+		suggestedStocks,
+		alerts,
+		trending,
+	}
 }
