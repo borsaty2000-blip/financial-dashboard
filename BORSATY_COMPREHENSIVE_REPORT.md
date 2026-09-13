@@ -449,3 +449,11 @@ level = floor(XP / 100) + 1
 ما بقي خارجياً: نشر Vercel، ربط Cloudflare، تدوير أسرار الإنتاج، Google Analytics، وSentry؛ لم تُنفذ لعدم توفر جلسات/معرفات الاعتماد المطلوبة. خدمة البريد وPassword Reset موجودتان محلياً عبر Nodemailer وSMTP اختياري، ولا يلزم Resend تحديداً إلا إذا تقرر استبداله.
 
 التحقق بعد هذه المرحلة: TypeScript ناجح، 4 اختبارات Auth ناجحة، 19 ملف اختبار و91 اختباراً ناجحاً، Build ناجح، Format Check ناجح، وملفات PWA موجودة في `client/dist`.
+
+## ملحق pasted_content_20 — Part 1: Data Layer
+
+تمت قراءة README والكود الرسميين لمستودعي EGX-Data-MCP-Server وsahmk-python قبل الدمج. يعرّف مستودع EGX الحالي أربع أدوات فقط: `stock_price_egx` و`stock_data_egx` و`gold_price` و`silver_price`؛ ولم أجد فيه 16 أداة أو أداة دليل شركات. لذلك أضيف Adapter موثق يعيد حالة عدم التوفر عند غياب جسر التشغيل الرسمي، دون اختراع Endpoint أو بيانات بديلة. اختبار تشغيل أداة EGX فشل مرة واحدة بسبب تعارض `StructuredTool` مع نسخة `langchain` المثبتة، ولم تتم إعادة المحاولة وفق القاعدة.
+
+تم تثبيت SDK الرسمي `sahmk` وفحص واجهاته. أضيف Adapter يستخدم المسارات الرسمية `market_summary` و`quote` و`companies` مع ترويسة `X-API-Key` وEnvelope موحد يتضمن `data` و`source` و`timestamp` و`freshness` و`delay_minutes` و`available`. أثناء اختبار مستقل أعاد SAHMK HTTP 429 بسبب استهلاك حد الخطة المجانية اليومي: 100 طلب/يوم. لا يتم إظهار أرقام وهمية؛ الرد يرجع `available:false` وسبب الخطأ.
+
+المسارات الجديدة: `/api/market/egx/summary` و`/api/market/egx/companies` و`/api/market/egx/quote/:symbol` و`/api/market/tasi/summary` و`/api/market/tasi/quote/:symbol` و`/api/market/tasi/companies`. TypeScript وBuild و4 اختبارات Auth و91 اختبار واجهة وFormat Check ناجحة. لم يتم النشر.

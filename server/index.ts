@@ -8,6 +8,7 @@ import { publicRateLimit } from './src/middleware/rateLimit.js'
 import { profileRoutes } from './src/routes/profile.routes.js'
 import { preferencesRoutes } from './src/routes/preferences.routes.js'
 import { achievementsRoutes } from './src/routes/achievements.routes.js'
+import { marketRoutes } from './src/routes/market.routes.js'
 
 const app = express()
 app.use(express.json())
@@ -66,15 +67,8 @@ app.get('/api/health', (_request, response) => {
 	response.json({ ok: true, service: 'financial-dashboard-api' })
 })
 
-app.get('/api/market/summary', (_request, response) => {
-	response.json({ ok: true, available: false, data: {} })
-})
-
-app.get('/api/market/egx/summary', (_request, response) => {
-	response.json({ ok: true, available: false, data: {} })
-})
-
 app.use('/api/auth', authRoutes)
+app.use('/api/market', marketRoutes)
 app.use(
 	'/uploads',
 	express.static(path.join(process.cwd(), 'server', 'uploads')),
