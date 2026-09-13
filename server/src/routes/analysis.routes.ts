@@ -5,6 +5,11 @@ import {
 } from '../services/analysis/indicators.service.js'
 import { analyzeElliott } from '../services/analysis/elliott.python.js'
 import { analyzeGann } from '../services/analysis/gann.python.js'
+import {
+	analyze,
+	forecastARIMA,
+	forecastLSTM,
+} from '../services/analysis/statistical.service.js'
 
 export const analysisRoutes = Router()
 
@@ -15,6 +20,82 @@ function queryPrices(value: unknown) {
 		.map(Number)
 		.filter((price) => Number.isFinite(price) && price > 0)
 }
+
+function querySteps(value: unknown) {
+	const steps = typeof value === 'string' ? Number(value) : 30
+	return Number.isFinite(steps)
+		? Math.max(1, Math.min(365, Math.trunc(steps)))
+		: 30
+}
+
+analysisRoutes.get('/:symbol/statistical', async (request, response) => {
+	const prices = queryPrices(request.query.prices)
+	if (prices.length < 3)
+		return response
+			.status(503)
+			.json({ status: 'unavailable', message: 'No price series was provided' })
+	try {
+		return response.json(await analyze(prices))
+	} catch (error) {
+		return response
+			.status(502)
+			.json({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: 'Statistical service unavailable',
+			})
+	}
+})
+
+analysisRoutes.get('/:symbol/forecast/arima', async (request, response) => {
+	const prices = queryPrices(request.query.prices)
+	if (prices.length < 20)
+		return response
+			.status(503)
+			.json({
+				status: 'unavailable',
+				message: 'At least 20 prices are required',
+			})
+	try {
+		return response.json(
+			await forecastARIMA(prices, querySteps(request.query.steps)),
+		)
+	} catch (error) {
+		return response
+			.status(502)
+			.json({
+				status: 'error',
+				message:
+					error instanceof Error ? error.message : 'ARIMA service unavailable',
+			})
+	}
+})
+
+analysisRoutes.get('/:symbol/forecast/lstm', async (request, response) => {
+	const prices = queryPrices(request.query.prices)
+	if (prices.length < 20)
+		return response
+			.status(503)
+			.json({
+				status: 'unavailable',
+				message: 'At least 20 prices are required',
+			})
+	try {
+		return response.json(
+			await forecastLSTM(prices, querySteps(request.query.steps)),
+		)
+	} catch (error) {
+		return response
+			.status(502)
+			.json({
+				status: 'error',
+				message:
+					error instanceof Error ? error.message : 'LSTM service unavailable',
+			})
+	}
+})
 
 analysisRoutes.get('/:symbol/elliott', async (request, response) => {
 	const prices = queryPrices(request.query.prices)
