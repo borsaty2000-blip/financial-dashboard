@@ -27,15 +27,11 @@ analysisRoutes.get('/:symbol/elliott', async (request, response) => {
 			await analyzeElliott(prices, Number(request.query.order ?? 5)),
 		)
 	} catch (error) {
-		return response
-			.status(502)
-			.json({
-				status: 'error',
-				message:
-					error instanceof Error
-						? error.message
-						: 'Elliott service unavailable',
-			})
+		return response.status(502).json({
+			status: 'error',
+			message:
+				error instanceof Error ? error.message : 'Elliott service unavailable',
+		})
 	}
 })
 
@@ -46,22 +42,18 @@ analysisRoutes.get('/:symbol/gann', async (request, response) => {
 			? request.query.dates.split(',')
 			: []
 	if (prices.length < 3 || dates.length !== prices.length)
-		return response
-			.status(503)
-			.json({
-				status: 'unavailable',
-				message: 'Matching prices and dates are required',
-			})
+		return response.status(503).json({
+			status: 'unavailable',
+			message: 'Matching prices and dates are required',
+		})
 	try {
 		return response.json(await analyzeGann(prices, dates))
 	} catch (error) {
-		return response
-			.status(502)
-			.json({
-				status: 'error',
-				message:
-					error instanceof Error ? error.message : 'Gann service unavailable',
-			})
+		return response.status(502).json({
+			status: 'error',
+			message:
+				error instanceof Error ? error.message : 'Gann service unavailable',
+		})
 	}
 })
 

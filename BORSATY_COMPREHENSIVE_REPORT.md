@@ -475,3 +475,11 @@ level = floor(XP / 100) + 1
 تمت قراءة README لـ halalterminal-sdk-js وhalalterminal-mcp. SDK الرسمي يعرّف `screen()` و`getQuote()` و`scanPortfolio()`، بينما طلب المهمة استخدم أسماء غير موجودة مثل `screenStock()` و`getMethodologies()`. كما أن حزمة SDK من الـfork تفتقد `dist/index.mjs` و`tsconfig.json`، وفشل بناؤها مرة واحدة.
 
 تم تنفيذ طبقة HTTP موثقة تعتمد عقد Halal Terminal الرسمي كـfallback، مع `/api/shariah/screen/:symbol` و`/api/shariah/methodologies` و`/api/shariah/batch-screen`. تعرض المنهجيات الخمس AAOIFI وDJIM وFTSE وMSCI وS&P، وتعيد أخطاء 502 صريحة عند غياب المفتاح أو تجاوز الحصة. اختبار methodologies نجح HTTP 200، ولم يتم إجراء screening فعلياً لعدم توفر API Key وعدم استهلاك الحصة المجانية. TypeScript وBuild وFormat Check ناجحة.
+
+## ملحق pasted_content_21 — Python Analysis Microservice
+
+تم بناء خدمة FastAPI مستقلة في `server/python-services` من الصفر، وتشمل `services/pivots.py` لكشف القمم والقيعان، و`services/elliott_wave.py` لقواعد الموجات 1–5 وA–B–C والثقة والأهداف، و`services/gann.py` للزوايا وSquare of Nine وGann Fan والدورات الزمنية، و`services/fibonacci.py` للأهداف. كما أضيفت طبقتا تنظيف وتحقق للمدخلات.
+
+تعمل الخدمة على المنفذ 8001 افتراضياً عبر `uvicorn main:app` وتوفر `GET /health` و`POST /analyze/elliott` و`POST /analyze/gann`. تم تصحيح اختلاف فعلي في SciPy: `find_peaks` يستخدم `distance` وليس `order`. نجحت اختبارات الدوال والحالات الحدية واختبارات HTTP وأعادت الخدمة JSON صحيحاً.
+
+تم ربط Node.js عبر `PYTHON_SERVICE_URL` وإضافة `GET /api/analysis/:symbol/elliott` و`GET /api/analysis/:symbol/gann`. اختبار COMI محلياً عبر Node إلى Python نجح HTTP 200 لكلا المسارين. تم حفظ العمل في commits: `6c5fd6e` لمحرك Elliott، `82775b8` لمحرك Gann، `26925d7` لتكامل Node/Python، و`63b3d89` لتجاهل ملفات البيئة المؤقتة. لم يتم النشر.
