@@ -1,0 +1,31 @@
+name: backup
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Export database
+        if: ${{ secrets.DATABASE_URL != '' }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pg_dump --dbname="$DATABASE_URL" --format=custom --file=borsaty-${{ github.run_id }}.dump
+      - name: Upload encrypted-at-rest artifact
+        if: ${{ secrets.DATABASE_URL != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: borsaty-postgres-${{ github.run_id }}
+          path: borsaty-${{ github.run_id }}.dump
+          retention-days: 14
+      - name: Explain missing backup secret
+        if: ${{ secrets.DATABASE_URL == '' }}
+        run: echo 'DATABASE_URL is not configured; backup was skipped safely.'

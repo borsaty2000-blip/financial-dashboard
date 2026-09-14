@@ -1,0 +1,113 @@
+:root {
+	--borsaty-ink: #17212b;
+	--borsaty-muted: #66727d;
+	--borsaty-surface: #fff;
+	--borsaty-border: #e3e8ed;
+	--borsaty-primary: #0071bc;
+	--borsaty-positive: #00a651;
+	--borsaty-negative: #e74c3c;
+	--borsaty-warning: #f39c12;
+	--borsaty-radius: 10px;
+	--borsaty-ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+.ds-card,
+.ds-panel,
+.ds-metric-card {
+	background: var(--borsaty-surface);
+	border: 1px solid var(--borsaty-border);
+	border-radius: var(--borsaty-radius);
+	box-shadow: 0 1px 3px rgb(0 0 0 / 6%);
+}
+.ds-button,
+.ds-icon-button,
+.ds-input,
+.ds-select {
+	min-height: 40px;
+	font: inherit;
+}
+.ds-button,
+.ds-icon-button {
+	border: 0;
+	border-radius: 8px;
+	background: var(--borsaty-primary);
+	color: white;
+	cursor: pointer;
+	transition:
+		transform 120ms var(--borsaty-ease),
+		filter 120ms var(--borsaty-ease);
+}
+.ds-button {
+	padding: 0 16px;
+}
+.ds-icon-button {
+	width: 40px;
+}
+.ds-button:hover,
+.ds-icon-button:hover {
+	filter: brightness(0.94);
+}
+.ds-button:active,
+.ds-icon-button:active {
+	transform: scale(0.97);
+}
+.ds-input,
+.ds-select {
+	border: 1px solid var(--borsaty-border);
+	border-radius: 8px;
+	padding: 0 12px;
+	color: var(--borsaty-ink);
+	background: var(--borsaty-surface);
+}
+.ds-number-value,
+.ds-currency-value,
+.ds-price-change {
+	font-family: 'JetBrains Mono', monospace;
+	font-variant-numeric: tabular-nums;
+}
+.ds-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 3px 8px;
+	border-radius: 999px;
+	background: #f1f4f7;
+	font-size: 12px;
+}
+.ds-status-dot {
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+}
+.ds-price-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+.ds-sparkline {
+	width: 120px;
+	height: 32px;
+	overflow: visible;
+}
+.ds-avatar {
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+.ds-avatar-fallback {
+	display: inline-grid;
+	place-items: center;
+	background: var(--borsaty-primary);
+	color: white;
+}
+.ds-divider {
+	height: 1px;
+	background: var(--borsaty-border);
+}
+@media (prefers-reduced-motion: reduce) {
+	.ds-button,
+	.ds-icon-button {
+		transition: none;
+	}
+}

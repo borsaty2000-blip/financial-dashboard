@@ -1,0 +1,36 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment
+        required: true
+        type: choice
+        options: [preview, production]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm --prefix client ci
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Deploy with Vercel CLI
+        if: ${{ secrets.VERCEL_TOKEN != '' }}
+        run: npx vercel deploy --token "$VERCEL_TOKEN" --yes ${{ inputs.environment == 'production' && '--prod' || '' }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      - name: Explain missing deployment secret
+        if: ${{ secrets.VERCEL_TOKEN == '' }}
+        run: echo 'VERCEL_TOKEN is not configured; validation passed and deployment was intentionally skipped.'

@@ -1,0 +1,20 @@
+flowchart TD
+  U[User] --> W[Web / Mobile]
+  W --> A[API]
+  A --> C{Cache hit?}
+  C -->|yes| R[Return normalized envelope]
+  C -->|no| P[Provider Router]
+  P --> E[EGX]
+  P --> S[SAHMK]
+  P --> F[Finnhub]
+  P --> T[Twelve Data]
+  E --> N[Normalize + validate]
+  S --> N
+  F --> N
+  T --> N
+  N --> K[Cache + provenance]
+  K --> R
+  A --> O[Observability]
+  O --> L[Logs]
+  O --> M[Metrics]
+  O --> X[Sentry]
