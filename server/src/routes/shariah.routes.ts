@@ -4,6 +4,11 @@ import {
 	getMethodologies,
 	screenStock,
 } from '../services/shariah/halal.service.js'
+import {
+	dividendPurification,
+	generateShariahCertificate,
+	screenWith5Methodologies,
+} from '../services/shariah/advanced-shariah.service.js'
 
 export const shariahRoutes = Router()
 
@@ -51,4 +56,53 @@ shariahRoutes.post('/batch-screen', async (request, response) => {
 				error instanceof Error ? error.message : 'Shariah service unavailable',
 		})
 	}
+})
+
+shariahRoutes.get('/advanced/:symbol', async (request, response) => {
+	try {
+		return response.json(await screenWith5Methodologies(request.params.symbol))
+	} catch (error) {
+		return response.status(502).json({
+			available: false,
+			error:
+				error instanceof Error ? error.message : 'Advanced Shariah unavailable',
+		})
+	}
+})
+
+shariahRoutes.get(
+	'/advanced/:symbol/certificate',
+	async (request, response) => {
+		try {
+			const certificate = await generateShariahCertificate(
+				request.params.symbol,
+			)
+			response.setHeader(
+				'Content-Disposition',
+				`attachment; filename="borsaty-${certificate.symbol}-shariah-certificate.json"`,
+			)
+			return response.json(certificate)
+		} catch (error) {
+			return response.status(502).json({
+				available: false,
+				error:
+					error instanceof Error ? error.message : 'Certificate unavailable',
+			})
+		}
+	},
+)
+
+shariahRoutes.post('/advanced/:symbol/purification', (request, response) => {
+	const dividends = request.body?.dividends
+	if (typeof dividends !== 'number' && !Array.isArray(dividends))
+		return response
+			.status(400)
+			.json({ error: 'dividends must be a number or array' })
+	return response.json(
+		dividendPurification(
+			request.params.symbol,
+			dividends,
+			Number(request.body?.purificationRate ?? 0),
+		),
+	)
 })

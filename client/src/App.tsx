@@ -28,6 +28,9 @@ import GlobalSearch from './components/GlobalSearch'
 import ErrorBoundary from './components/ErrorBoundary'
 import MobileChrome from './components/MobileChrome'
 import { StockDetailPage } from './pages/StockDetailPage'
+import { SimulatorPage } from './pages/SimulatorPage'
+import { ShariahPage } from './pages/ShariahPage'
+import NotificationLive from './components/NotificationLive'
 
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
@@ -46,6 +49,8 @@ function RoutedApp() {
 	if (path === '/about') return <AboutPage />
 	if (path === '/backtest') return <BacktestPage />
 	if (path === '/candlestick') return <CandlestickPage />
+	if (path === '/simulator') return <SimulatorPage />
+	if (path === '/shariah') return <ShariahPage />
 	if (path === '/watchlists' || path === '/alerts')
 		return (
 			<ProtectedRoute>
@@ -97,6 +102,7 @@ export function App() {
 					<MobileChrome />
 					<GlobalSearch />
 					<InstallPrompt />
+					<NotificationLive />
 				</ToastProvider>
 			</AuthProvider>
 		</ErrorBoundary>
