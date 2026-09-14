@@ -782,3 +782,13 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 يحتوي `prisma/schema.prisma` على `twoFactorSecret` و`twoFactorEnabled`، وتحتوي migration `20260914110000_add_push_security/migration.sql` على أوامر `ADD COLUMN IF NOT EXISTS` لهذه الأعمدة. أُضيف `npx prisma migrate deploy` إلى `vercel.json` قبل `npm run build`، بحيث تُطبّق migrations المتراكمة في مرحلة build قبل تشغيل Serverless. لم تُنفّذ migration مباشرة من البيئة المحلية ولم تُعرض أي قيمة سرية.
 
 نجحت بوابات التحقق المحلية بعد التعديل: Prisma validate، typecheck، typecheck:packages، اختبارات server، اختبارات auth، اختبارات الواجهة، build، وgit diff check. التغيير محفوظ محلياً فقط بانتظار موافقة نشر منفصلة لأن build سيجري migration على قاعدة الإنتاج.
+
+## نتيجة migration والحساب التجريبي وفحص الواجهة
+
+بعد نشر `0d53fd7` طبّقت Vercel migrations بنجاح وأصبح إنشاء المستخدم الاختباري يعيد HTTP 201. نجح login، ثم `/api/auth/me` و`/api/profile` و`/api/preferences` و`/api/achievements/progress` بحالة 200. اختُبرت واجهة الدخول في المتصفح وانتقلت فعلياً إلى `/dashboard`، وظهرت لوحة المستخدم دون أخطاء Console. الصفحة الرئيسية والتسجيل والدخول تُرسم RTL، وتعرض `—` عند غياب بيانات السوق بدلاً من أرقام مصطنعة.
+
+نتيجة المسح الإنتاجي بعد migration: `/api/health` وملخصات EGX/TASI والمعادن والأخبار والتحليلات وOpenAPI تعيد HTTP 200؛ `/api/watchlists` يعيد 401 بلا Token كما هو متوقع. TASI يعيد `available:false` لأن `SAHMK_API_KEY` غير مضبوط، والمعادن تعيد `available:false` لأن جسر EGX الرسمي غير مهيأ، والأخبار تعيد `available:false` عند فراغ المصادر. Elliott وGann يعيدان 200 بحالة `fallback` التعليمية، وConsensus يعيد 200؛ هذا ليس تشغيل Python الأصلي.
+
+أُنشئ حساب Demo المطلوب بالبريد `demo@borsatyai.com` والاسم `demo` باستخدام كلمة المرور المحددة في المرفق. اكتمل تحديث الملف الشخصي، وإنشاء قائمة متابعة، وإضافة الرموز COMI وETEL و2222، ثم تحقق `/api/auth/me` بحالة 200. لم تُضف أسعاراً أو صفقات وهمية.
+
+المصادقة وقاعدة البيانات وتدفق الواجهة الأساسي أصبحت قابلة للاختبار فعلياً. لا ينبغي ادعاء جاهزية بيانات حية كاملة قبل ضبط مفاتيح SAHMK وHalal Terminal وجسر EGX ومصدر معادن/أخبار موثوق، أو نشر Python الأصلي بدلاً من fallback التعليمي المعلن.
