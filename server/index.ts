@@ -20,6 +20,13 @@ import { startAlertChecker } from './src/services/alerts-checker.service.js'
 import { tradingRoutes } from './src/routes/trading.routes.js'
 import { searchRoutes } from './src/routes/search.routes.js'
 import { comparisonRoutes } from './src/routes/comparison.routes.js'
+import { simulatorRoutes } from './src/routes/simulator.routes.js'
+import { smartPortfolioRoutes } from './src/routes/smart-portfolio.routes.js'
+import { insightsRoutes } from './src/routes/insights.routes.js'
+import { developerRoutes } from './src/routes/developer.routes.js'
+import { audioRoutes } from './src/routes/audio.routes.js'
+import { whatsappRoutes } from './src/routes/whatsapp.routes.js'
+import { telegramRoutes } from './src/routes/telegram.routes.js'
 
 const app = express()
 app.use(express.json())
@@ -94,6 +101,13 @@ app.use('/api/backtest', backtestRoutes)
 app.use('/api/trading', tradingRoutes)
 app.use('/api/search', searchRoutes)
 app.use('/api/comparison', comparisonRoutes)
+app.use('/api/simulator', simulatorRoutes)
+app.use('/api/portfolio', smartPortfolioRoutes)
+app.use('/api', insightsRoutes)
+app.use('/api/developer', developerRoutes)
+app.use('/api/analysis', audioRoutes)
+app.use('/api/alerts', whatsappRoutes)
+app.use('/api', telegramRoutes)
 app.use(
 	'/uploads',
 	express.static(path.join(process.cwd(), 'server', 'uploads')),
