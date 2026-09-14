@@ -74,6 +74,7 @@ import {
 	ReferralPage,
 	VideoLibraryPage,
 } from './pages/MarketLeadershipPages'
+import { AnalysisOverviewPage, PublicHomePage } from './pages/PublicPages'
 
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
@@ -121,6 +122,11 @@ function RoutedApp() {
 	if (path.startsWith('/help/'))
 		return <HelpPage category={path.slice('/help/'.length)} />
 	if (path === '/backtest') return <BacktestPage />
+	if (path === '/analysis/elliott')
+		return <AnalysisOverviewPage engine="elliott" />
+	if (path === '/analysis/gann') return <AnalysisOverviewPage engine="gann" />
+	if (path === '/markets/egx') return <PublicHomePage focus="EGX" />
+	if (path === '/markets/tasi') return <PublicHomePage focus="TASI" />
 	if (path === '/strategies' || path === '/strategy-builder')
 		return (
 			<Suspense
@@ -323,16 +329,18 @@ function RoutedApp() {
 				)}
 			</ProtectedRoute>
 		)
+	if (path === '/financial-report')
+		return (
+			<main className="legacy-page">
+				<Suspense
+					fallback={<div className="loading-screen">جارٍ تحميل التقرير...</div>}
+				>
+					<FinancialReportSection />
+				</Suspense>
+			</main>
+		)
 	if (path !== '/') return <NotFoundPage />
-	return (
-		<main className="legacy-page">
-			<Suspense
-				fallback={<div className="loading-screen">جارٍ تحميل التقرير...</div>}
-			>
-				<FinancialReportSection />
-			</Suspense>
-		</main>
-	)
+	return <PublicHomePage />
 }
 export function App() {
 	return (

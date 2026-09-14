@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import type { Request, Response } from 'express'
+import app from '../server/index.js'
 
 function loadFinancialData(): unknown {
 	const candidates = [
@@ -37,6 +38,5 @@ export default async function handler(request: Request, response: Response) {
 		return
 	}
 
-	const { default: app } = await import('../server/index')
 	app(request, response)
 }
