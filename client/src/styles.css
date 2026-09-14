@@ -5749,3 +5749,106 @@ body.dark-mode .section-activity-links button:focus-visible {
 		grid-template-columns: 1fr;
 	}
 }
+
+/* Arabic stock directory: dense, readable and analysis-first. */
+.borsaty-directory-chips {
+	display: flex;
+	gap: 8px;
+	margin: 12px 0;
+	overflow-x: auto;
+	padding-bottom: 3px;
+	scrollbar-width: thin;
+}
+.borsaty-directory-chips span {
+	flex: 0 0 auto;
+	padding: 7px 11px;
+	border: 1px solid var(--border);
+	border-radius: 999px;
+	background: var(--surface-muted);
+	color: var(--muted);
+	font-size: 11px;
+	font-weight: 800;
+	white-space: nowrap;
+}
+.borsaty-directory-chips span.is-active {
+	border-color: #173f55;
+	background: #173f55;
+	color: #fff;
+}
+.borsaty-directory-table th {
+	white-space: nowrap;
+}
+.borsaty-directory-table td {
+	vertical-align: middle;
+}
+.borsaty-directory-symbol {
+	display: flex;
+	min-width: 220px;
+	align-items: center;
+	gap: 8px;
+	border: 0;
+	background: transparent;
+	color: inherit;
+	text-align: right;
+	cursor: pointer;
+}
+.borsaty-directory-symbol > div {
+	display: grid;
+	gap: 3px;
+}
+.borsaty-directory-symbol b {
+	color: var(--text);
+	font-size: 13px;
+}
+.borsaty-directory-symbol small {
+	color: #0b78a2;
+	font-family: 'JetBrains Mono', monospace;
+	font-size: 10px;
+	font-weight: 800;
+	direction: ltr;
+	text-align: right;
+}
+.borsaty-row-analysis {
+	padding: 7px 9px;
+	border: 1px solid #cfe4eb;
+	border-radius: 8px;
+	background: #f2fafc;
+	color: #096c91;
+	font-size: 10px;
+	font-weight: 800;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.borsaty-row-analysis span {
+	font-size: 14px;
+}
+.borsaty-row-analysis:hover,
+.borsaty-row-analysis:focus-visible,
+.borsaty-directory-symbol:focus-visible {
+	outline: 2px solid #39a2c7;
+	outline-offset: 2px;
+}
+body.dark-mode .borsaty-directory-chips span.is-active {
+	border-color: #65bfd8;
+	background: #65bfd8;
+	color: #092d3d;
+}
+body.dark-mode .borsaty-directory-symbol b {
+	color: #e6f1f4;
+}
+body.dark-mode .borsaty-row-analysis {
+	border-color: #326a7d;
+	background: #153e4d;
+	color: #a9e4f3;
+}
+@media (max-width: 700px) {
+	.borsaty-directory-table-wrap {
+		overflow-x: auto;
+	}
+	.borsaty-directory-table {
+		min-width: 680px;
+	}
+	.borsaty-directory-symbol {
+		min-width: 230px;
+	}
+}

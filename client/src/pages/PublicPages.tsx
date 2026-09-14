@@ -110,6 +110,29 @@ const quoteValue = (value: unknown) =>
 
 const formatValue = (value?: number) => formatEnglishNumber(value)
 
+const arabicCompanyNames: Record<string, string> = {
+	COMI: 'البنك التجاري الدولي',
+	ABUK: 'أبو قير للأسمدة والصناعات الكيماوية',
+	ETEL: 'المصرية للاتصالات',
+	SWDY: 'السويدي إليكتريك',
+	TMGH: 'مجموعة طلعت مصطفى القابضة',
+	ORAS: 'أوراسكوم كونستراكشون',
+	MFPC: 'مصر لإنتاج الأسمدة - موبكو',
+	EKHO: 'القابضة المصرية الكويتية',
+	HRHO: 'المجموعة المالية هيرميس القابضة',
+	CIEC: 'القاهرة للاستثمار والتنمية العقارية',
+	EFIH: 'إي فاينانس للاستثمارات المالية والرقمية',
+	SCRC: 'مدينة مصر للإسكان والتعمير',
+	'2222': 'أرامكو السعودية',
+	'1120': 'مصرف الراجحي',
+	'1211': 'شركة التعدين العربية السعودية - معادن',
+}
+
+const arabicCompanyName = (company: DirectoryCompany, displaySymbol: string) =>
+	arabicCompanyNames[displaySymbol.toUpperCase()] ??
+	arabicCompanyNames[company.symbol.toUpperCase()] ??
+	company.name
+
 function MarketMetric({ card }: { card: MarketCard }) {
 	return (
 		<article className="borsaty-market-card">
@@ -206,6 +229,13 @@ function MarketDirectory({
 					<span>{availableCount} بسعر متاح</span>
 				</div>
 			</div>
+			<div className="borsaty-directory-chips" aria-label="فلاتر دليل الأسهم">
+				<span className="is-active">جميع الأسهم</span>
+				<span>الأكثر ارتفاعاً</span>
+				<span>الأكثر نشاطاً</span>
+				<span>الأعلى سعراً</span>
+				<span>الأسهم المتاحة للتحليل</span>
+			</div>
 			<div className="borsaty-directory-toolbar">
 				<div>
 					<label htmlFor={`${market.toLowerCase()}-directory-search`}>
@@ -244,11 +274,11 @@ function MarketDirectory({
 					<table className="borsaty-directory-table">
 						<thead>
 							<tr>
-								<th>الرمز</th>
-								<th>الشركة</th>
+								<th>السهم</th>
 								<th>السعر</th>
 								<th>التغير</th>
 								<th>الحالة</th>
+								<th>التحليل</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -264,6 +294,7 @@ function MarketDirectory({
 										: price != null
 											? 'cached'
 											: 'unavailable'
+								const arabicName = arabicCompanyName(company, displaySymbol)
 								return (
 									<tr key={`${market}-${company.symbol}`}>
 										<td>
@@ -275,13 +306,12 @@ function MarketDirectory({
 													className={`borsaty-status-dot is-${status}`}
 													aria-hidden="true"
 												/>
-												<b>{displaySymbol}</b>
-												{displaySymbol !== company.symbol && (
-													<small>{company.symbol}</small>
-												)}
+												<div>
+													<b>{arabicName}</b>
+													<small>{displaySymbol}</small>
+												</div>
 											</button>
 										</td>
-										<td>{company.name}</td>
 										<td>{formatValue(price)}</td>
 										<td
 											className={
@@ -301,6 +331,14 @@ function MarketDirectory({
 												<i className="borsaty-status-dot" aria-hidden="true" />
 												{status === 'unavailable' ? 'دليل فقط' : 'متاح'}
 											</span>
+										</td>
+										<td>
+											<button
+												className="borsaty-row-analysis"
+												onClick={() => navigate(`/stock/${company.symbol}`)}
+											>
+												تحليل السهم <span aria-hidden="true">←</span>
+											</button>
 										</td>
 									</tr>
 								)
