@@ -133,6 +133,7 @@ function RoutedApp() {
 	if (path.startsWith('/help/'))
 		return <HelpPage category={path.slice('/help/'.length)} />
 	if (path === '/backtest') return <BacktestPage />
+	if (path === '/analysis/consensus') return <BacktestPage />
 	if (path === '/analysis/elliott')
 		return <AnalysisOverviewPage engine="elliott" />
 	if (path === '/analysis/gann') return <AnalysisOverviewPage engine="gann" />
@@ -330,6 +331,7 @@ function RoutedApp() {
 	if (
 		path === '/dashboard' ||
 		path === '/achievements' ||
+		path === '/profile' ||
 		path.startsWith('/profile/')
 	)
 		return (
