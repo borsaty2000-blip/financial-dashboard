@@ -34,7 +34,7 @@ const initialEdges: Edge[] = template.edges.map((edge) => ({
 	animated: false,
 }))
 
-function graphFromFlow(nodes: Node[], edges: Edge[]): StrategyGraph {
+const graphFromFlow = (nodes: Node[], edges: Edge[]): StrategyGraph => {
 	return {
 		...template,
 		nodes: nodes.map((node) => ({
