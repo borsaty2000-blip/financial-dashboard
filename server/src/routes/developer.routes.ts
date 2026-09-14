@@ -1,14 +1,72 @@
 import { createHash, randomBytes } from 'node:crypto'
-import { Router } from 'express'
+import { Router, type NextFunction, type Request, type Response } from 'express'
 import { z } from 'zod'
 import { requireAuth } from '../middleware/auth.js'
 import { prisma } from '../lib/prisma.js'
+import { CandlesService } from '../services/market/candles.service.js'
 
 export const developerRoutes = Router()
+export const developerApiRoutes = Router()
 const requests = new Map<string, { count: number; resetAt: number }>()
 function hash(value: string) {
 	return createHash('sha256').update(value).digest('hex')
 }
+
+export async function apiKeyAuth(
+	request: Request,
+	response: Response,
+	next: NextFunction,
+) {
+	const raw =
+		request.header('x-api-key') ??
+		request.headers.authorization?.replace(/^Bearer\s+/i, '')
+	if (!raw?.startsWith('brs_'))
+		return response.status(401).json({ error: 'x-api-key مطلوب' })
+	const current = requests.get(raw)
+	const now = Date.now()
+	if (current && current.resetAt > now && current.count >= 60)
+		return response
+			.status(429)
+			.json({ error: 'تم تجاوز حد 60 طلباً في الدقيقة' })
+	if (!current || current.resetAt <= now)
+		requests.set(raw, { count: 1, resetAt: now + 60_000 })
+	else current.count += 1
+	const key = await prisma.apiKey.findFirst({
+		where: { keyHash: hash(raw), revokedAt: null },
+	})
+	if (!key) return response.status(401).json({ error: 'مفتاح API غير صالح' })
+	await prisma.apiKey
+		.update({
+			where: { id: key.id },
+			data: { lastUsedAt: new Date(), requestCount: { increment: 1 } },
+		})
+		.catch(() => undefined)
+	request.userId = key.userId
+	next()
+}
+
+developerApiRoutes.use(apiKeyAuth)
+developerApiRoutes.get('/quote/:symbol', async (request, response) => {
+	try {
+		const data = await CandlesService.getCandles(
+			request.params.symbol,
+			'EGX',
+			'1d',
+			2,
+		)
+		return response.json({
+			symbol: request.params.symbol.toUpperCase(),
+			candle: data.candles.at(-1) ?? null,
+			available: Boolean(data.candles.length),
+			source: data.source,
+		})
+	} catch (error) {
+		return response.status(502).json({
+			available: false,
+			error: error instanceof Error ? error.message : 'Quote unavailable',
+		})
+	}
+})
 
 developerRoutes.use(requireAuth)
 developerRoutes.get('/keys', async (request, response) =>
@@ -69,7 +127,6 @@ developerRoutes.get('/usage', async (request, response) =>
 		}),
 	),
 )
-
 developerRoutes.post('/analysts/apply', async (request, response) => {
 	const parsed = z
 		.object({
@@ -89,15 +146,3 @@ developerRoutes.post('/analysts/apply', async (request, response) => {
 		.status(201)
 		.json({ profile, message: 'تم استلام الطلب للمراجعة' })
 })
-
-export function checkDeveloperKey(rawKey: string) {
-	const now = Date.now()
-	const current = requests.get(rawKey)
-	if (!current || current.resetAt <= now) {
-		requests.set(rawKey, { count: 1, resetAt: now + 60_000 })
-		return true
-	}
-	if (current.count >= 60) return false
-	current.count += 1
-	return true
-}
