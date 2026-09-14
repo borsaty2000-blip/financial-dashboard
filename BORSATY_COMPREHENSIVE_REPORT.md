@@ -766,3 +766,11 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 نتائج الجودة بعد الإصلاحات: `npm run typecheck` و`npm run typecheck:packages` و`npm run test:server` و`npm run test:auth` و`npm test -- --run` (19 ملفاً، 91 اختباراً) و`npm run build` وPrettier و`git diff --check` ناجحة. يظل lint الكامل متوقفاً على مخالفات موروثة في صفحات قديمة، وهو بند مستقل موثق وليس فشل build أو TypeScript.
 
 التفاصيل، نتائج HTTP، والقيود الخارجية موثقة في [تقرير المراجعة الهندسية](docs/qa/engineering-audit-2026-09-14.md). لم يتم نشر هذه الجولة بعد؛ يلزم اعتماد صريح قبل دفع commit لأن Vercel مربوط بـ`origin/main`.
+
+## نتيجة نشر c0ed8bc وفحص ما بعد النشر
+
+تم دفع `c0ed8bc` إلى `origin/main` بعد موافقة المستخدم، وأصبح الإصدار جاهزاً على النطاق الرسمي. احتاج readiness إلى محاولتين؛ في الأولى كان `/api/health` بحالة 200 بينما كان statistical ما زال 502، ثم عاد statistical إلى 200 في المحاولة الثانية. اختبار ما بعد النشر أثبت: `/api/health` وملخصات السوق والأخبار وElliott وConsensus وstatistical وARIMA وLSTM وensemble وanomalies وbacktest والفحص الشرعي تعود 200، و`/api/auth/me` بلا token يعيد 401 المتوقع.
+
+أظهر الفحص أن السعودية والمعادن تعيدان `available:false` عند غياب `SAHMK_API_KEY` أو جسر EGX الرسمي، من دون أرقام مختلقة. كما أن `/api/news` كان يعيد `available:true` مع قائمة فارغة؛ أضيف محلياً إصلاح يجعلها `available:false` مع رسالة واضحة عندما لا تُرجع أي feed أخباراً، واختُبر محلياً مع Gann والأخبار. هذا الإصلاح الأخير يحتاج commit ودفعاً منفصلاً قبل أن يظهر في الإنتاج.
+
+لم يُنفذ إنشاء حساب حقيقي: اختبار جسم التسجيل الفارغ عاد 400 validator، أما إنشاء مستخدم صالح فمتوقف على إصلاح `DATABASE_URL` في Vercel ويتطلب payload اختباراً صريحاً حتى لا يُنشأ حساب غير مقصود.
