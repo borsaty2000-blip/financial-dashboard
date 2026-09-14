@@ -1,6 +1,6 @@
 import { mkdirSync } from 'node:fs'
 import path from 'node:path'
-import { Router } from 'express'
+import { Router, type RequestHandler } from 'express'
 import multer from 'multer'
 import {
 	deleteAccountController,
@@ -13,7 +13,20 @@ import {
 import { requireAuth } from '../middleware/auth.js'
 
 const uploadDirectory = path.join(process.cwd(), 'server', 'uploads', 'avatars')
-mkdirSync(uploadDirectory, { recursive: true })
+if (!process.env.VERCEL) mkdirSync(uploadDirectory, { recursive: true })
+const requirePersistentAvatarStorage: RequestHandler = (
+	_request,
+	response,
+	next,
+) => {
+	if (process.env.VERCEL) {
+		response.status(503).json({
+			error: 'رفع الصورة غير متاح مؤقتاً حتى يتم ربط تخزين ملفات دائم بالخادم.',
+		})
+		return
+	}
+	next()
+}
 const allowed = new Set(['image/jpeg', 'image/png', 'image/webp'])
 const upload = multer({
 	storage: multer.diskStorage({
@@ -39,6 +52,7 @@ profileRoutes.put('/', requireAuth, updateProfileController)
 profileRoutes.post(
 	'/avatar',
 	requireAuth,
+	requirePersistentAvatarStorage,
 	upload.single('avatar'),
 	uploadAvatarController,
 )
