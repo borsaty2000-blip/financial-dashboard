@@ -728,3 +728,7 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 أضيفت security headers عبر Helmet مع CSP محافظ، `Cross-Origin-Resource-Policy: cross-origin` للموارد التي قد تخدمها الواجهة، و`X-Content-Type-Options` وHSTS. أضيف request-id آمن (مع قبول قيمة header مقيدة أو توليد UUID) وstructured JSON logs للطلب والمدة، ومعالج أخطاء لا يعيد stack أو تفاصيل داخلية للعميل.
 
 أضيفت limits مخصصة للتحليل (30 طلباً/دقيقة لكل IP) وTradingView webhook (60/دقيقة) فوق المحدد العام، مع استمرار التحقق السري الثابت للـwebhook. اختبار HTTP ذري على المنفذ 41999 أعاد `/api/health` 200، أظهر CSP و`X-Request-ID`، رفض webhook بلا توقيع بـ401، وأعاد مؤشرات COMI الحقيقية المتاحة بـ200. سجل التشغيل المحلي أظهر أن alert checker يتوقف بأمان عندما تكون `DATABASE_URL` المحلية غير صالحة؛ لم تُنفذ أي migration أو نشر.
+
+## ملحق المرحلة 7 — Fork Inventory
+
+تم جرد 18 fork تحت حساب `borsaty2000-blip` قراءةً فقط. لا يوجد fork إضافي جاهز للاعتماد الإنتاجي المباشر. تم تصنيف `trading-signals` و`finance-dashboard` و`Statistical-analysis-of-EGX30` و`ElliottWaves` كمراجع، وSAHMK/Halal Terminal/finmagic كمرشحات مشروطة بمراجعات واختبارات، بينما بقيت forks ذات الترخيص المفقود أو المخاطر التشغيلية العالية مرفوضة حالياً. المصفوفة الكاملة والحدود موثقة في [`docs/integrations/fork-inventory.md`](docs/integrations/fork-inventory.md).
