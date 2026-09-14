@@ -45,6 +45,13 @@ import { SpecializedCalendarsPage } from './pages/SpecializedCalendarsPage'
 import { AdditionalMarketsPage } from './pages/AdditionalMarketsPage'
 import { CurrencyConverter } from './components/CurrencyConverter'
 import { ComprehensiveComparisonPage } from './pages/ComprehensiveComparisonPage'
+import { DeveloperDocsPage } from './pages/DeveloperDocsPage'
+import { TelegramSettingsPage } from './pages/TelegramSettingsPage'
+import {
+	AnalystDashboardPage,
+	AnalystProfilePage,
+	MySubscriptionsPage,
+} from './pages/AnalystProgramPages'
 import NotificationLive from './components/NotificationLive'
 import { LiveAnalysisFeed } from './components/Analysis/LiveAnalysisFeed'
 
@@ -93,12 +100,35 @@ function RoutedApp() {
 				<AnalystApplyPage />
 			</ProtectedRoute>
 		)
+	if (path === '/analysts/dashboard')
+		return (
+			<ProtectedRoute>
+				<AnalystDashboardPage />
+			</ProtectedRoute>
+		)
+	if (path === '/my/subscriptions')
+		return (
+			<ProtectedRoute>
+				<MySubscriptionsPage />
+			</ProtectedRoute>
+		)
 	if (path === '/analysts' || path.startsWith('/analysts/'))
-		return <AnalystsPage />
+		return path === '/analysts' ? (
+			<AnalystsPage />
+		) : (
+			<AnalystProfilePage username={path.slice('/analysts/'.length)} />
+		)
 	if (path === '/developer/dashboard')
 		return (
 			<ProtectedRoute>
 				<DeveloperDashboardPage />
+			</ProtectedRoute>
+		)
+	if (path === '/developer/docs') return <DeveloperDocsPage />
+	if (path === '/settings/telegram')
+		return (
+			<ProtectedRoute>
+				<TelegramSettingsPage />
 			</ProtectedRoute>
 		)
 	if (path === '/twin')
@@ -183,6 +213,13 @@ export function App() {
 					<MobileChrome />
 					<GlobalSearch />
 					<CurrencyConverter />
+					<a
+						className="telegram-quick-link"
+						href="/settings/telegram"
+						title="ربط Telegram"
+					>
+						Telegram
+					</a>
 					<InstallPrompt />
 					<NotificationLive />
 					<LiveAnalysisFeed />

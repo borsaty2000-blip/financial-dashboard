@@ -5,8 +5,10 @@ export function DeveloperDashboardPage() {
 	const [keys, setKeys] = useState<any[]>([])
 	const [name, setName] = useState('My App')
 	const [newKey, setNewKey] = useState('')
+	const [usage, setUsage] = useState<any>(null)
 	async function load() {
 		setKeys(await api('/api/developer/keys'))
+		setUsage(await api('/api/developer/usage?period=30d'))
 	}
 	useEffect(() => {
 		void load().catch(() => undefined)
@@ -34,10 +36,19 @@ export function DeveloperDashboardPage() {
 				{newKey && <code>{newKey}</code>}
 			</section>
 			<section className="analysis-card">
+				<div className="developer-usage-grid">
+					<b>{usage?.total ?? 0} طلباً آخر 30 يوماً</b>
+					<span>{usage?.errors ?? 0} أخطاء</span>
+					<span>متوسط الاستجابة {usage?.averageLatencyMs ?? 0}ms</span>
+					<a href="/developer/docs">توثيق API</a>
+				</div>
 				{keys.map((key) => (
 					<div className="tool-row" key={key.id}>
 						<b>{key.name}</b>
 						<span>{key.keyPrefix}</span>
+						<span>
+							{key.tier ?? 'FREE'} · {key.dailyLimit ?? 100}/يوم
+						</span>
 						<span>{key.requestCount} طلب</span>
 						<button
 							className="link-button"

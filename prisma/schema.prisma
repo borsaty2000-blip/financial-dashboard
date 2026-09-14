@@ -34,6 +34,7 @@ model User {
   portfolio            Portfolio?
   orders               Order[]
   apiKeys              ApiKey[]
+  apiSubscription      ApiSubscription?
   analystProfile       AnalystProfile?
   analystSubscriptions AnalystSubscription[] @relation("Subscriber")
   analystSubscribers   AnalystSubscription[] @relation("Analyst")
@@ -239,47 +240,140 @@ model Order {
 }
 
 model ApiKey {
-  id           String    @id @default(uuid())
+  id           String        @id @default(uuid())
   userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   name         String
-  keyHash      String    @unique
+  keyHash      String        @unique
   keyPrefix    String
   lastUsedAt   DateTime?
-  requestCount Int       @default(0)
-  createdAt    DateTime  @default(now())
+  requestCount Int           @default(0)
+  tier         String        @default("FREE")
+  dailyLimit   Int           @default(100)
+  monthlyLimit Int           @default(3000)
+  isActive     Boolean       @default(true)
+  expiresAt    DateTime?
+  createdAt    DateTime      @default(now())
   revokedAt    DateTime?
+  usageLogs    ApiUsageLog[]
 
   @@index([userId])
   @@map("api_keys")
 }
 
+model ApiUsageLog {
+  id         String   @id @default(uuid())
+  apiKeyId   String
+  apiKey     ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  endpoint   String
+  method     String
+  statusCode Int
+  latencyMs  Int
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([apiKeyId, createdAt])
+  @@map("api_usage_logs")
+}
+
+model ApiSubscription {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tier          String    @default("FREE")
+  monthlyPrice  Float     @default(0)
+  startsAt      DateTime  @default(now())
+  endsAt        DateTime?
+  autoRenew     Boolean   @default(false)
+  paymentMethod String?
+  status        String    @default("ACTIVE")
+
+  @@map("api_subscriptions")
+}
+
 model AnalystProfile {
-  id          String   @id @default(uuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  displayName String
-  bio         String?  @db.VarChar(1000)
-  specialties String[] @default([])
-  status      String   @default("PENDING")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String        @id @default(uuid())
+  userId            String        @unique
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName       String
+  bio               String?       @db.VarChar(1000)
+  specialties       String[]      @default([])
+  experience        Int           @default(0)
+  credentials       String[]      @default([])
+  isVerified        Boolean       @default(false)
+  verificationDate  DateTime?
+  subscriptionPrice Float         @default(0)
+  totalSubscribers  Int           @default(0)
+  totalRevenue      Float         @default(0)
+  rating            Float         @default(0)
+  reviewCount       Int           @default(0)
+  status            String        @default("PENDING")
+  posts             AnalystPost[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
   @@map("analyst_profiles")
 }
 
 model AnalystSubscription {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   subscriberId String
   analystId    String
-  subscriber   User     @relation("Subscriber", fields: [subscriberId], references: [id], onDelete: Cascade)
-  analyst      User     @relation("Analyst", fields: [analystId], references: [id], onDelete: Cascade)
-  status       String   @default("ACTIVE")
-  createdAt    DateTime @default(now())
+  subscriber   User      @relation("Subscriber", fields: [subscriberId], references: [id], onDelete: Cascade)
+  analyst      User      @relation("Analyst", fields: [analystId], references: [id], onDelete: Cascade)
+  status       String    @default("ACTIVE")
+  price        Float     @default(0)
+  startsAt     DateTime  @default(now())
+  endsAt       DateTime?
+  createdAt    DateTime  @default(now())
 
   @@unique([subscriberId, analystId])
   @@index([analystId])
   @@map("analyst_subscriptions")
+}
+
+model AnalystPost {
+  id        String         @id @default(uuid())
+  analystId String
+  analyst   AnalystProfile @relation(fields: [analystId], references: [id], onDelete: Cascade)
+  symbol    String?
+  type      String
+  title     String
+  content   String         @db.Text
+  charts    String[]       @default([])
+  sentiment String?
+  isPremium Boolean        @default(false)
+  views     Int            @default(0)
+  likes     Int            @default(0)
+  createdAt DateTime       @default(now())
+
+  @@index([analystId, createdAt])
+  @@map("analyst_posts")
+}
+
+model WhatsAppSubscription {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  phoneNumber      String
+  isVerified       Boolean  @default(false)
+  verificationCode String?
+  alertTypes       String[] @default([])
+  createdAt        DateTime @default(now())
+
+  @@map("whatsapp_subscriptions")
+}
+
+model TelegramSubscription {
+  id         String   @id @default(uuid())
+  userId     String?  @unique
+  chatId     String   @unique
+  username   String?
+  isActive   Boolean  @default(true)
+  alertTypes String[] @default([])
+  createdAt  DateTime @default(now())
+
+  @@map("telegram_subscriptions")
 }
 
 model MarketCandle {
