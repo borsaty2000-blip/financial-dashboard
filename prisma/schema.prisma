@@ -331,3 +331,89 @@ model SavedScreener {
   @@index([userId])
   @@map("saved_screeners")
 }
+
+model IPOEvent {
+  id                String    @id @default(uuid())
+  symbol            String
+  companyName       String
+  nameAr            String
+  market            String
+  ipoDate           DateTime
+  priceRange        String
+  sharesOffered     BigInt
+  totalValue        Float
+  status            String
+  subscriptionStart DateTime?
+  subscriptionEnd   DateTime?
+  createdAt         DateTime  @default(now())
+
+  @@index([ipoDate])
+  @@map("ipo_events")
+}
+
+model DividendEvent {
+  id           String   @id @default(uuid())
+  symbol       String
+  market       String
+  amount       Float
+  currency     String
+  exDate       DateTime
+  recordDate   DateTime
+  paymentDate  DateTime
+  yieldPercent Float
+  status       String
+  createdAt    DateTime @default(now())
+
+  @@index([exDate])
+  @@map("dividend_events")
+}
+
+model EarningsEvent {
+  id              String   @id @default(uuid())
+  symbol          String
+  market          String
+  quarter         String
+  fiscalYear      Int
+  reportDate      DateTime
+  timeOfDay       String
+  epsEstimate     Float?
+  epsActual       Float?
+  revenueEstimate Float?
+  revenueActual   Float?
+  surprise        Float?
+  createdAt       DateTime @default(now())
+
+  @@index([reportDate])
+  @@map("earnings_events")
+}
+
+model SplitEvent {
+  id        String   @id @default(uuid())
+  symbol    String
+  market    String
+  splitDate DateTime
+  ratio     String
+  oldShares BigInt
+  newShares BigInt
+  createdAt DateTime @default(now())
+
+  @@index([splitDate])
+  @@map("split_events")
+}
+
+model InsiderTrade {
+  id              String   @id @default(uuid())
+  symbol          String
+  insiderName     String
+  insiderRole     String
+  transactionType String
+  shares          Int
+  price           Float
+  totalValue      Float
+  transactionDate DateTime
+  filingDate      DateTime
+  source          String
+
+  @@index([symbol, transactionDate])
+  @@map("insider_trades")
+}

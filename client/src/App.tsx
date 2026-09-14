@@ -41,6 +41,7 @@ import { EconomicCalendarPage } from './pages/EconomicCalendarPage'
 import { NewsPage } from './pages/NewsPage'
 import { AdvancedScreenerPage } from './pages/AdvancedScreenerPage'
 import { PortfolioAnalyticsPage } from './pages/PortfolioAnalyticsPage'
+import { SpecializedCalendarsPage } from './pages/SpecializedCalendarsPage'
 import NotificationLive from './components/NotificationLive'
 import { LiveAnalysisFeed } from './components/Analysis/LiveAnalysisFeed'
 
@@ -104,6 +105,13 @@ function RoutedApp() {
 			</ProtectedRoute>
 		)
 	if (path === '/calendar') return <EconomicCalendarPage />
+	if (path === '/calendar/ipo') return <SpecializedCalendarsPage kind="ipo" />
+	if (path === '/calendar/dividends')
+		return <SpecializedCalendarsPage kind="dividends" />
+	if (path === '/calendar/earnings')
+		return <SpecializedCalendarsPage kind="earnings" />
+	if (path === '/calendar/splits')
+		return <SpecializedCalendarsPage kind="splits" />
 	if (path === '/news') return <NewsPage />
 	if (path === '/screener') return <AdvancedScreenerPage />
 	if (path === '/portfolio/analytics')

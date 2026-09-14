@@ -23,3 +23,19 @@ export async function requireAuth(
 		res.status(401).json({ error: 'رمز الوصول غير صالح أو منتهي' })
 	}
 }
+
+export async function requireAdmin(
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) {
+	await requireAuth(req, res, () => {
+		const allowed = (process.env.ADMIN_USER_IDS ?? '')
+			.split(',')
+			.map((item) => item.trim())
+			.filter(Boolean)
+		if (!req.userId || !allowed.includes(req.userId))
+			return res.status(403).json({ error: 'صلاحيات الإدارة مطلوبة' })
+		next()
+	})
+}
