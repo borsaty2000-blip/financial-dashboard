@@ -704,3 +704,9 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 أضيفت حزمة `@borsaty/widgets` بعقد مستقل: 12 نوع Widget، `DashboardGrid` للسحب وتبديل المواضع، `MarketHeatmap` للتلوين الدلالي، وحفظ layout محلياً دون تخزين بيانات حساسة. لا تجلب الحزمة بيانات ولا تتصل بقاعدة البيانات؛ التطبيق يمرر البيانات المتحققة إليها.
 
 نجح فحص TypeScript للحزم والتطبيق، ونجح smoke test للـregistry: 12 Widget مع وجود Heatmap.
+
+## ملحق المرحلة 7 — Strategy Builder
+
+أضيفت حزمة `@borsaty/strategies` كطبقة عقود مستقلة لمنشئ استراتيجيات بصري لاحقاً. تحتوي على سجل من 23 نوع node ضمن input/indicator/logic/action/risk/output، وتحقق DAG يمنع العقد المكررة والمراجع المفقودة والحلقات وself-loop، ويلزم مخرجاً واحداً. أضيف قالب RSI تعليمي ومحاكي backtest تاريخي يعيد win rate وaverage return وmax drawdown مع disclaimer واضح.
+
+المحاكي تعليمي فقط: لا يرسل أوامر، لا يتصل بوسيط، ولا يقدم ضماناً أو توصية استثمارية. نجح `npm run typecheck:packages` وsmoke test للتحقق من القالب، رفض cycle، ورفض أقل من 30 شمعة.
