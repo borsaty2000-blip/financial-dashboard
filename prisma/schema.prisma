@@ -33,6 +33,8 @@ model User {
   notifications  Notification[]
   portfolio      Portfolio?
   orders         Order[]
+  apiKeys        ApiKey[]
+  analystProfile AnalystProfile?
 
   @@index([email])
   @@index([username])
@@ -231,4 +233,34 @@ model Order {
 
   @@index([userId, executedAt])
   @@map("orders")
+}
+
+model ApiKey {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  keyHash      String    @unique
+  keyPrefix    String
+  lastUsedAt   DateTime?
+  requestCount Int       @default(0)
+  createdAt    DateTime  @default(now())
+  revokedAt    DateTime?
+
+  @@index([userId])
+  @@map("api_keys")
+}
+
+model AnalystProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName String
+  bio         String?  @db.VarChar(1000)
+  specialties String[] @default([])
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("analyst_profiles")
 }

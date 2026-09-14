@@ -1,0 +1,13 @@
+# Optional ML models for Ensemble
+prophet
+xgboost
+# Optional Arabic NLP model
+transformers
+torch
+beautifulsoup4
+# Optional anomaly helpers
+pyod
+# Optional voice and messaging integrations
+gTTS
+twilio
+python-telegram-bot
