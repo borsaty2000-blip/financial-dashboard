@@ -160,6 +160,8 @@ export function AlertsPage() {
 	const [condition, setCondition] = useState('ABOVE')
 	const [notifications, setNotifications] = useState<Notification[]>([])
 	const [phone, setPhone] = useState('')
+	const [verificationCode, setVerificationCode] = useState('')
+	const [whatsappMessage, setWhatsappMessage] = useState('')
 	const [loading, setLoading] = useState(true)
 	async function load() {
 		setLoading(true)
@@ -193,6 +195,27 @@ export function AlertsPage() {
 				message: `تنبيه بورصتي: ${symbol} ${condition} ${target}`,
 			}),
 		})
+	}
+	async function subscribeWhatsApp() {
+		const result = await api<any>('/api/alerts/whatsapp/subscribe', {
+			method: 'POST',
+			body: JSON.stringify({
+				phoneNumber: phone,
+				alertTypes: ['PRICE', 'SIGNAL', 'NEWS'],
+			}),
+		})
+		setWhatsappMessage(
+			result.developmentCode
+				? `رمز التطوير: ${result.developmentCode}`
+				: 'تم إرسال رمز التحقق',
+		)
+	}
+	async function verifyWhatsApp() {
+		await api('/api/alerts/whatsapp/verify', {
+			method: 'POST',
+			body: JSON.stringify({ code: verificationCode }),
+		})
+		setWhatsappMessage('تم تفعيل WhatsApp')
 	}
 	return (
 		<main className="tools-page" dir="rtl">
@@ -239,6 +262,21 @@ export function AlertsPage() {
 					<button className="secondary-button" onClick={sendWhatsApp}>
 						إرسال عبر WhatsApp
 					</button>
+					<button
+						className="secondary-button"
+						onClick={() => void subscribeWhatsApp()}
+					>
+						تفعيل WhatsApp
+					</button>
+					<input
+						placeholder="رمز التحقق"
+						value={verificationCode}
+						onChange={(event) => setVerificationCode(event.target.value)}
+					/>
+					<button className="link-button" onClick={() => void verifyWhatsApp()}>
+						تحقق
+					</button>
+					{whatsappMessage && <small>{whatsappMessage}</small>}
 				</div>
 				{loading ? (
 					<StockListSkeleton />

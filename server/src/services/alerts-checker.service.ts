@@ -2,6 +2,7 @@ import { prisma } from '../lib/prisma.js'
 import { calculateRSI } from './analysis/indicators.service.js'
 import { CandlesService } from './market/candles.service.js'
 import { publishUserNotification } from './tradingview/signal-bus.js'
+import { sendWhatsAppForUser } from './notifications/whatsapp.service.js'
 
 let timer: NodeJS.Timeout | undefined
 
@@ -53,7 +54,14 @@ async function checkAlerts() {
 					},
 				})
 			})
-			if (notification) publishUserNotification(alert.userId, notification)
+			if (notification) {
+				publishUserNotification(alert.userId, notification)
+				void sendWhatsAppForUser(
+					alert.userId,
+					`تنبيه بورصتي: ${alert.symbol} وصل إلى ${latest}`,
+					'PRICE',
+				)
+			}
 		} catch (error) {
 			console.warn(
 				'Alert check failed:',

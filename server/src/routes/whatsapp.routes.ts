@@ -1,8 +1,76 @@
 import { Router } from 'express'
 import { z } from 'zod'
 import { requireAuth } from '../middleware/auth.js'
-
+import {
+	configureWhatsApp,
+	sendWhatsApp,
+	verifyWhatsApp,
+} from '../services/notifications/whatsapp.service.js'
+import { prisma } from '../lib/prisma.js'
 export const whatsappRoutes = Router()
+whatsappRoutes.get('/whatsapp/status', requireAuth, async (request, response) =>
+	response.json(
+		await prisma.whatsAppSubscription.findUnique({
+			where: { userId: request.userId! },
+			select: {
+				phoneNumber: true,
+				isVerified: true,
+				alertTypes: true,
+				createdAt: true,
+			},
+		}),
+	),
+)
+whatsappRoutes.post(
+	'/whatsapp/subscribe',
+	requireAuth,
+	async (request, response) => {
+		const parsed = z
+			.object({
+				phoneNumber: z.string().min(8).max(30),
+				alertTypes: z
+					.array(z.enum(['PRICE', 'SIGNAL', 'NEWS', 'ACHIEVEMENT']))
+					.default(['PRICE']),
+			})
+			.safeParse(request.body)
+		if (!parsed.success)
+			return response
+				.status(400)
+				.json({ error: 'رقم الهاتف وأنواع التنبيه مطلوبة' })
+		const subscription = await configureWhatsApp(
+			request.userId!,
+			parsed.data.phoneNumber,
+			parsed.data.alertTypes,
+		)
+		return response.status(201).json({
+			subscription: {
+				phoneNumber: subscription.phoneNumber,
+				isVerified: subscription.isVerified,
+				alertTypes: subscription.alertTypes,
+			},
+			verificationRequired: true,
+			developmentCode:
+				process.env.NODE_ENV === 'production'
+					? undefined
+					: subscription.verificationCode,
+		})
+	},
+)
+whatsappRoutes.post(
+	'/whatsapp/verify',
+	requireAuth,
+	async (request, response) => {
+		const parsed = z
+			.object({ code: z.string().length(6) })
+			.safeParse(request.body)
+		if (!parsed.success)
+			return response.status(400).json({ error: 'رمز التحقق غير صالح' })
+		const valid = await verifyWhatsApp(request.userId!, parsed.data.code)
+		return valid
+			? response.json({ verified: true })
+			: response.status(400).json({ verified: false, error: 'رمز التحقق خاطئ' })
+	},
+)
 whatsappRoutes.post('/whatsapp', requireAuth, async (request, response) => {
 	const parsed = z
 		.object({
@@ -12,34 +80,6 @@ whatsappRoutes.post('/whatsapp', requireAuth, async (request, response) => {
 		.safeParse(request.body)
 	if (!parsed.success)
 		return response.status(400).json({ error: 'رقم الهاتف والرسالة مطلوبان' })
-	const sid = process.env.TWILIO_ACCOUNT_SID
-	const token = process.env.TWILIO_AUTH_TOKEN
-	const from = process.env.TWILIO_WHATSAPP_FROM
-	if (!sid || !token || !from)
-		return response
-			.status(503)
-			.json({ available: false, error: 'Twilio WhatsApp غير مهيأ' })
-	const auth = Buffer.from(`${sid}:${token}`).toString('base64')
-	const body = new URLSearchParams({
-		From: from,
-		To: parsed.data.to,
-		Body: parsed.data.message,
-	})
-	const result = await fetch(
-		`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
-		{
-			method: 'POST',
-			headers: {
-				Authorization: `Basic ${auth}`,
-				'Content-Type': 'application/x-www-form-urlencoded',
-			},
-			body,
-		},
-	)
-	const data = await result.json().catch(() => ({}))
-	if (!result.ok)
-		return response
-			.status(502)
-			.json({ available: false, error: 'تعذر إرسال WhatsApp', detail: data })
-	return response.status(202).json({ accepted: true, sid: data.sid })
+	const result = await sendWhatsApp(parsed.data.to, parsed.data.message)
+	return response.status(result.accepted ? 202 : 503).json(result)
 })
