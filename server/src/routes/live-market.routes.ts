@@ -3,12 +3,16 @@ import { getEgxSummary } from '../services/market/egx.adapter.js'
 import { getTasiSummary } from '../services/market/sahmk.adapter.js'
 import { CandlesService } from '../services/market/candles.service.js'
 import { getEgyptCompanies } from '../services/market/twelve-data.adapter.js'
+import { getTasiCompanies } from '../services/market/sahmk.adapter.js'
 import { NewsService } from '../services/news/news.service.js'
 
 type QuoteData = Record<string, unknown>
 
 const liveMarketRoutes = Router()
-let directoryCache: { expiresAt: number; value: unknown[] } | null = null
+let directoryCache: {
+	expiresAt: number
+	value: { egx: unknown[]; tasi: unknown[] }
+} | null = null
 let liveCache: { expiresAt: number; value: unknown } | null = null
 
 const numberFrom = (value: unknown, keys: string[]) => {
@@ -55,11 +59,14 @@ function indexCard(
 	}
 }
 
-async function companies() {
+async function companies(): Promise<{ egx: unknown[]; tasi: unknown[] }> {
 	if (directoryCache && directoryCache.expiresAt > Date.now())
 		return directoryCache.value
-	const result = await getEgyptCompanies()
-	const value = result.slice(0, 60).map((company) => ({
+	const [egxResult, tasiResult] = await Promise.all([
+		getEgyptCompanies().catch(() => []),
+		getTasiCompanies().catch(() => ({ data: [] })),
+	])
+	const egx = egxResult.map((company) => ({
 		symbol: company.symbol,
 		name: company.name,
 		currency: company.currency,
@@ -69,6 +76,29 @@ async function companies() {
 		available: false,
 		freshness: 'unavailable',
 	}))
+	const tasiData =
+		tasiResult && typeof tasiResult === 'object' && 'data' in tasiResult
+			? tasiResult.data
+			: []
+	const tasi = Array.isArray(tasiData)
+		? tasiData
+				.map((company) => ({
+					symbol: String((company as Record<string, unknown>).symbol ?? ''),
+					name: String((company as Record<string, unknown>).name ?? ''),
+					currency: String(
+						(company as Record<string, unknown>).currency ?? 'SAR',
+					),
+					exchange: String(
+						(company as Record<string, unknown>).exchange ?? 'XSAU',
+					),
+					price: null,
+					changePercent: null,
+					available: false,
+					freshness: 'unavailable',
+				}))
+				.filter((company) => company.symbol && company.name)
+		: []
+	const value = { egx, tasi }
 	directoryCache = { expiresAt: Date.now() + 86_400_000, value }
 	return value
 }
@@ -106,12 +136,12 @@ liveMarketRoutes.get('/live', async (_request, response) => {
 		const [egx, tasi, directory, news] = await Promise.all([
 			getEgxSummary(),
 			getTasiSummary(),
-			companies().catch(() => []),
+			companies().catch(() => ({ egx: [], tasi: [] })),
 			NewsService.list({ limit: 10 }),
 		])
 		const egxData = (egx.data ?? {}) as Record<string, unknown>
 		const tasiData = (tasi.data ?? {}) as QuoteData
-		const directorySymbols = directory.map((item) =>
+		const directorySymbols = directory.egx.map((item) =>
 			String((item as { symbol: string }).symbol),
 		)
 		const topMovers = await quotes(directorySymbols, 'EGX')
@@ -126,13 +156,15 @@ liveMarketRoutes.get('/live', async (_request, response) => {
 			},
 			topMovers,
 			topTraded: topMovers.slice(0, 10),
-			companies: directory,
+			companies: directory.egx,
+			directories: directory,
 			latestSignals: [],
 			news,
 			available:
 				egx.available ||
 				tasi.available ||
-				directory.length > 0 ||
+				directory.egx.length > 0 ||
+				directory.tasi.length > 0 ||
 				news.length > 0,
 			source: egx.source === tasi.source ? egx.source : 'mixed',
 			freshness: [egx.freshness, tasi.freshness].includes('delayed')
@@ -150,6 +182,7 @@ liveMarketRoutes.get('/live', async (_request, response) => {
 			topMovers: [],
 			topTraded: [],
 			companies: [],
+			directories: { egx: [], tasi: [] },
 			latestSignals: [],
 			news: [],
 			message:

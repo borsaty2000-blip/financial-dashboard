@@ -23,7 +23,7 @@ type TwelveDirectoryResponse = {
 }
 
 type CompanyCache = { expiresAt: number; companies: TwelveCompany[] }
-let egyptCompaniesCache: CompanyCache | null = null
+const directoryCache = new Map<string, CompanyCache>()
 const DIRECTORY_CACHE_TTL_MS = 24 * 60 * 60 * 1_000
 
 const egxAliases: Record<string, string[]> = {
@@ -62,27 +62,37 @@ function normalizeCompany(
 	}
 }
 
-export async function getEgyptCompanies(): Promise<TwelveCompany[]> {
-	if (egyptCompaniesCache && egyptCompaniesCache.expiresAt > Date.now())
-		return egyptCompaniesCache.companies
+async function getCompaniesByExchange(
+	exchange: 'XCAI' | 'XSAU',
+): Promise<TwelveCompany[]> {
+	const cached = directoryCache.get(exchange)
+	if (cached && cached.expiresAt > Date.now()) return cached.companies
 	const key = requiredKey()
 	const response = await fetch(
-		`https://api.twelvedata.com/stocks?exchange=XCAI&apikey=${encodeURIComponent(key)}`,
+		`https://api.twelvedata.com/stocks?exchange=${exchange}&apikey=${encodeURIComponent(key)}`,
 		{ signal: AbortSignal.timeout(10_000) },
 	)
 	if (!response.ok)
-		throw new Error(`Twelve Data directory HTTP ${response.status}`)
+		throw new Error(`Twelve Data ${exchange} directory HTTP ${response.status}`)
 	const payload = (await response.json()) as TwelveDirectoryResponse
 	const companies = (payload.data ?? [])
 		.map(normalizeCompany)
 		.filter((company): company is TwelveCompany => company !== null)
 	if (!companies.length)
-		throw new Error('Twelve Data returned no EGX companies')
-	egyptCompaniesCache = {
+		throw new Error(`Twelve Data returned no ${exchange} companies`)
+	directoryCache.set(exchange, {
 		companies,
 		expiresAt: Date.now() + DIRECTORY_CACHE_TTL_MS,
-	}
+	})
 	return companies
+}
+
+export function getEgyptCompanies(): Promise<TwelveCompany[]> {
+	return getCompaniesByExchange('XCAI')
+}
+
+export function getSaudiCompanies(): Promise<TwelveCompany[]> {
+	return getCompaniesByExchange('XSAU')
 }
 
 export async function resolveEgyptSymbol(input: string): Promise<string> {
@@ -101,5 +111,5 @@ export async function resolveEgyptSymbol(input: string): Promise<string> {
 }
 
 export function clearTwelveDirectoryCacheForTest() {
-	egyptCompaniesCache = null
+	directoryCache.clear()
 }

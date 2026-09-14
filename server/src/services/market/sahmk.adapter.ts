@@ -5,6 +5,7 @@ import {
 	type MarketEnvelope,
 } from './market.types.js'
 import { getYahooDelayedEnvelope } from './yahoo.adapter.js'
+import { getSaudiCompanies } from './twelve-data.adapter.js'
 
 const baseUrl = (
 	process.env.SAHMK_BASE_URL ?? 'https://api.sahmk.sa/api/v1'
@@ -69,14 +70,31 @@ export async function getTasiCompanies(
 	search?: string,
 ): Promise<MarketEnvelope<unknown>> {
 	try {
-		return live(
-			'SAHMK',
-			await request('/companies/', search ? { search } : undefined),
+		const companies = await request<unknown[]>(
+			'/companies/',
+			search ? { search } : undefined,
 		)
-	} catch (error) {
-		return unavailable(
-			'SAHMK',
-			error instanceof Error ? error.message : 'SAHMK unavailable',
-		)
+		return live('SAHMK', companies)
+	} catch (sahmkError) {
+		try {
+			const companies = await getSaudiCompanies()
+			const filtered = search
+				? companies.filter((company) =>
+						`${company.symbol} ${company.name}`
+							.toLowerCase()
+							.includes(search.toLowerCase()),
+					)
+				: companies
+			return delayed('Twelve Data', filtered, 1_440)
+		} catch (twelveError) {
+			return unavailable(
+				'Twelve Data',
+				twelveError instanceof Error
+					? twelveError.message
+					: sahmkError instanceof Error
+						? sahmkError.message
+						: 'TASI companies unavailable',
+			)
+		}
 	}
 }

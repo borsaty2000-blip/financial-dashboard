@@ -10,7 +10,7 @@
 		"typecheck": "tsc --noEmit",
 		"lint": "npm --prefix client run lint",
 		"test": "npm --prefix client run test",
-		"test:server": "node --import tsx --test server/health.integration.test.ts server/analysis-fallback.test.ts server/security.contract.test.ts server/feature.contract.test.ts",
+		"test:server": "node --import tsx --test server/health.integration.test.ts server/analysis-fallback.test.ts server/security.contract.test.ts server/feature.contract.test.ts server/market-directory.contract.test.ts",
 		"test:auth": "tsx --test server/auth.validator.test.ts",
 		"test:watch": "npm --prefix client run test:watch",
 		"coverage": "npm --prefix client run coverage",

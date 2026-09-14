@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { navigate } from '../router'
 
-type MarketEnvelope = {
+type MarketEnvelope<T = unknown> = {
 	available?: boolean
 	freshness?: 'live' | 'delayed' | 'cached' | 'stale'
-	data?: unknown
+	data?: T
 }
 
 type MarketCard = {
@@ -31,14 +31,31 @@ type LiveIndex = {
 	available: boolean
 }
 
+type DirectoryCompany = {
+	symbol: string
+	name: string
+	currency?: string
+	exchange?: string
+	price?: number | null
+	changePercent?: number | null
+	freshness?: 'live' | 'delayed' | 'cached' | 'unavailable'
+}
+
+type MarketMover = {
+	symbol: string
+	price?: number | null
+	changePercent?: number | null
+	freshness?: 'live' | 'delayed' | 'cached' | 'unavailable'
+}
+
 type UnifiedLive = {
 	indices?: Record<string, LiveIndex>
-	companies?: Array<{
-		symbol: string
-		name: string
-		currency?: string
-		available?: boolean
-	}>
+	companies?: DirectoryCompany[]
+	directories?: {
+		egx?: DirectoryCompany[]
+		tasi?: DirectoryCompany[]
+	}
+	topMovers?: MarketMover[]
 	news?: NewsItem[]
 }
 
@@ -121,6 +138,125 @@ function MarketMetric({ card }: { card: MarketCard }) {
 					: `${card.change > 0 ? '+' : ''}${card.change.toFixed(2)}%`}
 			</div>
 		</article>
+	)
+}
+
+function MarketDirectory({
+	title,
+	market,
+	companies,
+	prices,
+}: {
+	title: string
+	market: 'EGX' | 'TASI'
+	companies: DirectoryCompany[]
+	prices: Map<string, MarketMover>
+}) {
+	const [query, setQuery] = useState('')
+	const filtered = useMemo(() => {
+		const normalized = query.trim().toLowerCase()
+		if (!normalized) return companies
+		return companies.filter((company) =>
+			`${company.symbol} ${company.name}`.toLowerCase().includes(normalized),
+		)
+	}, [companies, query])
+
+	return (
+		<section className="borsaty-section borsaty-directory-section">
+			<div className="borsaty-section__heading">
+				<div>
+					<span className="borsaty-kicker">دليل السوق الكامل</span>
+					<h2>{title}</h2>
+				</div>
+				<strong>
+					{filtered.length} من {companies.length} سهم
+				</strong>
+			</div>
+			<div className="borsaty-directory-toolbar">
+				<label htmlFor={`${market.toLowerCase()}-directory-search`}>
+					بحث بالرمز أو اسم الشركة
+				</label>
+				<input
+					id={`${market.toLowerCase()}-directory-search`}
+					value={query}
+					onChange={(event) => setQuery(event.target.value)}
+					placeholder={
+						market === 'EGX' ? 'مثال: COMI أو البنك' : 'مثال: 2222 أو أرامكو'
+					}
+				/>
+			</div>
+			{companies.length ? (
+				<div className="borsaty-directory-table-wrap">
+					<table className="borsaty-directory-table">
+						<thead>
+							<tr>
+								<th>الرمز</th>
+								<th>الشركة</th>
+								<th>السعر</th>
+								<th>التغير</th>
+							</tr>
+						</thead>
+						<tbody>
+							{filtered.map((company) => {
+								const mover = prices.get(company.symbol)
+								const price = mover?.price ?? company.price ?? undefined
+								const change =
+									mover?.changePercent ?? company.changePercent ?? undefined
+								const status =
+									mover?.freshness === 'live'
+										? 'live'
+										: price != null
+											? 'cached'
+											: 'unavailable'
+								return (
+									<tr key={`${market}-${company.symbol}`}>
+										<td>
+											<button
+												className="borsaty-directory-symbol"
+												onClick={() => navigate(`/stock/${company.symbol}`)}
+											>
+												<i
+													className={`borsaty-status-dot is-${status}`}
+													aria-hidden="true"
+												/>
+												<b>{company.symbol}</b>
+											</button>
+										</td>
+										<td>{company.name}</td>
+										<td>{formatValue(price)}</td>
+										<td
+											className={
+												change == null
+													? 'is-muted'
+													: change > 0
+														? 'is-up'
+														: change < 0
+															? 'is-down'
+															: ''
+											}
+										>
+											{change == null
+												? '—'
+												: `${change > 0 ? '+' : ''}${change.toFixed(2)}%`}
+										</td>
+									</tr>
+								)
+							})}
+						</tbody>
+					</table>
+					{filtered.length === 0 && (
+						<div className="borsaty-empty-state">
+							لا توجد نتائج مطابقة للبحث.
+						</div>
+					)}
+				</div>
+			) : (
+				<div className="borsaty-empty-state">
+					<strong>قائمة {title} غير متاحة حالياً</strong>
+					<p>لن يتم عرض أسماء أو أسعار تجريبية.</p>
+				</div>
+			)}
+		</section>
 	)
 }
 
@@ -226,6 +362,8 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 	const [tasi, setTasi] = useState<MarketEnvelope | null>(null)
 	const [news, setNews] = useState<NewsItem[]>([])
 	const [live, setLive] = useState<UnifiedLive | null>(null)
+	const [egxCompanies, setEgxCompanies] = useState<DirectoryCompany[]>([])
+	const [tasiCompanies, setTasiCompanies] = useState<DirectoryCompany[]>([])
 
 	useEffect(() => {
 		let active = true
@@ -239,6 +377,29 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 			setLive(nextLive)
 			setEgx(nextEgx)
 			setTasi(nextTasi)
+			if (nextLive?.directories) {
+				setEgxCompanies(nextLive.directories.egx ?? [])
+				setTasiCompanies(nextLive.directories.tasi ?? [])
+			} else {
+				void Promise.all([
+					safeJson<MarketEnvelope<DirectoryCompany[]>>(
+						'/api/market/egx/companies',
+					),
+					safeJson<MarketEnvelope<DirectoryCompany[]>>(
+						'/api/market/tasi/companies',
+					),
+				]).then(([nextEgxCompanies, nextTasiCompanies]) => {
+					if (!active) return
+					setEgxCompanies(
+						Array.isArray(nextEgxCompanies?.data) ? nextEgxCompanies.data : [],
+					)
+					setTasiCompanies(
+						Array.isArray(nextTasiCompanies?.data)
+							? nextTasiCompanies.data
+							: [],
+					)
+				})
+			}
 			setNews(
 				Array.isArray(nextLive?.news)
 					? nextLive.news.slice(0, 6)
@@ -343,6 +504,11 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 			},
 		]
 	}, [egx, live, tasi])
+
+	const moverPrices = useMemo(
+		() => new Map((live?.topMovers ?? []).map((item) => [item.symbol, item])),
+		[live?.topMovers],
+	)
 
 	const heroTitle =
 		focus === 'EGX'
@@ -501,34 +667,18 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 					)}
 				</section>
 
-				<section className="borsaty-section">
-					<div className="borsaty-section__heading">
-						<div>
-							<span className="borsaty-kicker">دليل السوق</span>
-							<h2>أسهم EGX المتاحة</h2>
-						</div>
-						<span>{live?.companies?.length ?? 0} شركة</span>
-					</div>
-					{live?.companies?.length ? (
-						<div className="borsaty-company-grid">
-							{live.companies.slice(0, 40).map((company) => (
-								<button
-									key={company.symbol}
-									onClick={() => navigate(`/stock/${company.symbol}`)}
-								>
-									<b>{company.symbol}</b>
-									<span>{company.name}</span>
-									<small>السعر — حتى تتوفر شمعة موثوقة</small>
-								</button>
-							))}
-						</div>
-					) : (
-						<div className="borsaty-empty-state">
-							<strong>دليل الشركات غير متاح حالياً</strong>
-							<p>لن يتم عرض أسماء أو أسعار تجريبية.</p>
-						</div>
-					)}
-				</section>
+				<MarketDirectory
+					title="كل أسهم البورصة المصرية"
+					market="EGX"
+					companies={egxCompanies}
+					prices={moverPrices}
+				/>
+				<MarketDirectory
+					title="كل أسهم السوق السعودي"
+					market="TASI"
+					companies={tasiCompanies}
+					prices={new Map()}
+				/>
 
 				<section className="borsaty-why">
 					<div>
