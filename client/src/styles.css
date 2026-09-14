@@ -5368,3 +5368,266 @@ body.dark-mode .public-news-menu-list button:focus-visible {
 		grid-template-columns: 1fr;
 	}
 }
+
+/* Rich home market pulse */
+.borsaty-pulse-section {
+	padding-top: 30px;
+}
+
+.borsaty-pulse-heading {
+	margin-bottom: 18px;
+}
+
+.borsaty-pulse-tabs {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 16px;
+	overflow-x: auto;
+	padding-bottom: 3px;
+}
+
+.borsaty-pulse-tabs button {
+	padding: 9px 14px;
+	border: 1px solid #d4e4ea;
+	border-radius: 999px;
+	background: #fff;
+	color: #56717c;
+	font-size: 11px;
+	font-weight: 800;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.borsaty-pulse-tabs button:hover,
+.borsaty-pulse-tabs button.is-active {
+	border-color: #0878ae;
+	background: #0878ae;
+	color: #fff;
+}
+
+.borsaty-pulse-grid {
+	display: grid;
+	grid-template-columns: minmax(270px, 0.75fr) minmax(0, 1.25fr);
+	gap: 15px;
+}
+
+.borsaty-pulse-indices {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 9px;
+}
+
+.borsaty-pulse-index {
+	display: grid;
+	position: relative;
+	min-height: 106px;
+	align-content: space-between;
+	gap: 7px;
+	padding: 13px;
+	border: 1px solid #dfe9ed;
+	border-radius: 13px;
+	background: linear-gradient(145deg, #fff, #f7fbfc);
+	box-shadow: 0 8px 18px rgb(18 53 74 / 5%);
+}
+
+.borsaty-pulse-index > div {
+	display: grid;
+	gap: 3px;
+}
+
+.borsaty-pulse-index strong {
+	color: #173c50;
+	font:
+		800 14px 'JetBrains Mono',
+		monospace;
+}
+
+.borsaty-pulse-index div span {
+	color: #78909a;
+	font-size: 10px;
+}
+
+.borsaty-pulse-index > i {
+	position: absolute;
+	top: 14px;
+	left: 14px;
+}
+
+.borsaty-pulse-index > b {
+	color: #173c50;
+	font:
+		800 20px 'JetBrains Mono',
+		monospace;
+	unicode-bidi: plaintext;
+}
+
+.borsaty-pulse-index > span:last-child {
+	font:
+		700 11px 'JetBrains Mono',
+		monospace;
+}
+
+.borsaty-pulse-table-card {
+	min-width: 0;
+	padding: 15px;
+	border: 1px solid #dfe9ed;
+	border-radius: 15px;
+	background: #fff;
+	box-shadow: 0 10px 28px rgb(18 53 74 / 6%);
+}
+
+.borsaty-pulse-table-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #edf2f4;
+}
+
+.borsaty-pulse-table-head > div {
+	display: grid;
+	gap: 4px;
+}
+
+.borsaty-pulse-table-head strong {
+	color: #173c50;
+	font-size: 15px;
+}
+
+.borsaty-pulse-table-head span,
+.borsaty-pulse-table-head label span {
+	color: #78909a;
+	font-size: 10px;
+}
+
+.borsaty-pulse-table-head label {
+	display: grid;
+	gap: 4px;
+}
+
+.borsaty-pulse-table-head select {
+	padding: 7px 9px;
+	border: 1px solid #d4e4ea;
+	border-radius: 8px;
+	background: #fff;
+	color: #294654;
+	font: inherit;
+	font-size: 11px;
+}
+
+.borsaty-pulse-rows {
+	display: grid;
+}
+
+.borsaty-pulse-row {
+	display: grid;
+	grid-template-columns: minmax(120px, 1.5fr) 85px 68px minmax(65px, 0.7fr);
+	align-items: center;
+	gap: 10px;
+	padding: 11px 3px;
+	border: 0;
+	border-bottom: 1px solid #edf2f4;
+	background: transparent;
+	color: #294654;
+	text-align: right;
+	cursor: pointer;
+}
+
+.borsaty-pulse-row:hover,
+.borsaty-pulse-row:focus-visible {
+	background: #f5fbfd;
+	outline: none;
+}
+
+.borsaty-pulse-row > strong,
+.borsaty-pulse-row > span:nth-child(3) {
+	font:
+		700 11px 'JetBrains Mono',
+		monospace;
+	white-space: nowrap;
+}
+
+.borsaty-pulse-symbol {
+	display: grid;
+	gap: 3px;
+	min-width: 0;
+}
+
+.borsaty-pulse-symbol b {
+	overflow: hidden;
+	color: #0878ae;
+	font:
+		800 12px 'JetBrains Mono',
+		monospace;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.borsaty-pulse-symbol small {
+	overflow: hidden;
+	color: #78909a;
+	font-size: 10px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.borsaty-pulse-row > i {
+	display: block;
+	height: 5px;
+	width: var(--pulse-width, 8%);
+	border-radius: 999px;
+	background: #23a66f;
+}
+
+.borsaty-pulse-row > i.is-down {
+	background: #d65b62;
+}
+
+.borsaty-pulse-empty {
+	padding: 34px 12px;
+	color: #78909a;
+	font-size: 12px;
+	line-height: 1.9;
+	text-align: center;
+}
+
+body.dark-mode .borsaty-pulse-tabs button,
+body.dark-mode .borsaty-pulse-index,
+body.dark-mode .borsaty-pulse-table-card,
+body.dark-mode .borsaty-pulse-table-head select {
+	border-color: #294b5b;
+	background: #102d3e;
+	color: #e6f4f8;
+}
+
+body.dark-mode .borsaty-pulse-index strong,
+body.dark-mode .borsaty-pulse-table-head strong,
+body.dark-mode .borsaty-pulse-row > strong {
+	color: #e6f4f8;
+}
+
+body.dark-mode .borsaty-pulse-row:hover,
+body.dark-mode .borsaty-pulse-row:focus-visible {
+	background: #174a61;
+}
+
+@media (max-width: 900px) {
+	.borsaty-pulse-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 560px) {
+	.borsaty-pulse-indices {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.borsaty-pulse-row {
+		grid-template-columns: minmax(100px, 1fr) 70px 58px;
+	}
+
+	.borsaty-pulse-row > i {
+		display: none;
+	}
+}

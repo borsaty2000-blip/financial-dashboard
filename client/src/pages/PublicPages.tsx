@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { navigate } from '../router'
 import { formatEnglishNumber, formatEnglishPercent } from '../lib/format'
+import { PublicMarketPulse } from '../components/PublicMarketPulse'
 
 type MarketEnvelope<T = unknown> = {
 	available?: boolean
@@ -87,9 +88,13 @@ const nested = (value: unknown, key: string): unknown => {
 const safeJson = async <T,>(path: string): Promise<T | null> => {
 	try {
 		const response = await fetch(path, {
-			headers: { accept: 'application/json' },
+			cache: 'no-store',
+			headers: {
+				accept: 'application/json',
+				'cache-control': 'no-cache',
+			},
 		})
-		if (!response.ok) return null
+		if (!response.ok && response.status !== 304) return null
 		return (await response.json()) as T
 	} catch {
 		return null
@@ -962,6 +967,12 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 						))}
 					</div>
 				</section>
+
+				<PublicMarketPulse
+					cards={cards}
+					egxCompanies={egxCompanies}
+					tasiCompanies={tasiCompanies}
+				/>
 
 				<section className="borsaty-section borsaty-tool-section">
 					<div className="borsaty-section__heading">
