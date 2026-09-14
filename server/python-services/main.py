@@ -9,6 +9,9 @@ from services.statistical import calculate_statistics
 from services.forecasting import forecast_arima, forecast_lstm
 from services.backtesting import backtest_elliott, backtest_gann, backtest_indicators
 from services.candlestick import detect_candlestick_patterns
+from services.ensemble import ensemble_forecast
+from services.arabic_sentiment import get_stock_sentiment
+from services.anomaly import get_anomaly_score
 from utils.data_prep import prepare_dates, prepare_prices
 
 app = FastAPI(title="Borsaty Analysis Service", version="1.0.0")
@@ -33,6 +36,11 @@ class ForecastData(BaseModel):
     steps: int = Field(default=30, ge=1, le=365)
 
 
+class EnsembleData(BaseModel):
+    prices: List[float] = Field(min_length=30)
+    steps: int = Field(default=30, ge=1, le=90)
+
+
 class BacktestData(BaseModel):
     prices: List[float] = Field(min_length=40)
     lookback: int = Field(default=30, ge=5, le=365)
@@ -46,6 +54,12 @@ class CandlestickData(BaseModel):
     lows: List[float] = Field(min_length=2)
     closes: List[float] = Field(min_length=2)
     dates: List[str] | None = None
+
+
+class AnomalyData(BaseModel):
+    symbol: str = "UNKNOWN"
+    prices: List[float] = Field(min_length=20)
+    volumes: List[float] | None = None
 
 
 @app.get("/health")
@@ -103,6 +117,29 @@ async def lstm_endpoint(data: ForecastData) -> dict:
         raise HTTPException(status_code=422, detail=str(error)) from error
     except Exception as error:
         raise HTTPException(status_code=500, detail="LSTM forecast failed") from error
+
+
+@app.post("/forecast/ensemble")
+async def ensemble_endpoint(data: EnsembleData) -> dict:
+    try:
+        return {"status": "success", "data": ensemble_forecast(prepare_prices(data.prices), data.steps)}
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    except Exception as error:
+        raise HTTPException(status_code=500, detail="Ensemble forecast failed") from error
+
+
+@app.get("/sentiment/{symbol}")
+async def sentiment_endpoint(symbol: str) -> dict:
+    return {"status": "success", "data": get_stock_sentiment(symbol)}
+
+
+@app.post("/analyze/anomaly")
+async def anomaly_endpoint(data: AnomalyData) -> dict:
+    try:
+        return {"status": "success", "data": get_anomaly_score(data.symbol, data.prices, data.volumes)}
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
 
 
 @app.post("/backtest/elliott")

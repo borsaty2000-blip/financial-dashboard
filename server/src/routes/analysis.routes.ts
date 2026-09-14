@@ -13,6 +13,11 @@ import {
 import { ConsensusService } from '../services/analysis/consensus.service.js'
 import { analyzeCandlesticks } from '../services/analysis/candlestick.python.js'
 import {
+	anomaly,
+	ensemble,
+	sentiment,
+} from '../services/analysis/ai-features.service.js'
+import {
 	CandlesService,
 	type CandleMarket,
 } from '../services/market/candles.service.js'
@@ -302,6 +307,66 @@ analysisRoutes.get('/:symbol/indicators', async (request, response) => {
 				error instanceof Error
 					? error.message
 					: 'Indicator service unavailable',
+		})
+	}
+})
+
+analysisRoutes.get('/:symbol/ensemble', async (request, response) => {
+	try {
+		const series = await resolveSeries(request)
+		if (series.prices.length < 30)
+			return response.status(404).json({
+				status: 'unavailable',
+				message: 'لا توجد بيانات كافية للتنبؤ المجمع',
+			})
+		return response.json({
+			...(await ensemble(series.prices, querySteps(request.query.steps))),
+			source: series.source,
+			candles_count: series.count,
+		})
+	} catch (error) {
+		return response.status(502).json({
+			status: 'error',
+			message:
+				error instanceof Error ? error.message : 'Ensemble service unavailable',
+		})
+	}
+})
+
+analysisRoutes.get('/:symbol/sentiment', async (request, response) => {
+	try {
+		return response.json(await sentiment(request.params.symbol.toUpperCase()))
+	} catch (error) {
+		return response.status(502).json({
+			status: 'error',
+			message:
+				error instanceof Error
+					? error.message
+					: 'Sentiment service unavailable',
+		})
+	}
+})
+
+analysisRoutes.get('/:symbol/anomalies', async (request, response) => {
+	try {
+		const series = await resolveSeries(request)
+		if (series.candles.length < 20)
+			return response.status(404).json({
+				status: 'unavailable',
+				message: 'لا توجد بيانات كافية لكشف الشذوذ',
+			})
+		return response.json(
+			await anomaly(
+				request.params.symbol.toUpperCase(),
+				series.candles.map((candle) => candle.close),
+				series.candles.map((candle) => candle.volume),
+			),
+		)
+	} catch (error) {
+		return response.status(502).json({
+			status: 'error',
+			message:
+				error instanceof Error ? error.message : 'Anomaly service unavailable',
 		})
 	}
 })
