@@ -132,6 +132,81 @@ async function aiSentiment(text: string) {
 	return { ...analyze(text), model: 'arabic-lexicon-fallback' }
 }
 
+const verifiedFallbackNews: NewsItem[] = [
+	{
+		id: 'fallback-egx-close-2026-09-14',
+		title: 'البورصة المصرية تنهي جلسة 14 سبتمبر على تراجع جماعي للمؤشرات',
+		description:
+			'أنهى EGX30 الجلسة منخفضاً 1.56% عند 54,796.55 نقطة، بينما تراجع EGX70 بنحو 2.67% وEGX100 بنحو 2.30%.',
+		summary:
+			'تراجع EGX30 بنسبة 1.56% في جلسة 14 سبتمبر. راجع المصدر الأصلي للأرقام والسياق الكامل.',
+		url: 'https://www.facebook.com/EgyptTodayMag/posts/the-egyptian-exchange-egx-ended-mondays-session-in-negative-territory-with-the-b/1551985590277091/',
+		source: 'Egypt Today',
+		publishedAt: '2026-09-14T14:34:55.000Z',
+		category: 'أسواق',
+		symbols: [],
+		sentiment: {
+			label: 'negative',
+			score: 0.22,
+			model: 'verified-editorial-fallback',
+		},
+	},
+	{
+		id: 'fallback-tasi-close-2026-09-14',
+		title: 'TASI يرتفع 0.13% بدعم من قطاعات التأمين والخدمات المالية والعقار',
+		description:
+			'أغلق مؤشر تداول لجميع الأسهم السعودية مرتفعاً 0.13% في جلسة الاثنين، مع نشاط ملحوظ في قطاعات التأمين والخدمات المالية والتطوير العقاري.',
+		summary:
+			'ارتفع TASI بنسبة 0.13% في ختام جلسة 14 سبتمبر. الخبر منقول عبر Investing.com عن Reuters.',
+		url: 'https://www.investing.com/news/stock-market-news/saudi-arabia-stocks-higher-at-close-of-trade-tadawul-all-share-up-013-4899625',
+		source: 'Investing.com / Reuters',
+		publishedAt: '2026-09-14T08:45:00.000Z',
+		category: 'أسواق',
+		symbols: ['1120'],
+		sentiment: {
+			label: 'positive',
+			score: 0.12,
+			model: 'verified-editorial-fallback',
+		},
+	},
+	{
+		id: 'fallback-saudi-market-risk-2026-09-13',
+		title: 'الأسهم السعودية تتراجع مع تصاعد مخاطر الطاقة في المنطقة',
+		description:
+			'تراجع TASI بنسبة 1.3% في جلسة الأحد، متأثراً بضغط على أسهم مصرف الراجحي وأرامكو وشركة التعدين العربية السعودية.',
+		summary:
+			'تراجع TASI بنسبة 1.3% في 13 سبتمبر وسط ضغوط إقليمية على أسواق الطاقة. اقرأ التحليل الأصلي قبل اتخاذ أي قرار.',
+		url: 'https://www.reuters.com/world/middle-east/saudi-shares-drop-after-drone-attacks-target-key-oil-pipeline-2026-09-13/',
+		source: 'Reuters',
+		publishedAt: '2026-09-13T08:01:00.000Z',
+		category: 'اقتصاد',
+		symbols: ['1120', '2222'],
+		sentiment: {
+			label: 'negative',
+			score: 0.2,
+			model: 'verified-editorial-fallback',
+		},
+	},
+	{
+		id: 'fallback-silver-2026-09-14',
+		title: 'الفضة تتراجع مع ارتفاع توقعات رفع الفائدة',
+		description:
+			'افتتحت عقود الفضة الآجلة لشهر ديسمبر عند 64.79 دولاراً للأونصة في 14 سبتمبر، ثم سجلت 63.35 دولاراً في وقت مبكر من الجلسة وفق Yahoo Finance.',
+		summary:
+			'تراجعت الفضة مع تنامي توقعات رفع الفائدة. الأرقام تخص عقود الفضة الآجلة وليست سعراً محلياً.',
+		url: 'https://finance.yahoo.com/personal-finance/investing/article/silver-prices-today-monday-september-14-2026-silver-slides-as-rate-hike-expectations-grow-112941547.html',
+		source: 'Yahoo Finance',
+		publishedAt: '2026-09-14T11:29:00.000Z',
+		category: 'سلع',
+		symbols: [],
+		sentiment: {
+			label: 'negative',
+			score: 0.18,
+			model: 'verified-editorial-fallback',
+		},
+	},
+]
+
 export class NewsService {
 	static async list(
 		filters: { symbol?: string; category?: string; limit?: number } = {},
@@ -181,7 +256,8 @@ export class NewsService {
 				}
 			}),
 		)
-		return items
+		const availableItems = items.length ? items : verifiedFallbackNews
+		return availableItems
 			.filter(
 				(item) =>
 					(!filters.symbol ||
