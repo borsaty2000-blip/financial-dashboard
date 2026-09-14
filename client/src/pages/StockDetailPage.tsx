@@ -78,6 +78,13 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 			setMessage('سجّل الدخول لإضافة السهم إلى قائمتك')
 		}
 	}
+	function listen() {
+		const text = `السعر الحالي لسهم ${normalized} هو ${stats.last?.close?.toFixed(2) ?? 'غير متاح'}. التغير ${stats.changePercent?.toFixed(2) ?? 'غير متاح'} بالمئة.`
+		if ('speechSynthesis' in window) {
+			window.speechSynthesis.cancel()
+			window.speechSynthesis.speak(new SpeechSynthesisUtterance(text))
+		}
+	}
 
 	const ai = ensembleData?.data ?? ensembleData
 	const mood = sentimentData?.data ?? sentimentData
@@ -93,9 +100,14 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 					<p className="eyebrow">تفاصيل السهم</p>
 					<h1>{normalized}</h1>
 				</div>
-				<button className="primary-button" onClick={addToWatchlist}>
-					＋ أضف إلى قائمتي
-				</button>
+				<div className="stock-header-actions">
+					<button className="secondary-button" onClick={listen}>
+						🎧 استمع للتحليل
+					</button>
+					<button className="primary-button" onClick={addToWatchlist}>
+						＋ أضف إلى قائمتي
+					</button>
+				</div>
 			</header>
 			{loading && (
 				<div className="stock-detail-skeleton">
