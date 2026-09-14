@@ -1,8 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../lib/api'
+import { useLivePrice } from '../hooks/useLivePrice'
 
 type Candle = { date: string; close: number; volume: number }
-type Candles = { symbol: string; candles: Candle[]; count: number }
+type Candles = {
+	symbol: string
+	candles: Candle[]
+	count: number
+	freshness?: 'live' | 'delayed' | 'cached'
+}
 type Watchlist = { id: string; items: { symbol: string }[] }
 type FeatureResponse = {
 	data?: any
@@ -21,9 +27,11 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 		null,
 	)
 	const [anomalyData, setAnomalyData] = useState<FeatureResponse | null>(null)
+	const [fundamentals, setFundamentals] = useState<any>(null)
 	const [message, setMessage] = useState('')
 	const [loading, setLoading] = useState(true)
 	const normalized = symbol.toUpperCase()
+	const livePrice = useLivePrice(normalized)
 
 	useEffect(() => {
 		void api<Candles>(`/api/market/candles/${normalized}?days=120`)
@@ -38,6 +46,9 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 			.catch(() => undefined)
 		void api<FeatureResponse>(`/api/analysis/${normalized}/anomalies`)
 			.then(setAnomalyData)
+			.catch(() => undefined)
+		void api<any>(`/api/fundamentals/${normalized}`)
+			.then(setFundamentals)
 			.catch(() => undefined)
 	}, [normalized])
 
@@ -122,7 +133,25 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 					<section className="stock-hero-card">
 						<div>
 							<span>السعر الحالي</span>
-							<strong>{stats.last?.close.toFixed(2) ?? '—'}</strong>
+							<strong>
+								{livePrice?.price?.toFixed(2) ??
+									stats.last?.close.toFixed(2) ??
+									'—'}
+							</strong>
+							<span
+								className={`freshness-badge ${livePrice?.freshness ?? data.freshness ?? 'cached'}`}
+								title={
+									livePrice?.freshness === 'delayed'
+										? 'السعر متأخر عن السوق'
+										: 'بيانات السعر متاحة حالياً'
+								}
+							>
+								{livePrice?.freshness === 'live'
+									? 'Live'
+									: livePrice?.freshness === 'delayed'
+										? 'Delayed'
+										: 'Cached'}
+							</span>
 						</div>
 						<div
 							className={
@@ -192,6 +221,59 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 							</strong>
 							<small>{anomalyResult?.anomalyCount ?? 0} حالات مرصودة</small>
 						</div>
+					</section>
+					<section className="analysis-card fundamentals-panel">
+						<div className="panel-title">
+							<h2>البيانات المالية</h2>
+							<span className="eyebrow">مالية</span>
+						</div>
+						<div className="fundamentals-grid">
+							{[
+								['P/E', fundamentals?.keyRatios?.peRatio],
+								['EPS', fundamentals?.keyRatios?.eps],
+								['القيمة السوقية', fundamentals?.keyRatios?.marketCap],
+								['عائد التوزيعات', fundamentals?.keyRatios?.dividendYield],
+								['أعلى 52 أسبوعاً', fundamentals?.keyRatios?.fiftyTwoWeekHigh],
+								['أدنى 52 أسبوعاً', fundamentals?.keyRatios?.fiftyTwoWeekLow],
+							].map(([label, value]) => (
+								<div key={String(label)}>
+									<span>{label}</span>
+									<strong>
+										{value == null
+											? '—'
+											: typeof value === 'number'
+												? value.toLocaleString('en-US', {
+														maximumFractionDigits: 2,
+													})
+												: String(value)}
+									</strong>
+								</div>
+							))}
+						</div>
+						{fundamentals?.incomeStatement?.length ? (
+							<div className="fundamentals-table">
+								{fundamentals.incomeStatement
+									.slice(0, 5)
+									.map((item: any, index: number) => (
+										<div key={index}>
+											<span>
+												{item.filingDate ?? item.period ?? `سنة ${index + 1}`}
+											</span>
+											<b>{item.revenue ?? item.totalRevenue ?? '—'}</b>
+											<b>{item.netIncome ?? item.netIncomeLoss ?? '—'}</b>
+										</div>
+									))}
+							</div>
+						) : (
+							<p className="muted">
+								لا تتوفر قوائم مالية منظمة لهذا الرمز حالياً.
+							</p>
+						)}
+						<small>
+							{fundamentals?.available
+								? `بيانات مالية متاحة`
+								: 'لا تتوفر بيانات مالية موثوقة حالياً.'}
+						</small>
 					</section>
 				</>
 			)}
