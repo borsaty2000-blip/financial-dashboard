@@ -1,0 +1,2 @@
+import { io, type Socket } from 'socket.io-client'
+export function connectPriceStream(symbols: string[], onPrice: (payload: unknown) => void): Socket { const socket = io(`${process.env.EXPO_PUBLIC_API_URL ?? 'https://borsatyai.com'}/api/v1/ws/prices`, { transports: ['websocket'] }); socket.on('connect', () => socket.emit('price:subscribe', { symbols, market: 'EGX' })); socket.on('price:update', onPrice); return socket }

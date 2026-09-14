@@ -1,0 +1,4 @@
+import { StyleSheet, Text, View } from 'react-native'
+import { ScreenContainer } from '../../src/components/ScreenContainer'
+export default function ProfileScreen() { return <ScreenContainer><Text style={styles.title}>الملف الشخصي</Text><View style={styles.card}><Text style={styles.avatar}>ب</Text><Text style={styles.heading}>حساب بورصتي</Text><Text style={styles.muted}>المصادقة، الإشعارات، اللغة، والوضع الداكن متاحة من الإعدادات.</Text></View></ScreenContainer> }
+const styles = StyleSheet.create({ title: { fontSize: 26, fontWeight: '800', textAlign: 'right', marginVertical: 18 }, card: { backgroundColor: '#fff', borderRadius: 12, padding: 18, gap: 12, alignItems: 'flex-end' }, avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#0878bd', color: '#fff', fontSize: 28, textAlign: 'center', paddingTop: 10 }, heading: { fontSize: 18, fontWeight: '800' }, muted: { color: '#64748b', lineHeight: 22, textAlign: 'right' } })

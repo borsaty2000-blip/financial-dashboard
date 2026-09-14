@@ -1,0 +1,2 @@
+import * as LocalAuthentication from 'expo-local-authentication'
+export async function authenticateBiometrically() { const supported = await LocalAuthentication.hasHardwareAsync(); const enrolled = await LocalAuthentication.isEnrolledAsync(); if (!supported || !enrolled) return false; const result = await LocalAuthentication.authenticateAsync({ promptMessage: 'تسجيل الدخول إلى بورصتي' }); return result.success }

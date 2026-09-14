@@ -1,0 +1,4 @@
+import { StyleSheet, Text, View } from 'react-native'
+import { ScreenContainer } from '../../src/components/ScreenContainer'
+export default function PortfolioScreen() { return <ScreenContainer><Text style={styles.title}>المحفظة</Text><View style={styles.card}><Text style={styles.label}>قيمة المحفظة الافتراضية</Text><Text style={styles.value}>—</Text><Text style={styles.muted}>سجّل الدخول لعرض المراكز والأداء.</Text></View></ScreenContainer> }
+const styles = StyleSheet.create({ title: { fontSize: 26, fontWeight: '800', textAlign: 'right', marginVertical: 18 }, card: { backgroundColor: '#fff', borderRadius: 12, padding: 18, gap: 10 }, label: { textAlign: 'right', color: '#64748b' }, value: { textAlign: 'right', fontSize: 30, fontWeight: '800' }, muted: { textAlign: 'right', color: '#64748b' } })

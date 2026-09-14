@@ -1,0 +1,2 @@
+import { Tabs } from 'expo-router'
+export default function TabsLayout() { return <Tabs screenOptions={{ headerShown: false, tabBarActiveTintColor: '#0878bd' }}><Tabs.Screen name="index" options={{ title: 'الرئيسية' }} /><Tabs.Screen name="markets" options={{ title: 'الأسواق' }} /><Tabs.Screen name="analysis" options={{ title: 'التحليل' }} /><Tabs.Screen name="portfolio" options={{ title: 'المحفظة' }} /><Tabs.Screen name="profile" options={{ title: 'الملف الشخصي' }} /></Tabs> }

@@ -1,0 +1,4 @@
+import { StyleSheet, Text, View } from 'react-native'
+import { ScreenContainer } from '../../src/components/ScreenContainer'
+export default function AnalysisScreen() { return <ScreenContainer><Text style={styles.title}>التحليل</Text><View style={styles.card}><Text style={styles.heading}>مركز التحليل الفني</Text><Text style={styles.text}>Elliott Wave · Gann · Consensus · Backtesting · Candlestick Patterns</Text><Text style={styles.note}>تتوفر النتائج عند اختيار سهم من صفحة الأسواق. جميع النتائج تعليمية وليست توصية استثمارية.</Text></View></ScreenContainer> }
+const styles = StyleSheet.create({ title: { fontSize: 26, fontWeight: '800', textAlign: 'right', marginVertical: 18 }, card: { backgroundColor: '#fff', borderRadius: 12, padding: 18, gap: 12 }, heading: { fontSize: 18, fontWeight: '800', textAlign: 'right' }, text: { color: '#0878bd', lineHeight: 26, textAlign: 'right' }, note: { color: '#64748b', lineHeight: 22, textAlign: 'right' } })
