@@ -112,7 +112,6 @@ at ... server/src/routes/profile.routes.ts
 
 لم تُعدّل النطاقات ولم يُحذف أي مشروع. لم تُرسل عملية نشر جديدة في هذه المرحلة؛ يلزم اعتماد صريح قبل دفع التغييرات إلى `origin/main` إذا كان الربط التلقائي لـVercel مفعلاً. بعد الاعتماد، يجب تنفيذ بوابة ما بعد النشر التالية: `health`، ملخص EGX، ملخص TASI، الذهب، الأخبار، Elliott، Gann، Consensus، ثم فحص Console وRuntime Logs خلال نافذة قصيرة.
 
-
 ## نتيجة lint وPrisma
 
 مرّ lint المستهدف على `client/src/pages/PublicPages.tsx`. أما `npm run lint` الكامل من مجلد `client` فأخفق بـ160 مشكلة موروثة في صفحات وأدوات قديمة، معظمها `no-explicit-any` و`no-restricted-syntax` و`react-hooks/set-state-in-effect`؛ لم تُنسب هذه المشاكل إلى التغيير الحالي ولم تُخفَ من التقرير. كما نجح `prisma validate` باستخدام URL شكلي آمن من دون اتصال أو migration، مع تحذير Prisma بأن إعداد `package.json#prisma` deprecated في Prisma 7، وهو بند صيانة لاحق.
@@ -120,3 +119,9 @@ at ... server/src/routes/profile.routes.ts
 ## الحالة الحالية للـGit
 
 التغييرات الإصلاحية موجودة محلياً وغير مدفوعة بعد إلى `origin/main` بانتظار قرار النشر الصريح. الملفات المعدلة تشمل إصلاح `profile.routes.ts`، عقود `market.routes.ts`، fallback المعادن، نوع مصدر السوق، تصحيح TASI في الواجهة، اختبار serverless، وهذا التقرير.
+
+## نتيجة النشر الأول بعد موافقة المستخدم
+
+تم دفع `6896f5e` إلى `origin/main`، وأصبح `/api/health` على `borsatyai.com` بحالة 200 بعد أربع محاولات مراقبة. بعد النشر أصبحت المسارات التالية 200: health، market summary، EGX summary، TASI summary، gold، EGX companies، consensus، news، وOpenAPI. بقي Elliott وGann بحالة 502 برسالة `fetch failed` لأن `PYTHON_SERVICE_URL` غير موجودة في Vercel، كما ظهرت استجابات `available: false` للبيانات السوقية بسبب غياب `SAHMK_API_KEY` وغياب جسر EGX الرسمي في بيئة الإنتاج.
+
+أضيف بعد ذلك fallback حتمي داخل Node لمعادلات Elliott وGann التعليمية، مع `engine: deterministic-node-fallback` وإخلاء صريح. اختُبر محلياً مع خدمة Python معزولة، وأعاد المساران 200 بعقد fallback واضح. لم يُنشر هذا التعديل الثاني بعد عند كتابة هذه الفقرة.
