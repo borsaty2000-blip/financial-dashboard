@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process'
 import { unavailable, type MarketEnvelope, live } from './market.types.js'
+import { CommoditiesService } from './commodities.service.js'
 
 type EgxRequest =
 	| { tool: 'stock_price_egx'; symbol: string }
@@ -77,16 +78,21 @@ export async function getEgxCompanyData(
 
 export async function getEgxMetals(metal: 'gold' | 'silver') {
 	try {
-		return live(
+		const official = live(
 			'EGX MCP',
 			await runOfficialTool({
 				tool: metal === 'gold' ? 'gold_price' : 'silver_price',
 			}),
 		)
+		return official
 	} catch (error) {
+		const quote = await CommoditiesService.getQuote(
+			metal === 'gold' ? 'XAU/USD' : 'XAG/USD',
+		)
+		if (quote.available) return live('Twelve Data Pro', quote)
 		return unavailable(
-			'EGX MCP',
-			error instanceof Error ? error.message : 'EGX unavailable',
+			'Twelve Data Pro',
+			error instanceof Error ? error.message : 'Metal data unavailable',
 		)
 	}
 }
@@ -96,16 +102,14 @@ export async function getEgxSummary() {
 		getEgxMetals('gold'),
 		getEgxMetals('silver'),
 	])
+	const source = gold.source === silver.source ? gold.source : 'mixed'
+	const available = gold.available || silver.available
 	return {
 		data: { gold: gold.data, silver: silver.data },
-		source: 'EGX MCP' as const,
+		source,
 		timestamp: new Date().toISOString(),
-		freshness:
-			gold.available && silver.available
-				? ('live' as const)
-				: ('cached' as const),
-		delay_minutes:
-			gold.available && silver.available ? (0 as const) : (15 as const),
-		available: gold.available || silver.available,
+		freshness: available ? ('live' as const) : ('cached' as const),
+		delay_minutes: available ? (0 as const) : (15 as const),
+		available,
 	}
 }

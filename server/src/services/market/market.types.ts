@@ -1,4 +1,4 @@
-export type MarketSource = 'EGX MCP' | 'SAHMK'
+export type MarketSource = 'EGX MCP' | 'SAHMK' | 'Twelve Data Pro' | 'mixed'
 export type Freshness = 'live' | 'delayed' | 'cached'
 
 export type MarketEnvelope<T> = {

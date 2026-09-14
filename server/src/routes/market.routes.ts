@@ -1,5 +1,9 @@
 import { Router } from 'express'
-import { getEgxQuote, getEgxSummary } from '../services/market/egx.adapter.js'
+import {
+	getEgxMetals,
+	getEgxQuote,
+	getEgxSummary,
+} from '../services/market/egx.adapter.js'
 import {
 	getTasiCompanies,
 	getTasiQuote,
@@ -40,6 +44,23 @@ marketRoutes.get('/candles/:symbol', async (request, response) => {
 
 marketRoutes.get('/egx/summary', async (_request, response) => {
 	response.json(await getEgxSummary())
+})
+
+marketRoutes.get('/summary', async (_request, response) => {
+	const [egx, tasi] = await Promise.all([getEgxSummary(), getTasiSummary()])
+	response.json({
+		data: { egx, tasi, gold: egx.data.gold, silver: egx.data.silver },
+		available: egx.available || tasi.available,
+		timestamp: new Date().toISOString(),
+	})
+})
+
+marketRoutes.get('/gold', async (_request, response) => {
+	response.json(await getEgxMetals('gold'))
+})
+
+marketRoutes.get('/silver', async (_request, response) => {
+	response.json(await getEgxMetals('silver'))
 })
 
 marketRoutes.get('/egx/companies', (_request, response) => {

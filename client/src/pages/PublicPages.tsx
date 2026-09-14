@@ -191,6 +191,7 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 		const tasiChange = numberFrom(tasiData, [
 			'changePercent',
 			'change_percent',
+			'index_change_percent',
 			'percentChange',
 			'change',
 		])

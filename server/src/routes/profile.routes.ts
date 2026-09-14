@@ -28,20 +28,23 @@ const requirePersistentAvatarStorage: RequestHandler = (
 	next()
 }
 const allowed = new Set(['image/jpeg', 'image/png', 'image/webp'])
+const storage = process.env.VERCEL
+	? multer.memoryStorage()
+	: multer.diskStorage({
+			destination: uploadDirectory,
+			filename: (req, file, callback) => {
+				const ext =
+					path.extname(file.originalname).toLowerCase() ||
+					(file.mimetype === 'image/png'
+						? '.png'
+						: file.mimetype === 'image/webp'
+							? '.webp'
+							: '.jpg')
+				callback(null, `${req.userId}-${Date.now()}${ext}`)
+			},
+		})
 const upload = multer({
-	storage: multer.diskStorage({
-		destination: uploadDirectory,
-		filename: (req, file, callback) => {
-			const ext =
-				path.extname(file.originalname).toLowerCase() ||
-				(file.mimetype === 'image/png'
-					? '.png'
-					: file.mimetype === 'image/webp'
-						? '.webp'
-						: '.jpg')
-			callback(null, `${req.userId}-${Date.now()}${ext}`)
-		},
-	}),
+	storage,
 	limits: { fileSize: 2 * 1024 * 1024 },
 	fileFilter: (_req, file, callback) =>
 		callback(null, allowed.has(file.mimetype)),
