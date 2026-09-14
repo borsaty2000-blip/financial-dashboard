@@ -1058,10 +1058,10 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 
 	const heroTitle =
 		focus === 'EGX'
-			? 'السوق المصري بواجهة أوضح'
+			? 'مركز التحليل المتقدم للسوق المصري'
 			: focus === 'TASI'
-				? 'تابع السوق السعودي ببصيرة'
-				: 'بورصتك.. ببصيرة الذكاء الاصطناعي'
+				? 'مركز التحليل المتقدم للسوق السعودي'
+				: 'منصة التحليل المتقدم للأسواق العربية'
 
 	return (
 		<div className="borsaty-public-page" dir="rtl">
