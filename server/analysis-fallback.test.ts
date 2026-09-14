@@ -3,6 +3,10 @@ import test from 'node:test'
 import {
 	analyzeElliottFallback,
 	analyzeGannFallback,
+	anomalyFallback,
+	backtestFallback,
+	forecastFallback,
+	statisticalFallback,
 } from './src/services/analysis/analysis-fallback.ts'
 
 const prices = Array.from(
@@ -26,4 +30,31 @@ test('Gann fallback preserves dates and educational provenance', () => {
 	assert.equal(result.time_cycles.length, 8)
 	assert.equal(result.low_index, 0)
 	assert.equal(result.high_index, prices.length - 1)
+})
+
+test('statistical fallback returns finite educational metrics', () => {
+	const result = statisticalFallback(prices)
+	assert.equal(result.available, true)
+	assert.equal(result.model, 'deterministic-node-fallback')
+	assert.equal(Number.isFinite(result.sharpe_ratio), true)
+})
+
+test('forecast fallback identifies the requested unavailable model', () => {
+	const result = forecastFallback(prices, 5, 'LSTM')
+	assert.equal(result.requested_model, 'LSTM')
+	assert.equal(result.forecast.length, 5)
+	assert.match(result.note, /تعذر تشغيل/)
+})
+
+test('anomaly and backtest fallbacks remain deterministic and educational', () => {
+	const anomaly = anomalyFallback(
+		'COMI',
+		prices,
+		prices.map(() => 1000),
+	)
+	const backtest = backtestFallback('indicators', prices, 5, 2)
+	assert.equal(anomaly.available, true)
+	assert.equal(backtest.available, true)
+	assert.equal(backtest.strategy, 'indicators')
+	assert.match(backtest.disclaimer, /تعليمي/)
 })

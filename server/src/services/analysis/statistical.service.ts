@@ -2,6 +2,8 @@ const pythonServiceUrl = (
 	process.env.PYTHON_SERVICE_URL ?? 'http://127.0.0.1:8001'
 ).replace(/\/$/, '')
 
+import { forecastFallback, statisticalFallback } from './analysis-fallback.js'
+
 async function postPython(path: string, payload: unknown) {
 	const response = await fetch(`${pythonServiceUrl}${path}`, {
 		method: 'POST',
@@ -16,14 +18,26 @@ async function postPython(path: string, payload: unknown) {
 	return body
 }
 
-export function analyze(prices: number[]) {
-	return postPython('/analyze/statistical', { prices })
+export async function analyze(prices: number[]) {
+	try {
+		return await postPython('/analyze/statistical', { prices })
+	} catch {
+		return statisticalFallback(prices)
+	}
 }
 
-export function forecastARIMA(prices: number[], steps = 30) {
-	return postPython('/forecast/arima', { prices, steps })
+export async function forecastARIMA(prices: number[], steps = 30) {
+	try {
+		return await postPython('/forecast/arima', { prices, steps })
+	} catch {
+		return forecastFallback(prices, steps, 'ARIMA')
+	}
 }
 
-export function forecastLSTM(prices: number[], steps = 30) {
-	return postPython('/forecast/lstm', { prices, steps })
+export async function forecastLSTM(prices: number[], steps = 30) {
+	try {
+		return await postPython('/forecast/lstm', { prices, steps })
+	} catch {
+		return forecastFallback(prices, steps, 'LSTM')
+	}
 }

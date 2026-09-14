@@ -352,7 +352,7 @@ analysisRoutes.get('/:symbol/sentiment', async (request, response) => {
 analysisRoutes.get('/:symbol/anomalies', async (request, response) => {
 	try {
 		const series = await resolveSeries(request)
-		if (series.candles.length < 20)
+		if (series.prices.length < 20)
 			return response.status(404).json({
 				status: 'unavailable',
 				message: 'لا توجد بيانات كافية لكشف الشذوذ',
@@ -360,8 +360,10 @@ analysisRoutes.get('/:symbol/anomalies', async (request, response) => {
 		return response.json(
 			await anomaly(
 				request.params.symbol.toUpperCase(),
-				series.candles.map((candle) => candle.close),
-				series.candles.map((candle) => candle.volume),
+				series.prices,
+				series.candles.length
+					? series.candles.map((candle) => candle.volume)
+					: series.prices.map(() => 0),
 			),
 		)
 	} catch (error) {

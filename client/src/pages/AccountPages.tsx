@@ -232,6 +232,8 @@ export function RegisterPage() {
 	const { register } = useAuth()
 	const [step, setStep] = useState(1)
 	const [error, setError] = useState('')
+	const [submitting, setSubmitting] = useState(false)
+	const [termsAccepted, setTermsAccepted] = useState(false)
 	const [data, setData] = useState({
 		email: '',
 		password: '',
@@ -251,11 +253,15 @@ export function RegisterPage() {
 	const next = () => {
 		if (
 			step === 1 &&
-			(!data.email ||
+			(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) ||
 				data.password.length < 8 ||
+				!/[A-Za-z]/.test(data.password) ||
+				!/\d/.test(data.password) ||
 				data.password !== data.confirm)
 		)
-			return setError('أكمل البريد وكلمة المرور بشكل صحيح')
+			return setError(
+				'أدخل بريداً صحيحاً وكلمة مرور من 8 أحرف تحتوي حروفاً وأرقاماً متطابقة',
+			)
 		if (step === 2 && (!data.fullName || !data.username))
 			return setError('أكمل المعلومات الشخصية')
 		setError('')
@@ -263,8 +269,10 @@ export function RegisterPage() {
 	}
 	const submit = async (e: FormEvent) => {
 		e.preventDefault()
-		if (!document.querySelector<HTMLInputElement>('#terms')?.checked)
-			return setError('يجب الموافقة على الشروط')
+		if (!termsAccepted) return setError('يجب الموافقة على الشروط')
+		if (submitting) return
+		setSubmitting(true)
+		setError('')
 		try {
 			await register({
 				email: data.email,
@@ -273,10 +281,19 @@ export function RegisterPage() {
 				fullName: data.fullName,
 				country: data.country,
 				language: data.language,
+				preferences: {
+					preferredMarkets: data.preferredMarkets,
+					experienceLevel: data.experienceLevel,
+					investmentStyle: data.investmentStyle,
+					preferredSectors: data.preferredSectors,
+					dailyTimeCommitment: data.dailyTimeCommitment,
+				},
 			})
 			navigate('/dashboard')
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'تعذر إنشاء الحساب')
+		} finally {
+			setSubmitting(false)
 		}
 	}
 	return (
@@ -463,8 +480,14 @@ export function RegisterPage() {
 							<b>السوق:</b> {data.preferredMarkets.join('، ')}
 						</p>
 						<label>
-							<input id="terms" type="checkbox" /> أوافق على الشروط وإخلاء
-							المسؤولية
+							<input
+								id="terms"
+								type="checkbox"
+								checked={termsAccepted}
+								onChange={(event) => setTermsAccepted(event.target.checked)}
+							/>{' '}
+							أوافق على <a href="/terms">الشروط</a> و
+							<a href="/disclaimer">إخلاء المسؤولية</a>
 						</label>
 					</div>
 				)}
@@ -484,8 +507,12 @@ export function RegisterPage() {
 							التالي
 						</button>
 					) : (
-						<button className="primary-button" type="submit">
-							إنشاء الحساب
+						<button
+							className="primary-button"
+							type="submit"
+							disabled={submitting}
+						>
+							{submitting ? 'جارٍ إنشاء الحساب...' : 'إنشاء الحساب'}
 						</button>
 					)}
 				</div>

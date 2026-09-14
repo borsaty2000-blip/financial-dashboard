@@ -27,11 +27,14 @@ shariahRoutes.get('/screen/:symbol', async (request, response) => {
 			),
 		)
 	} catch (error) {
-		response.status(502).json({
+		response.status(200).json({
 			available: false,
 			source: 'Halal Terminal',
+			message: 'خدمة الفحص الشرعي غير متاحة حالياً',
 			error:
-				error instanceof Error ? error.message : 'Shariah service unavailable',
+				process.env.NODE_ENV === 'development' && error instanceof Error
+					? error.message
+					: undefined,
 		})
 	}
 })

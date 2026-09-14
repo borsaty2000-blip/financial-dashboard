@@ -26,6 +26,23 @@ test('register rejects weak password and invalid username', () => {
 		}),
 	)
 })
+
+test('register preserves validated onboarding preferences', () => {
+	const result = registerSchema.parse({
+		email: 'user@example.com',
+		username: 'user_1',
+		password: 'Test1234',
+		preferences: {
+			preferredMarkets: ['EGX', 'TASI'],
+			experienceLevel: 'BEGINNER',
+			investmentStyle: 'BALANCED',
+			preferredSectors: [],
+			dailyTimeCommitment: 'MEDIUM',
+		},
+	})
+	assert.deepEqual(result.preferences?.preferredMarkets, ['EGX', 'TASI'])
+})
+
 test('login accepts email or username identifier', () => {
 	assert.deepEqual(
 		loginSchema.parse({ identifier: 'user_1', password: 'Test1234' }),

@@ -2,6 +2,12 @@ const pythonServiceUrl = (
 	process.env.PYTHON_SERVICE_URL ?? 'http://127.0.0.1:8001'
 ).replace(/\/$/, '')
 
+import {
+	anomalyFallback,
+	ensembleFallback,
+	sentimentFallback,
+} from './analysis-fallback.js'
+
 async function request<T>(
 	path: string,
 	method: 'GET' | 'POST',
@@ -20,17 +26,37 @@ async function request<T>(
 	return body as T
 }
 
-export function ensemble(
+export async function ensemble(
 	prices: number[],
 	steps = 30,
-): Promise<Record<string, any>> {
-	return request('/forecast/ensemble', 'POST', { prices, steps })
+): Promise<Record<string, unknown>> {
+	try {
+		return await request('/forecast/ensemble', 'POST', { prices, steps })
+	} catch {
+		return ensembleFallback(prices, steps)
+	}
 }
 
-export function sentiment(symbol: string) {
-	return request(`/sentiment/${encodeURIComponent(symbol)}`, 'GET')
+export async function sentiment(symbol: string) {
+	try {
+		return await request(`/sentiment/${encodeURIComponent(symbol)}`, 'GET')
+	} catch {
+		return sentimentFallback(symbol)
+	}
 }
 
-export function anomaly(symbol: string, prices: number[], volumes: number[]) {
-	return request('/analyze/anomaly', 'POST', { symbol, prices, volumes })
+export async function anomaly(
+	symbol: string,
+	prices: number[],
+	volumes: number[],
+) {
+	try {
+		return await request('/analyze/anomaly', 'POST', {
+			symbol,
+			prices,
+			volumes,
+		})
+	} catch {
+		return anomalyFallback(symbol, prices, volumes)
+	}
 }

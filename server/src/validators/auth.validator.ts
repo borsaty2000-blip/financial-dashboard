@@ -16,11 +16,23 @@ export const registerSchema = z.object({
 	fullName: z.string().trim().max(120).optional(),
 	country: z.string().length(2).default('EG'),
 	language: z.string().min(2).max(5).default('ar'),
+	preferences: z
+		.object({
+			preferredMarkets: z.array(z.string().trim().min(1).max(20)).max(10),
+			experienceLevel: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
+			investmentStyle: z.enum(['CONSERVATIVE', 'BALANCED', 'GROWTH']),
+			preferredSectors: z.array(z.string().trim().min(1).max(40)).max(20),
+			dailyTimeCommitment: z.enum(['LOW', 'MEDIUM', 'HIGH']),
+		})
+		.optional(),
 })
 export const loginSchema = z.object({
 	identifier: z.string().trim().min(1),
 	password: z.string().min(1),
-	twoFactorCode: z.string().regex(/^\d{6}$/).optional(),
+	twoFactorCode: z
+		.string()
+		.regex(/^\d{6}$/)
+		.optional(),
 })
 export const forgotPasswordSchema = z.object({
 	email: z.string().trim().toLowerCase().email(),

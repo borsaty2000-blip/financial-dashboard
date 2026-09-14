@@ -37,10 +37,22 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 	const livePrice = useLivePrice(normalized)
 
 	useEffect(() => {
-		void api<Candles>(`/api/market/candles/${normalized}?days=120`)
-			.then(setData)
-			.catch(() => setMessage('لا تتوفر بيانات تاريخية حالياً'))
-			.finally(() => setLoading(false))
+		const controller = new AbortController()
+		const timeout = window.setTimeout(() => controller.abort(), 12_000)
+		let cancelled = false
+		void api<Candles>(`/api/market/candles/${normalized}?days=120`, {
+			signal: controller.signal,
+		})
+			.then((result) => {
+				if (!cancelled) setData(result)
+			})
+			.catch(() => {
+				if (!cancelled) setMessage('لا تتوفر بيانات تاريخية حالياً')
+			})
+			.finally(() => {
+				window.clearTimeout(timeout)
+				if (!cancelled) setLoading(false)
+			})
 		void api<FeatureResponse>(`/api/analysis/${normalized}/ensemble?steps=7`)
 			.then(setEnsembleData)
 			.catch(() => undefined)
@@ -59,6 +71,11 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 		void api<any>(`/api/ownership/${normalized}`)
 			.then(setOwnership)
 			.catch(() => undefined)
+		return () => {
+			cancelled = true
+			controller.abort()
+			window.clearTimeout(timeout)
+		}
 	}, [normalized])
 
 	const stats = useMemo(() => {
@@ -161,6 +178,15 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 				</div>
 			)}
 			{message && <div className="analysis-error">{message}</div>}
+			{!loading && !data && (
+				<section className="analysis-empty-panel stock-empty-panel">
+					<strong>بيانات السهم غير متاحة حالياً</strong>
+					<p>
+						لم تُرجع مصادر الشموع بيانات موثوقة لهذا الرمز. لن نعرض أرقاماً
+						تجريبية.
+					</p>
+				</section>
+			)}
 			{data && !loading && (
 				<>
 					<section className="stock-hero-card">

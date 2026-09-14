@@ -256,3 +256,203 @@ export function analyzeGannFallback(prices: number[], dates: string[]) {
 			'تحليل تعليمي احتياطي؛ لا يمثل توصية استثمارية ولا يضمن نتيجة مستقبلية.',
 	}
 }
+
+function cleanPrices(prices: number[]) {
+	const values = prices.filter((price) => Number.isFinite(price) && price > 0)
+	if (!values.length)
+		throw new Error('prices must contain positive finite values')
+	return values
+}
+
+function mean(values: number[]) {
+	return values.reduce((sum, value) => sum + value, 0) / values.length
+}
+
+function standardDeviation(values: number[], average = mean(values)) {
+	return Math.sqrt(
+		values.reduce((sum, value) => sum + (value - average) ** 2, 0) /
+			Math.max(values.length, 1),
+	)
+}
+
+export function statisticalFallback(prices: number[]) {
+	const values = cleanPrices(prices)
+	const returns = values
+		.slice(1)
+		.map((value, index) => value / values[index] - 1)
+	const average = mean(values)
+	const deviation = standardDeviation(values, average)
+	const returnMean = returns.length ? mean(returns) : 0
+	const returnDeviation = returns.length
+		? standardDeviation(returns, returnMean)
+		: 0
+	const zScores = returns.map((value) =>
+		returnDeviation ? (value - returnMean) / returnDeviation : 0,
+	)
+	const skewness = deviation
+		? values.reduce(
+				(sum, value) => sum + ((value - average) / deviation) ** 3,
+				0,
+			) / values.length
+		: 0
+	const kurtosis = deviation
+		? values.reduce(
+				(sum, value) => sum + ((value - average) / deviation) ** 4,
+				0,
+			) /
+				values.length -
+			3
+		: 0
+	const sortedReturns = [...returns].sort((a, b) => a - b)
+	const varIndex = Math.max(0, Math.floor(sortedReturns.length * 0.05) - 1)
+	const var95 = sortedReturns.length ? -sortedReturns[varIndex] : 0
+	const latestZScore = zScores.at(-1)
+	return {
+		available: true,
+		model: 'deterministic-node-fallback',
+		mean: round(average),
+		std_dev: round(deviation),
+		variance: round(deviation ** 2),
+		skewness: round(skewness),
+		kurtosis: round(kurtosis),
+		volatility: round(returnDeviation * Math.sqrt(252)),
+		var_95: round(var95),
+		sharpe_ratio: round(
+			returnDeviation ? (returnMean / returnDeviation) * Math.sqrt(252) : 0,
+		),
+		garch: null,
+		cdf:
+			latestZScore == null
+				? null
+				: round(0.5 * (1 + Math.tanh(latestZScore / Math.sqrt(2)))),
+		pdf:
+			latestZScore == null
+				? null
+				: round(Math.exp(-0.5 * latestZScore ** 2) / Math.sqrt(2 * Math.PI)),
+		disclaimer:
+			'إحصاء تعليمي احتياطي؛ لا يمثل توصية استثمارية ولا يضمن نتيجة مستقبلية.',
+	}
+}
+
+export function forecastFallback(
+	prices: number[],
+	steps: number,
+	requestedModel: 'ARIMA' | 'LSTM',
+) {
+	const values = cleanPrices(prices)
+	const horizon = Math.max(1, Math.min(365, Math.trunc(steps)))
+	const window = values.slice(-Math.min(values.length, 20))
+	const slope =
+		window.length > 1 ? (window.at(-1)! - window[0]) / (window.length - 1) : 0
+	const forecast = Array.from({ length: horizon }, (_, index) =>
+		round(Math.max(0.000001, values.at(-1)! + slope * (index + 1)), 4),
+	)
+	return {
+		available: true,
+		model: 'deterministic-node-fallback',
+		requested_model: requestedModel,
+		steps: horizon,
+		forecast,
+		confidence: 0.25,
+		note: `تعذر تشغيل ${requestedModel} خارجياً؛ تم استخدام خط اتجاه تعليمي بسيط.`,
+		disclaimer: 'توقع تعليمي احتياطي وليس تنبؤاً مضموناً أو توصية استثمارية.',
+	}
+}
+
+export function ensembleFallback(prices: number[], steps: number) {
+	const forecast = forecastFallback(prices, steps, 'ARIMA')
+	return {
+		...forecast,
+		model: 'deterministic-node-ensemble-fallback',
+		components: ['trend-baseline'],
+		note: 'تعذر تشغيل نماذج التجميع خارجياً؛ النتيجة خط أساس تعليمي قابل للمراجعة.',
+	}
+}
+
+export function sentimentFallback(symbol: string) {
+	return {
+		available: false,
+		symbol,
+		articleCount: 0,
+		distribution: { positive: 0, neutral: 0, negative: 0 },
+		message: 'لا توجد خدمة مشاعر موثوقة متاحة حالياً لهذا الرمز.',
+		disclaimer: 'لا يتم استنتاج المشاعر عند غياب مصدر أخبار موثوق.',
+	}
+}
+
+export function anomalyFallback(
+	symbol: string,
+	prices: number[],
+	volumes: number[],
+) {
+	const values = cleanPrices(prices)
+	const returns = values
+		.slice(1)
+		.map((value, index) => value / values[index] - 1)
+	const average = returns.length ? mean(returns) : 0
+	const deviation = returns.length ? standardDeviation(returns, average) : 0
+	const latest = returns.at(-1) ?? 0
+	const zScore = deviation ? (latest - average) / deviation : 0
+	return {
+		available: true,
+		symbol,
+		latest: Math.abs(zScore) >= 2.5,
+		anomalyCount: returns.filter(
+			(value) => deviation && Math.abs((value - average) / deviation) >= 2.5,
+		).length,
+		zScore: round(zScore),
+		volumeAvailable: volumes.some(
+			(volume) => Number.isFinite(volume) && volume > 0,
+		),
+		model: 'deterministic-node-fallback',
+		disclaimer: 'رصد إحصائي تعليمي لا يمثل توصية أو حكماً على جودة السهم.',
+	}
+}
+
+export function backtestFallback(
+	strategy: 'elliott' | 'gann' | 'indicators',
+	prices: number[],
+	lookback: number,
+	horizon: number,
+) {
+	const values = cleanPrices(prices)
+	const trades: number[] = []
+	const start = Math.max(lookback, 1)
+	for (let index = start; index + horizon < values.length; index += horizon) {
+		const baseline = mean(values.slice(index - lookback, index))
+		const direction = values[index] >= baseline ? 1 : -1
+		trades.push(direction * (values[index + horizon] / values[index] - 1))
+	}
+	const winners = trades.filter((value) => value > 0)
+	const losers = trades.filter((value) => value <= 0)
+	const average = trades.length ? mean(trades) : 0
+	let equity = 1
+	let peak = 1
+	let maxDrawdown = 0
+	for (const trade of trades) {
+		equity *= 1 + trade
+		peak = Math.max(peak, equity)
+		maxDrawdown = Math.max(maxDrawdown, (peak - equity) / peak)
+	}
+	const deviation = trades.length ? standardDeviation(trades, average) : 0
+	return {
+		available: true,
+		strategy,
+		model: 'deterministic-node-fallback',
+		total_trades: trades.length,
+		winning_trades: winners.length,
+		losing_trades: losers.length,
+		win_rate: round(trades.length ? winners.length / trades.length : 0, 4),
+		avg_return: round(average),
+		avg_loss: round(losers.length ? mean(losers) : 0),
+		sharpe_ratio: round(
+			deviation ? (average / deviation) * Math.sqrt(trades.length) : 0,
+		),
+		max_drawdown: round(maxDrawdown),
+		equity_curve: trades.map((_, index) =>
+			round(values[start + index * horizon] / values[start], 6),
+		),
+		disclaimer:
+			'اختبار تاريخي تعليمي بخط اتجاه مبسط؛ لا يضمن النتائج المستقبلية ولا ينفذ صفقات.',
+	}
+}

@@ -64,7 +64,7 @@ export async function register(
 				fullName: input.fullName,
 				country: input.country,
 				language: input.language,
-				preference: { create: {} },
+				preference: { create: input.preferences ?? {} },
 			},
 			select: publicUser,
 		})
