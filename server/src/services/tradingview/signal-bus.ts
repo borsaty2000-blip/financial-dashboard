@@ -2,6 +2,7 @@ import { EventEmitter } from 'node:events'
 import type { Server as HttpServer } from 'node:http'
 import { Server } from 'socket.io'
 import { LiveAnalysisService } from '../stream/live-analysis.service.js'
+import { attachPriceStream } from '../../sockets/price-stream.js'
 
 export type TradingViewSignal = {
 	symbol?: string
@@ -40,6 +41,7 @@ export function attachSignalSocket(httpServer: HttpServer) {
 		)
 	})
 	LiveAnalysisService.init(socketServer)
+	attachPriceStream(socketServer)
 	return socketServer
 }
 

@@ -12,6 +12,14 @@ import {
 
 export const marketRoutes = Router()
 
+marketRoutes.get('/quote/:symbol', async (request, response) => {
+	const market: CandleMarket =
+		request.query.market === 'TASI' || request.query.market === 'GLOBAL'
+			? request.query.market
+			: 'EGX'
+	response.json(await CandlesService.getQuote(request.params.symbol, market))
+})
+
 marketRoutes.get('/candles/:symbol', async (request, response) => {
 	const market: CandleMarket =
 		request.query.market === 'TASI' || request.query.market === 'GLOBAL'
