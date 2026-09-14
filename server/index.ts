@@ -60,10 +60,13 @@ import { regionalRoutes } from './src/routes/regional.routes.js'
 import { seoRoutes } from './src/routes/seo.routes.js'
 import { marketingRoutes } from './src/routes/marketing.routes.js'
 import {
+	initializeOptionalSentry,
 	requestObservability,
 	safeErrorHandler,
 } from './src/middleware/observability.js'
+import { openApiRoutes } from './src/routes/openapi.routes.js'
 
+initializeOptionalSentry()
 const app = express()
 app.use(
 	helmet({
@@ -139,6 +142,7 @@ app.get('/api/financial-report', (_request, response) =>
 app.get('/api/health', (_request, response) =>
 	response.json({ ok: true, service: 'financial-dashboard-api' }),
 )
+app.use('/api', openApiRoutes)
 app.use('/', seoRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/market', marketRoutes)

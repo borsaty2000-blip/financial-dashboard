@@ -732,3 +732,9 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 ## ملحق المرحلة 7 — Fork Inventory
 
 تم جرد 18 fork تحت حساب `borsaty2000-blip` قراءةً فقط. لا يوجد fork إضافي جاهز للاعتماد الإنتاجي المباشر. تم تصنيف `trading-signals` و`finance-dashboard` و`Statistical-analysis-of-EGX30` و`ElliottWaves` كمراجع، وSAHMK/Halal Terminal/finmagic كمرشحات مشروطة بمراجعات واختبارات، بينما بقيت forks ذات الترخيص المفقود أو المخاطر التشغيلية العالية مرفوضة حالياً. المصفوفة الكاملة والحدود موثقة في [`docs/integrations/fork-inventory.md`](docs/integrations/fork-inventory.md).
+
+## ملحق المرحلة 7 — OpenAPI وSentry
+
+أضيف `/api/openapi.json` بعقود أولية للمسارات المستقرة: health، التقرير، ملخص EGX/TASI، quote/candles، والمؤشرات/consensus. الوصف يذكر بوضوح أن الواجهات تعليمية ولا تنفذ صفقات أو تقدم ضمانات.
+
+أضيف `@sentry/node` خلف `SENTRY_DSN` اختياري؛ عند غياب المتغير لا تتم تهيئة Sentry ولا يلزم secret. اختبار التشغيل المحلي بدون DSN أعاد OpenAPI 3.0.3 بثمانية مسارات وhealth سليماً.

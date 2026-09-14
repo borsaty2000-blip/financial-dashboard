@@ -24,6 +24,7 @@
 		"@halalterminal/sdk": "github:borsaty2000-blip/halalterminal-sdk-js",
 		"@neabytelab/trading-lib": "github:borsaty2000-blip/Trading-Lib",
 		"@prisma/client": "^6.17.1",
+		"@sentry/node": "^10.74.0",
 		"bcryptjs": "^3.0.3",
 		"dotenv": "^17.4.2",
 		"express": "^4.22.2",

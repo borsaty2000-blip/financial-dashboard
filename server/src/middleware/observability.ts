@@ -5,6 +5,7 @@ import type {
 	Request,
 	Response,
 } from 'express'
+import * as Sentry from '@sentry/node'
 
 declare global {
 	namespace Express {
@@ -15,6 +16,17 @@ declare global {
 }
 
 const safeRequestId = /^[A-Za-z0-9._-]{1,100}$/
+
+export function initializeOptionalSentry() {
+	const dsn = process.env.SENTRY_DSN?.trim()
+	if (!dsn) return false
+	Sentry.init({
+		dsn,
+		environment: process.env.NODE_ENV ?? 'development',
+		tracesSampleRate: 0.05,
+	})
+	return true
+}
 
 export function requestObservability(
 	request: Request,
@@ -51,6 +63,7 @@ export const safeErrorHandler: ErrorRequestHandler = (
 	if (response.headersSent) return next(error)
 	const message =
 		error instanceof Error ? error.message : 'Internal server error'
+	if (process.env.SENTRY_DSN) Sentry.captureException(error)
 	console.error(
 		JSON.stringify({
 			event: 'http_error',
