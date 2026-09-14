@@ -2416,3 +2416,6 @@ body.dark-mode {
 
 .comparison-tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }.comparison-tools-grid article { display: grid; gap: 8px; padding: 14px; border: 1px solid var(--border); border-radius: 8px; }.comparison-tools-grid strong { color: #00a651; font-family: 'JetBrains Mono'; font-size: 20px; }.comparison-tools-grid span { color: var(--muted); font-size: 12px; }
 @media (max-width: 720px) { .comparison-tools-grid { grid-template-columns: 1fr 1fr; } }
+
+.governance-panel { margin-top: 14px; }.ownership-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }.ownership-list div { display: flex; justify-content: space-between; padding: 10px; background: var(--surface-muted); border-radius: 6px; }
+@media (max-width: 720px) { .ownership-list { grid-template-columns: 1fr; } }

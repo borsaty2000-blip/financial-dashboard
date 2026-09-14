@@ -28,6 +28,8 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 	)
 	const [anomalyData, setAnomalyData] = useState<FeatureResponse | null>(null)
 	const [fundamentals, setFundamentals] = useState<any>(null)
+	const [insiderTrades, setInsiderTrades] = useState<any[]>([])
+	const [ownership, setOwnership] = useState<any>(null)
 	const [message, setMessage] = useState('')
 	const [loading, setLoading] = useState(true)
 	const normalized = symbol.toUpperCase()
@@ -49,6 +51,12 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 			.catch(() => undefined)
 		void api<any>(`/api/fundamentals/${normalized}`)
 			.then(setFundamentals)
+			.catch(() => undefined)
+		void api<{ data: any[] }>(`/api/insider-trades/${normalized}`)
+			.then((result) => setInsiderTrades(result.data))
+			.catch(() => undefined)
+		void api<any>(`/api/ownership/${normalized}`)
+			.then(setOwnership)
 			.catch(() => undefined)
 	}, [normalized])
 
@@ -273,6 +281,40 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 							{fundamentals?.available
 								? `بيانات مالية متاحة`
 								: 'لا تتوفر بيانات مالية موثوقة حالياً.'}
+						</small>
+					</section>
+					<section className="analysis-card governance-panel">
+						<div className="panel-title">
+							<h2>الحوكمة والإفصاحات</h2>
+							<span className="eyebrow">Insider Trading</span>
+						</div>
+						<div className="ownership-list">
+							{(ownership?.shareholders ?? []).map((item: any) => (
+								<div key={item.name}>
+									<span>{item.name}</span>
+									<b>{item.percentage == null ? '—' : `${item.percentage}%`}</b>
+								</div>
+							))}
+						</div>
+						<div className="fundamentals-table">
+							{insiderTrades.slice(0, 6).map((item) => (
+								<div key={item.id}>
+									<span>
+										{item.insiderName} · {item.insiderRole}
+									</span>
+									<b
+										className={
+											item.transactionType === 'BUY' ? 'positive' : 'negative'
+										}
+									>
+										{item.transactionType === 'BUY' ? 'شراء' : 'بيع'}
+									</b>
+									<b>{item.shares.toLocaleString()}</b>
+								</div>
+							))}
+						</div>
+						<small>
+							الأرقام غير المتاحة تظهر كشرطة ولا تمثل توصية استثمارية.
 						</small>
 					</section>
 				</>
