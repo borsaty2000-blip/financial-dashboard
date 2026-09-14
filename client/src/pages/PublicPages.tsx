@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
 import { navigate } from '../router'
 import { formatEnglishNumber, formatEnglishPercent } from '../lib/format'
 
@@ -345,96 +346,359 @@ function MarketDirectory({
 	)
 }
 
-function PublicHeader() {
+type PublicHeaderProps = {
+	live: UnifiedLive | null
+	news: NewsItem[]
+}
+
+function HeaderMenu({
+	id,
+	label,
+	openMenu,
+	onToggle,
+	children,
+}: {
+	id: string
+	label: string
+	openMenu: string | null
+	onToggle: (id: string) => void
+	children: ReactNode
+}) {
+	const isOpen = openMenu === id
+	return (
+		<div className="public-nav-group">
+			<button
+				onClick={() => onToggle(id)}
+				onKeyDown={(event) => {
+					if (event.key === 'ArrowDown' || event.key === 'Enter') onToggle(id)
+				}}
+				aria-expanded={isOpen}
+				aria-haspopup="menu"
+			>
+				{label}{' '}
+				<span className="public-nav-chevron" aria-hidden="true">
+					⌄
+				</span>
+			</button>
+			{isOpen && (
+				<div className="public-dropdown public-mega-menu" role="menu">
+					{children}
+				</div>
+			)}
+		</div>
+	)
+}
+
+function MenuLink({
+	path,
+	label,
+	description,
+	value,
+	onSelect,
+}: {
+	path: string
+	label: string
+	description?: string
+	value?: string
+	onSelect: (path: string) => void
+}) {
+	return (
+		<button
+			className="public-menu-link"
+			role="menuitem"
+			onClick={() => onSelect(path)}
+		>
+			<span>
+				<strong>{label}</strong>
+				{description && <small>{description}</small>}
+			</span>
+			{value && <b>{value}</b>}
+		</button>
+	)
+}
+
+function PublicHeader({ live, news }: PublicHeaderProps) {
 	const [openMenu, setOpenMenu] = useState<string | null>(null)
 	const toggle = (menu: string) =>
 		setOpenMenu((current) => (current === menu ? null : menu))
+	const go = (path: string) => {
+		setOpenMenu(null)
+		navigate(path)
+	}
+	useEffect(() => {
+		const closeOnEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') setOpenMenu(null)
+		}
+		document.addEventListener('keydown', closeOnEscape)
+		return () => document.removeEventListener('keydown', closeOnEscape)
+	}, [])
+
+	const indices = live?.indices ?? {}
+	const egxCount = live?.directories?.egx?.length ?? 0
+	const tasiCount = live?.directories?.tasi?.length ?? 0
 	return (
 		<header className="borsaty-public-header">
-			<button className="borsaty-public-brand" onClick={() => navigate('/')}>
+			<button className="borsaty-public-brand" onClick={() => go('/')}>
 				<span>ب</span>
 				<strong>بورصتي</strong>
 				<small>BORSATY</small>
 			</button>
 			<nav className="borsaty-public-nav" aria-label="التنقل الرئيسي">
-				<div className="public-nav-group">
-					<button
-						onClick={() => toggle('markets')}
-						aria-expanded={openMenu === 'markets'}
-						aria-haspopup="menu"
-					>
-						الأسواق{' '}
-						<span className="public-nav-chevron" aria-hidden="true">
-							⌄
-						</span>
-					</button>
-					{openMenu === 'markets' && (
-						<div className="public-dropdown" role="menu">
-							<button role="menuitem" onClick={() => navigate('/markets/egx')}>
-								البورصة المصرية
-							</button>
-							<button role="menuitem" onClick={() => navigate('/markets/tasi')}>
-								السوق السعودي
-							</button>
+				<HeaderMenu
+					id="markets"
+					label="الأسواق"
+					openMenu={openMenu}
+					onToggle={toggle}
+				>
+					<div className="public-menu-grid public-menu-market-grid">
+						<div className="public-menu-intro">
+							<span className="public-menu-eyebrow">نبض السوق</span>
+							<strong>الأسواق العربية</strong>
+							<p>مؤشرات مصر والسعودية والسلع، مع عرض صريح عند غياب السعر.</p>
+							<div className="public-menu-stats">
+								<span>
+									<b>{egxCount || '—'}</b> EGX
+								</span>
+								<span>
+									<b>{tasiCount || '—'}</b> TASI
+								</span>
+							</div>
+						</div>
+						<div className="public-menu-links">
+							<MenuLink
+								path="/markets/egx"
+								label="البورصة المصرية"
+								description="دليل EGX الكامل"
+								value={formatValue(indices.egx30?.value ?? undefined)}
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/markets/tasi"
+								label="السوق السعودي"
+								description="دليل TASI الكامل"
+								value={formatValue(indices.tasi?.value ?? undefined)}
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/markets/commodities"
+								label="الذهب والفضة"
+								description="أسعار السلع المتاحة"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/screener"
+								label="فاحص الأسهم"
+								description="فلترة وبحث متقدم"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/markets/forex"
+								label="الفوركس"
+								description="أسواق إضافية"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/markets/crypto"
+								label="الأصول الرقمية"
+								description="متابعة تعليمية"
+								onSelect={go}
+							/>
+						</div>
+					</div>
+				</HeaderMenu>
+				<HeaderMenu
+					id="analysis"
+					label="التحليل"
+					openMenu={openMenu}
+					onToggle={toggle}
+				>
+					<div className="public-menu-grid public-menu-analysis-grid">
+						<div className="public-menu-intro">
+							<span className="public-menu-eyebrow">مختبر القرار</span>
+							<strong>حلّل ثم اختبر</strong>
+							<p>أدوات تعليمية منفصلة عن تنفيذ الأوامر والوساطة.</p>
+							<div className="public-menu-feature">
+								Elliott · Gann · RSI · Backtest
+							</div>
+						</div>
+						<div className="public-menu-links">
+							<MenuLink
+								path="/analysis/elliott"
+								label="Elliott Wave"
+								description="موجات واتجاهات تعليمية"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/analysis/gann"
+								label="Gann"
+								description="زوايا ودورات سعرية"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/backtest"
+								label="الاختبار التاريخي"
+								description="قارن الفرضية بالماضي"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/strategies"
+								label="منشئ الاستراتيجيات"
+								description="ابنِ قواعد قابلة للمراجعة"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/compare"
+								label="مقارنة الأسهم"
+								description="مقارنة متعددة الرموز"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/candlestick"
+								label="الشموع والمؤشرات"
+								description="قراءة فنية تعليمية"
+								onSelect={go}
+							/>
+						</div>
+					</div>
+				</HeaderMenu>
+				<HeaderMenu
+					id="news"
+					label="الأخبار"
+					openMenu={openMenu}
+					onToggle={toggle}
+				>
+					<div className="public-news-menu">
+						<div className="public-menu-intro">
+							<span className="public-menu-eyebrow">آخر التحديثات</span>
+							<strong>أخبار السوق</strong>
+							<p>عناوين تصل من خدمة الأخبار عند توفرها.</p>
+						</div>
+						<div className="public-news-menu-list">
+							{news.length ? (
+								news.slice(0, 3).map((item) => (
+									<button
+										key={item.id}
+										role="menuitem"
+										onClick={() => go('/news')}
+									>
+										<small>{item.category ?? 'السوق'}</small>
+										<strong>{item.title}</strong>
+									</button>
+								))
+							) : (
+								<span className="public-menu-empty">
+									لا توجد عناوين متاحة الآن.
+								</span>
+							)}
+						</div>
+						<button
+							className="public-menu-all-link"
+							onClick={() => go('/news')}
+						>
+							فتح مركز الأخبار ←
+						</button>
+					</div>
+				</HeaderMenu>
+				<HeaderMenu
+					id="tools"
+					label="الأدوات"
+					openMenu={openMenu}
+					onToggle={toggle}
+				>
+					<div className="public-menu-grid public-menu-tools-grid">
+						<div className="public-menu-links">
+							<MenuLink
+								path="/portfolio"
+								label="المحفظة الافتراضية"
+								description="محاكاة تعليمية"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/watchlists"
+								label="قوائم المتابعة"
+								description="تحتاج تسجيل دخول"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/alerts"
+								label="التنبيهات"
+								description="تحتاج تسجيل دخول"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/calendar"
+								label="التقويم الاقتصادي"
+								description="أحداث السوق"
+								onSelect={go}
+							/>
+						</div>
+						<div className="public-menu-intro">
+							<span className="public-menu-eyebrow">مساحة العمل</span>
+							<strong>أدوات قابلة للتنفيذ التعليمي</strong>
+							<p>احفظ ما تراقبه وقارن الفرضيات دون تنفيذ صفقات حقيقية.</p>
 							<button
-								role="menuitem"
-								onClick={() => navigate('/markets/commodities')}
+								className="public-menu-cta"
+								onClick={() => go('/register')}
 							>
-								الذهب والفضة
-							</button>
-							<button role="menuitem" onClick={() => navigate('/screener')}>
-								فاحص الأسهم
+								أنشئ حساباً مجاناً
 							</button>
 						</div>
-					)}
-				</div>
-				<div className="public-nav-group">
-					<button
-						onClick={() => toggle('analysis')}
-						aria-expanded={openMenu === 'analysis'}
-						aria-haspopup="menu"
-					>
-						التحليل{' '}
-						<span className="public-nav-chevron" aria-hidden="true">
-							⌄
-						</span>
-					</button>
-					{openMenu === 'analysis' && (
-						<div className="public-dropdown" role="menu">
-							<button
-								role="menuitem"
-								onClick={() => navigate('/analysis/elliott')}
-							>
-								Elliott Wave
-							</button>
-							<button
-								role="menuitem"
-								onClick={() => navigate('/analysis/gann')}
-							>
-								Gann
-							</button>
-							<button role="menuitem" onClick={() => navigate('/backtest')}>
-								الاختبار التاريخي
-							</button>
-							<button role="menuitem" onClick={() => navigate('/strategies')}>
-								منشئ الاستراتيجيات
-							</button>
+					</div>
+				</HeaderMenu>
+				<HeaderMenu
+					id="learn"
+					label="التعلم"
+					openMenu={openMenu}
+					onToggle={toggle}
+				>
+					<div className="public-menu-grid public-menu-learning-grid">
+						<div className="public-menu-intro">
+							<span className="public-menu-eyebrow">أكاديمية بورصتي</span>
+							<strong>تعلّم بإيقاعك</strong>
+							<p>محتوى عربي لفهم السوق وإدارة الفرضيات والمخاطر.</p>
 						</div>
-					)}
-				</div>
-				<button onClick={() => navigate('/news')}>الأخبار</button>
-				<button onClick={() => navigate('/education')}>التعليم</button>
+						<div className="public-menu-links">
+							<MenuLink
+								path="/education"
+								label="الأكاديمية"
+								description="الدورات والدروس"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/videos"
+								label="مكتبة الفيديو"
+								description="شروحات مرئية"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/webinars"
+								label="الندوات"
+								description="جلسات تعليمية"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/community"
+								label="المجتمع"
+								description="نقاشات المتداولين"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/community/leaderboard"
+								label="المتصدرون"
+								description="محاكاة تعليمية"
+								onSelect={go}
+							/>
+						</div>
+					</div>
+				</HeaderMenu>
 			</nav>
 			<div className="borsaty-public-actions">
-				<button
-					className="borsaty-text-button"
-					onClick={() => navigate('/login')}
-				>
+				<button className="borsaty-text-button" onClick={() => go('/login')}>
 					دخول
 				</button>
 				<button
 					className="borsaty-solid-button"
-					onClick={() => navigate('/register')}
+					onClick={() => go('/register')}
 				>
 					ابدأ مجاناً
 				</button>
@@ -625,7 +889,7 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 
 	return (
 		<div className="borsaty-public-page" dir="rtl">
-			<PublicHeader />
+			<PublicHeader live={live} news={news} />
 			<main>
 				<section className="borsaty-hero">
 					<div className="borsaty-hero__copy">
@@ -820,7 +1084,7 @@ export function AnalysisOverviewPage({
 	}
 	return (
 		<div className="borsaty-public-page" dir="rtl">
-			<PublicHeader />
+			<PublicHeader live={null} news={[]} />
 			<main className="borsaty-analysis-overview">
 				<span className="borsaty-kicker">تحليل تعليمي</span>
 				<h1>{isElliott ? 'تحليل Elliott Wave' : 'تحليل Gann'}</h1>

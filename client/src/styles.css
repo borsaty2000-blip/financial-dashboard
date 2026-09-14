@@ -5119,3 +5119,252 @@ body.dark-mode .borsaty-public-header .public-dropdown button:focus-visible {
 	background: #174a61;
 	color: #ffffff;
 }
+
+/* Interactive market-terminal mega menus */
+.public-mega-menu {
+	width: min(680px, calc(100vw - 32px));
+	padding: 14px;
+}
+
+.public-menu-grid,
+.public-news-menu {
+	display: grid;
+	gap: 16px;
+}
+
+.public-menu-market-grid,
+.public-menu-analysis-grid,
+.public-menu-tools-grid,
+.public-menu-learning-grid {
+	grid-template-columns: minmax(190px, 0.72fr) minmax(300px, 1.28fr);
+}
+
+.public-menu-intro {
+	display: grid;
+	align-content: start;
+	gap: 8px;
+	padding: 14px;
+	border: 1px solid #d9eaf0;
+	border-radius: 12px;
+	background: linear-gradient(145deg, #f4fbfd, #e7f4f8);
+}
+
+.public-menu-intro strong {
+	color: #123c4e;
+	font-size: 16px;
+}
+
+.public-menu-intro p {
+	margin: 0;
+	color: #5d7580;
+	font-size: 11px;
+	line-height: 1.8;
+}
+
+.public-menu-eyebrow {
+	color: #0878ae;
+	font-size: 10px;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+}
+
+.public-menu-links {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 6px;
+}
+
+.public-menu-link {
+	display: flex;
+	min-height: 62px;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 10px 11px;
+	border: 1px solid transparent;
+	border-radius: 10px;
+	background: #ffffff;
+	color: #173c50;
+	text-align: right;
+	cursor: pointer;
+}
+
+.public-menu-link > span {
+	display: grid;
+	gap: 4px;
+}
+
+.public-menu-link strong {
+	font-size: 12px;
+}
+
+.public-menu-link small {
+	color: #78909a;
+	font-size: 10px;
+}
+
+.public-menu-link > b {
+	color: #0878ae;
+	font:
+		700 11px 'JetBrains Mono',
+		monospace;
+	white-space: nowrap;
+}
+
+.public-menu-link:hover,
+.public-menu-link:focus-visible {
+	border-color: #a7d7e8;
+	background: #eaf7fb;
+	color: #056b9c;
+	outline: none;
+}
+
+.public-menu-stats {
+	display: flex;
+	gap: 7px;
+	margin-top: 4px;
+}
+
+.public-menu-stats span {
+	padding: 6px 8px;
+	border-radius: 8px;
+	background: #ffffff;
+	color: #68818b;
+	font:
+		10px 'JetBrains Mono',
+		monospace;
+}
+
+.public-menu-stats b {
+	color: #0878ae;
+}
+
+.public-menu-feature {
+	padding: 8px 9px;
+	border-radius: 8px;
+	background: #ffffff;
+	color: #0878ae;
+	font:
+		10px 'JetBrains Mono',
+		monospace;
+}
+
+.public-news-menu {
+	grid-template-columns: minmax(165px, 0.7fr) minmax(260px, 1.3fr);
+}
+
+.public-news-menu-list {
+	display: grid;
+	gap: 6px;
+}
+
+.public-news-menu-list button {
+	display: grid;
+	gap: 5px;
+	padding: 10px 11px;
+	border: 1px solid #e0edf1;
+	border-radius: 10px;
+	background: #ffffff;
+	color: #173c50;
+	text-align: right;
+	cursor: pointer;
+}
+
+.public-news-menu-list button:hover,
+.public-news-menu-list button:focus-visible {
+	border-color: #a7d7e8;
+	background: #eaf7fb;
+	outline: none;
+}
+
+.public-news-menu-list small {
+	color: #0878ae;
+	font-size: 10px;
+}
+
+.public-news-menu-list strong {
+	font-size: 11px;
+	line-height: 1.5;
+}
+
+.public-menu-empty {
+	align-self: center;
+	padding: 18px 10px;
+	color: #78909a;
+	font-size: 11px;
+}
+
+.public-menu-all-link,
+.public-menu-cta {
+	padding: 9px 11px;
+	border: 0;
+	border-radius: 9px;
+	background: #0b739f;
+	color: #ffffff;
+	font-size: 11px;
+	font-weight: 800;
+	cursor: pointer;
+}
+
+.public-menu-all-link:hover,
+.public-menu-cta:hover {
+	background: #075d83;
+}
+
+.public-news-menu > .public-menu-all-link {
+	grid-column: 1 / -1;
+	text-align: center;
+}
+
+body.dark-mode .public-menu-intro {
+	border-color: #2b5668;
+	background: linear-gradient(145deg, #173f51, #102d3e);
+}
+
+body.dark-mode .public-menu-intro strong,
+body.dark-mode .public-menu-link,
+body.dark-mode .public-news-menu-list button {
+	color: #e6f4f8;
+}
+
+body.dark-mode .public-menu-intro p,
+body.dark-mode .public-menu-link small {
+	color: #9bb9c4;
+}
+
+body.dark-mode .public-menu-link,
+body.dark-mode .public-news-menu-list button,
+body.dark-mode .public-menu-stats span,
+body.dark-mode .public-menu-feature {
+	border-color: #294b5b;
+	background: #102d3e;
+}
+
+body.dark-mode .public-menu-link:hover,
+body.dark-mode .public-menu-link:focus-visible,
+body.dark-mode .public-news-menu-list button:hover,
+body.dark-mode .public-news-menu-list button:focus-visible {
+	border-color: #287a9c;
+	background: #174a61;
+}
+
+@media (max-width: 800px) {
+	.public-mega-menu {
+		right: -16px;
+		width: min(620px, calc(100vw - 24px));
+	}
+}
+
+@media (max-width: 560px) {
+	.public-menu-market-grid,
+	.public-menu-analysis-grid,
+	.public-menu-tools-grid,
+	.public-menu-learning-grid,
+	.public-news-menu {
+		grid-template-columns: 1fr;
+	}
+
+	.public-menu-links {
+		grid-template-columns: 1fr;
+	}
+}
