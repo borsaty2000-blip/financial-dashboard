@@ -43,7 +43,7 @@ function MobileDrawer({
 				aria-hidden={!open}
 			>
 				<div className="drawer-header">
-					<b>بورصتي</b>
+					<img src="/branding/borsatyai-logo.png" alt="BorsatyAI" />
 					<button
 						className="icon-button drawer-close"
 						onClick={onClose}

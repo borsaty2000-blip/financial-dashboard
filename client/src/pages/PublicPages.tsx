@@ -411,6 +411,7 @@ function HeaderMenu({
 	return (
 		<div className="public-nav-group">
 			<button
+				className={isOpen ? 'is-open' : undefined}
 				onClick={() => onToggle(id)}
 				onKeyDown={(event) => {
 					if (event.key === 'ArrowDown' || event.key === 'Enter') onToggle(id)
@@ -429,6 +430,7 @@ function HeaderMenu({
 					id={`public-menu-${id}`}
 					className="public-dropdown public-mega-menu"
 					role="menu"
+					tabIndex={-1}
 				>
 					{children}
 				</div>
