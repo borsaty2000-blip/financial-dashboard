@@ -14,14 +14,13 @@ export default class ErrorBoundary extends Component<Props, State> {
 	render() {
 		if (!this.state.hasError) return this.props.children
 		return (
-			<main className="error-page" dir="rtl">
+			<main className="error-page" dir="rtl" role="alert">
 				<div className="error-card">
 					<strong>حدث خطأ غير متوقع</strong>
 					<p>تعذر تحميل هذا القسم. يمكنك إعادة المحاولة دون فقدان بياناتك.</p>
-					<small>{this.state.message}</small>
 					<button
 						className="primary-button"
-						onClick={() => this.setState({ hasError: false, message: '' })}
+						onClick={() => window.location.reload()}
 					>
 						إعادة المحاولة
 					</button>

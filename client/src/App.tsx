@@ -79,7 +79,17 @@ import { AnalysisOverviewPage, PublicHomePage } from './pages/PublicPages'
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
 )
-const StrategyBuilderPage = lazy(() => import('./pages/StrategyBuilderPage'))
+const StrategyBuilderPage = lazy(() =>
+	Promise.race([
+		import('./pages/StrategyBuilderPage'),
+		new Promise<never>((_, reject) =>
+			window.setTimeout(
+				() => reject(new Error('تعذر تحميل منشئ الاستراتيجيات')),
+				15_000,
+			),
+		),
+	]),
+)
 
 function RoutedApp() {
 	const location = useLocation()
@@ -216,6 +226,7 @@ function RoutedApp() {
 			</ProtectedRoute>
 		)
 	if (path === '/education') return <EducationPage />
+	if (path === '/learning') return <EducationPage />
 	if (path === '/education/my-courses')
 		return (
 			<ProtectedRoute>
@@ -239,6 +250,7 @@ function RoutedApp() {
 	if (path === '/community') return <CommunityPage />
 	if (path === '/community/leaderboard')
 		return <CommunityPage mode="leaderboard" />
+	if (path === '/leaderboard') return <CommunityPage mode="leaderboard" />
 	if (path.startsWith('/community/topics/'))
 		return (
 			<CommunityPage
@@ -311,6 +323,7 @@ function RoutedApp() {
 				<WeeklyReportPage />
 			</ProtectedRoute>
 		)
+	if (path === '/stock') return <NotFoundPage />
 	if (path.startsWith('/stock/'))
 		return <StockDetailPage symbol={path.slice('/stock/'.length)} />
 	if (

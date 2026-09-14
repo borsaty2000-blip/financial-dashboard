@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { prisma } from '../../lib/prisma.js'
 import { signToken, verifyToken } from '../../config/jwt.js'
+import { hashOpaqueToken } from '../../utils/token-hash.js'
 import type {
 	LoginInput,
 	RegisterInput,
@@ -36,7 +37,7 @@ async function issueSession(
 	await prisma.session.create({
 		data: {
 			userId,
-			token: refreshToken,
+			token: hashOpaqueToken(refreshToken),
 			userAgent,
 			ipAddress,
 			expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
@@ -140,8 +141,13 @@ export async function login(
 }
 
 export async function logout(token: string) {
+	const payload = await verifyToken(token, 'refresh')
 	const result = await prisma.session.updateMany({
-		where: { token, revokedAt: null },
+		where: {
+			token: hashOpaqueToken(token),
+			userId: payload.sub,
+			revokedAt: null,
+		},
 		data: { revokedAt: new Date() },
 	})
 	return { success: result.count > 0 }
@@ -153,7 +159,7 @@ export async function refreshToken(
 	const payload = await verifyToken(token, 'refresh')
 	const session = await prisma.session.findFirst({
 		where: {
-			token,
+			token: hashOpaqueToken(token),
 			userId: payload.sub,
 			revokedAt: null,
 			expiresAt: { gt: new Date() },

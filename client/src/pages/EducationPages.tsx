@@ -23,12 +23,20 @@ type Lesson = {
 	duration: number
 	order: number
 }
+type ProgressItem = {
+	id: string
+	course?: { title?: string }
+	courseId?: string
+	progress?: number
+	verificationCode?: string
+}
 
 const levelLabel: Record<string, string> = {
 	BEGINNER: 'مبتدئ',
 	INTERMEDIATE: 'متوسط',
 	ADVANCED: 'متقدم',
 }
+
 export function EducationPage({
 	mode = 'catalog',
 	id = '',
@@ -39,11 +47,13 @@ export function EducationPage({
 	const [courses, setCourses] = useState<Course[]>([])
 	const [course, setCourse] = useState<Course | null>(null)
 	const [lesson, setLesson] = useState<Lesson | null>(null)
-	const [data, setData] = useState<any>(null)
-	const [loading, setLoading] = useState(true)
+	const [data, setData] = useState<ProgressItem[]>([])
+	const [loadedKey, setLoadedKey] = useState('')
 	const [message, setMessage] = useState('')
+	const requestKey = `${mode}:${id}`
+	const loading = loadedKey !== requestKey
+
 	useEffect(() => {
-		setLoading(true)
 		const path =
 			mode === 'catalog'
 				? '/api/courses'
@@ -54,17 +64,32 @@ export function EducationPage({
 						: mode === 'my'
 							? '/api/my/courses'
 							: '/api/my/certificates'
-		void api<any>(path)
-			.then((value) => {
-				if (mode === 'catalog') setCourses(value)
-				else if (mode === 'course') setCourse(value)
-				else if (mode === 'lesson') setLesson(value)
-				else setData(value)
-			})
-			.catch(() => setMessage('سجّل الدخول للوصول إلى مسارك التعليمي'))
-			.finally(() => setLoading(false))
-	}, [mode, id])
-	async function enroll(courseId: string) {
+		let active = true
+		const load = async () => {
+			try {
+				if (mode === 'catalog') setCourses(await api<Course[]>(path))
+				else if (mode === 'course') setCourse(await api<Course>(path))
+				else if (mode === 'lesson') setLesson(await api<Lesson>(path))
+				else setData(await api<ProgressItem[]>(path))
+				if (active) setMessage('')
+			} catch {
+				if (active)
+					setMessage(
+						mode === 'catalog' || mode === 'course' || mode === 'lesson'
+							? 'تعذر تحميل المحتوى التعليمي حالياً'
+							: 'سجّل الدخول للوصول إلى مسارك التعليمي',
+					)
+			} finally {
+				if (active) setLoadedKey(requestKey)
+			}
+		}
+		void load()
+		return () => {
+			active = false
+		}
+	}, [mode, id, requestKey])
+
+	const enroll = async (courseId: string) => {
 		try {
 			await api(`/api/courses/${courseId}/enroll`, { method: 'POST' })
 			setMessage('تم التسجيل في الدورة بنجاح')
@@ -72,7 +97,7 @@ export function EducationPage({
 			setMessage('يتطلب التسجيل الدخول إلى الحساب')
 		}
 	}
-	async function complete(lessonId: string) {
+	const complete = async (lessonId: string) => {
 		try {
 			await api(`/api/lessons/${lessonId}/complete`, { method: 'POST' })
 			setMessage('تم حفظ تقدمك')
@@ -80,10 +105,46 @@ export function EducationPage({
 			setMessage('تعذر حفظ التقدم')
 		}
 	}
+
 	if (loading)
 		return (
 			<main className="education-page analysis-page">
-				<div className="loading-screen">جارٍ تحميل المحتوى التعليمي...</div>
+				<div className="loading-screen" role="status" aria-live="polite">
+					جارٍ تحميل المحتوى التعليمي...
+				</div>
+			</main>
+		)
+	const hasEmptyResult =
+		(mode === 'catalog' && courses.length === 0) ||
+		(mode === 'course' && !course) ||
+		(mode === 'lesson' && !lesson) ||
+		((mode === 'my' || mode === 'certificates') && data.length === 0)
+	if (message || hasEmptyResult)
+		return (
+			<main className="education-page analysis-page" dir="rtl">
+				<header className="page-heading">
+					<p className="eyebrow">Borsaty Academy</p>
+					<h1>
+						{mode === 'catalog'
+							? 'المحتوى التعليمي غير متاح حالياً'
+							: mode === 'course'
+								? 'الدورة غير متاحة'
+								: mode === 'lesson'
+									? 'الدرس غير متاح'
+									: mode === 'my'
+										? 'لا توجد دورات مسجلة بعد'
+										: 'لا توجد شهادات بعد'}
+					</h1>
+					<p>
+						{message ||
+							(mode === 'catalog'
+								? 'ستظهر الدورات هنا عند توفر محتوى موثوق.'
+								: 'يمكنك العودة لاحقاً أو الرجوع إلى الأكاديمية.')}
+					</p>
+				</header>
+				<a className="secondary-button" href="/education">
+					العودة إلى الأكاديمية
+				</a>
 			</main>
 		)
 	if (mode === 'course' && course)
@@ -153,13 +214,13 @@ export function EducationPage({
 					<h1>{mode === 'my' ? 'دوراتي' : 'شهاداتي'}</h1>
 				</header>
 				<section className="education-grid">
-					{(data ?? []).map((item: any) => (
+					{data.map((item) => (
 						<article className="analysis-card" key={item.id}>
 							<h3>{item.course?.title ?? item.courseId ?? 'شهادة بورصتي'}</h3>
 							<p>
 								{item.progress != null
 									? `التقدم ${item.progress}%`
-									: `رمز التحقق: ${item.verificationCode}`}
+									: `رمز التحقق: ${item.verificationCode ?? '—'}`}
 							</p>
 						</article>
 					))}

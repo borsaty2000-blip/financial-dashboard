@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto'
 import bcrypt from 'bcryptjs'
 import { prisma } from '../../lib/prisma.js'
 import { sendPasswordResetEmail } from '../email/email.service.js'
+import { hashOpaqueToken } from '../../utils/token-hash.js'
 
 const genericMessage = 'إذا كان البريد مسجلاً، ستصلك تعليمات الاستعادة قريباً.'
 const resetBaseUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173'
@@ -17,7 +18,7 @@ export async function requestReset(email: string) {
 	await prisma.passwordReset.create({
 		data: {
 			userId: user.id,
-			token,
+			token: hashOpaqueToken(token),
 			expiresAt: new Date(Date.now() + 15 * 60 * 1000),
 		},
 	})
@@ -29,13 +30,17 @@ export async function requestReset(email: string) {
 }
 
 export async function validateResetToken(token: string) {
-	const reset = await prisma.passwordReset.findUnique({ where: { token } })
+	const reset = await prisma.passwordReset.findUnique({
+		where: { token: hashOpaqueToken(token) },
+	})
 	const valid = Boolean(reset && !reset.usedAt && reset.expiresAt > new Date())
 	return { valid }
 }
 
 export async function resetPassword(token: string, newPassword: string) {
-	const reset = await prisma.passwordReset.findUnique({ where: { token } })
+	const reset = await prisma.passwordReset.findUnique({
+		where: { token: hashOpaqueToken(token) },
+	})
 	if (!reset || reset.usedAt || reset.expiresAt <= new Date())
 		throw new Error('رابط الاستعادة غير صالح أو منتهي')
 	const passwordHash = await bcrypt.hash(newPassword, 12)

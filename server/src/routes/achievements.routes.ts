@@ -1,8 +1,6 @@
 import { Router } from 'express'
 import {
 	allAchievementsController,
-	awardController,
-	checkController,
 	leaderboardController,
 	myAchievementsController,
 	progressController,
@@ -14,5 +12,3 @@ achievementsRoutes.get('/', allAchievementsController)
 achievementsRoutes.get('/leaderboard', leaderboardController)
 achievementsRoutes.get('/my', requireAuth, myAchievementsController)
 achievementsRoutes.get('/progress', requireAuth, progressController)
-achievementsRoutes.post('/check', requireAuth, checkController)
-achievementsRoutes.post('/award/:code', requireAuth, awardController)

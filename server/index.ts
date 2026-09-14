@@ -68,6 +68,7 @@ import { openApiRoutes } from './src/routes/openapi.routes.js'
 
 initializeOptionalSentry()
 const app = express()
+app.set('trust proxy', 1)
 app.use(
 	helmet({
 		contentSecurityPolicy: {
@@ -86,7 +87,7 @@ app.use(
 		crossOriginResourcePolicy: { policy: 'cross-origin' },
 	}),
 )
-app.use(express.json())
+app.use(express.json({ limit: '256kb' }))
 app.use(languageMiddleware)
 app.use(requestObservability)
 app.use(publicRateLimit)
@@ -102,10 +103,12 @@ const allowedOrigins = [
 	.filter(Boolean)
 app.use((request, response, next) => {
 	const origin = request.headers.origin
-	if (!origin || allowedOrigins.includes(origin)) {
-		if (origin) response.setHeader('Access-Control-Allow-Origin', origin)
+	const originAllowed = !origin || allowedOrigins.includes(origin)
+	response.setHeader('Vary', 'Origin')
+	if (originAllowed && origin) {
+		response.setHeader('Access-Control-Allow-Origin', origin)
+		response.setHeader('Access-Control-Allow-Credentials', 'true')
 	}
-	response.setHeader('Access-Control-Allow-Credentials', 'true')
 	response.setHeader(
 		'Access-Control-Allow-Methods',
 		'GET,POST,PUT,PATCH,DELETE,OPTIONS',
