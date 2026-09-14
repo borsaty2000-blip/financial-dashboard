@@ -714,3 +714,11 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 ## ملحق المرحلة 7 — AI Strategy Assistant Contract
 
 أضيف عقد typed لمساعد الاستراتيجيات يحدد الطلب والاستجابة وprovider قابل للحقن لاحقاً، مع التحقق من السؤال والرمز. التنفيذ الحالي fallback حتمي لا يستدعي LLM ولا يحتاج secrets أو credits؛ يعيد قالب RSI صالحاً، شرحاً تعليمياً، limitations، وdisclaimer. لا ينفذ صفقات ولا يقدم توصية مالية. smoke test يتحقق من الاستجابة الصحيحة ورفض السؤال الفارغ.
+
+## ملحق المرحلة 7 — Visual Strategy Builder
+
+بعد مراجعة README والترخيص والمستودع الرسمي، تم اعتماد `@xyflow/react` 12.11.6 بترخيص MIT، مع repository نشط وReact Flow 12 موثق رسمياً. تم عزله في route lazy على `/strategies` و`/strategy-builder`، وربطه فقط بعقد `@borsaty/strategies`; أي محاولة لإضافة edge تكسر DAG تُرفض في الواجهة قبل الحفظ.
+
+المحاكاة والواجهة لا تنفذ صفقات ولا تتصل بوسيط. بناء الإنتاج نجح، وظهر chunk مستقل للصفحة بحجم 174.86 kB (55.68 kB gzip)، فلا يدخل في initial route chunk. نجحت TypeScript والحزم والاختبارات: 19 ملفاً و91 اختباراً.
+
+أظهر `npm audit --omit=dev` مخاطر موجودة في سلسلة Prisma/Express (`deepmerge-ts` و`effect` و`qs`)؛ لم يُنفذ `npm audit fix --force` لأنه يقترح تغيير Prisma بشكل breaking. يلزم triage وترقية مستقلة قبل الإطلاق، ولا يُعد هذا الملحق إغلاقاً للمخاطر.

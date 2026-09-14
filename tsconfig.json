@@ -5,7 +5,8 @@
 		"module": "ESNext",
 		"moduleResolution": "Bundler",
 		"paths": {
-			"@client/*": ["./client/src/*"]
+			"@client/*": ["./client/src/*"],
+			"@borsaty/strategies": ["./packages/strategies/src/index.ts"]
 		},
 		"jsx": "react-jsx",
 		"strict": true,
@@ -19,6 +20,11 @@
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true
 	},
-	"include": ["client/**/*.ts", "client/**/*.tsx", "server/**/*.ts"],
+	"include": [
+		"client/**/*.ts",
+		"client/**/*.tsx",
+		"server/**/*.ts",
+		"packages/strategies/**/*.ts"
+	],
 	"exclude": ["node_modules", "client/node_modules", "client/dist"]
 }

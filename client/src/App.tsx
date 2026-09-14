@@ -78,6 +78,7 @@ import {
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
 )
+const StrategyBuilderPage = lazy(() => import('./pages/StrategyBuilderPage'))
 
 function RoutedApp() {
 	const location = useLocation()
@@ -120,6 +121,16 @@ function RoutedApp() {
 	if (path.startsWith('/help/'))
 		return <HelpPage category={path.slice('/help/'.length)} />
 	if (path === '/backtest') return <BacktestPage />
+	if (path === '/strategies' || path === '/strategy-builder')
+		return (
+			<Suspense
+				fallback={
+					<div className="loading-screen">جارٍ تحميل منشئ الاستراتيجيات...</div>
+				}
+			>
+				<StrategyBuilderPage />
+			</Suspense>
+		)
 	if (path === '/candlestick') return <CandlestickPage />
 	if (path === '/simulator') return <SimulatorPage />
 	if (path === '/shariah') return <ShariahPage />
