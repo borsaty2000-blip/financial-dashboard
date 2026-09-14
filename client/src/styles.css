@@ -5638,3 +5638,114 @@ body.dark-mode .borsaty-pulse-row:focus-visible {
 		display: none;
 	}
 }
+
+/* Contextual section activity rail: keeps every public page connected to its job. */
+.section-activity-bar {
+	display: grid;
+	grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
+	gap: 16px;
+	align-items: stretch;
+	max-width: 1180px;
+	margin: 18px auto 0;
+	padding: 14px;
+	border: 1px solid #cfe4eb;
+	border-radius: 16px;
+	background: linear-gradient(135deg, #f8fcfd, #eaf6f8);
+	box-shadow: 0 12px 30px rgb(16 73 91 / 8%);
+}
+.section-activity-copy {
+	display: grid;
+	align-content: center;
+	gap: 5px;
+	padding: 5px 8px;
+}
+.section-activity-kicker {
+	color: #0b739f;
+	font-size: 10px;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+.section-activity-copy strong {
+	color: #10394b;
+	font-size: 17px;
+}
+.section-activity-copy p {
+	margin: 0;
+	color: #5d7580;
+	font-size: 11px;
+	line-height: 1.8;
+}
+.section-activity-links {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 7px;
+}
+.section-activity-links button {
+	display: flex;
+	min-height: 58px;
+	align-items: center;
+	justify-content: space-between;
+	gap: 6px;
+	padding: 10px;
+	border: 1px solid #d7e8ed;
+	border-radius: 11px;
+	background: rgb(255 255 255 / 86%);
+	color: #16475b;
+	font-size: 11px;
+	font-weight: 800;
+	text-align: right;
+	cursor: pointer;
+	transition:
+		transform 160ms ease-out,
+		border-color 160ms ease-out,
+		background 160ms ease-out;
+}
+.section-activity-links button span {
+	color: #0b83af;
+	font-size: 15px;
+}
+.section-activity-links button:hover,
+.section-activity-links button:focus-visible {
+	border-color: #53aeca;
+	background: #ffffff;
+	outline: none;
+	transform: translateY(-2px);
+}
+.section-activity-links button:focus-visible {
+	box-shadow: 0 0 0 3px rgb(38 157 201 / 25%);
+}
+body.dark-mode .section-activity-bar {
+	border-color: #2c5969;
+	background: linear-gradient(135deg, #123c4c, #102b3a);
+}
+body.dark-mode .section-activity-copy strong,
+body.dark-mode .section-activity-links button {
+	color: #e5f4f8;
+}
+body.dark-mode .section-activity-copy p {
+	color: #9bbbc5;
+}
+body.dark-mode .section-activity-links button {
+	border-color: #2b5261;
+	background: #153c4c;
+}
+body.dark-mode .section-activity-links button:hover,
+body.dark-mode .section-activity-links button:focus-visible {
+	border-color: #459dbd;
+	background: #1d5265;
+}
+@media (max-width: 760px) {
+	.section-activity-bar {
+		grid-template-columns: 1fr;
+		margin-inline: 12px;
+	}
+	.section-activity-links {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+@media (max-width: 420px) {
+	.section-activity-links {
+		grid-template-columns: 1fr;
+	}
+}

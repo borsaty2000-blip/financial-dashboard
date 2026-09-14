@@ -66,6 +66,7 @@ import { EducationPage } from './pages/EducationPages'
 import { VoiceAssistantWidget } from './components/VoiceAssistantWidget'
 import { LiveChatWidget } from './components/LiveChatWidget'
 import AIAssistantWidget from './components/AIAssistantWidget'
+import { SectionActivityBar } from './components/SectionActivityBar'
 import { HelpPage, SupportPage, TicketsPage } from './pages/SupportPages'
 import { RegionalSettingsPage } from './pages/RegionalSettingsPage'
 import {
@@ -359,11 +360,13 @@ function RoutedApp() {
 	return <PublicHomePage />
 }
 export function App() {
+	const location = useLocation()
 	return (
 		<ErrorBoundary>
 			<AuthProvider>
 				<ToastProvider>
 					<RoutedApp />
+					<SectionActivityBar path={location.split('?')[0]} />
 					<MobileChrome />
 					<GlobalSearch />
 					<CurrencyConverter />
