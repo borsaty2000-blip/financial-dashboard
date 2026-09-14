@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import express from 'express'
+import helmet from 'helmet'
 import { authRoutes } from './src/routes/auth.routes.js'
 import { publicRateLimit } from './src/middleware/rateLimit.js'
 import { profileRoutes } from './src/routes/profile.routes.js'
@@ -58,10 +59,33 @@ import { attachLiveChatSocket } from './src/services/support/live-chat.service.j
 import { regionalRoutes } from './src/routes/regional.routes.js'
 import { seoRoutes } from './src/routes/seo.routes.js'
 import { marketingRoutes } from './src/routes/marketing.routes.js'
+import {
+	requestObservability,
+	safeErrorHandler,
+} from './src/middleware/observability.js'
 
 const app = express()
+app.use(
+	helmet({
+		contentSecurityPolicy: {
+			directives: {
+				defaultSrc: ["'self'"],
+				baseUri: ["'self'"],
+				connectSrc: ["'self'", 'https:', 'wss:'],
+				fontSrc: ["'self'", 'https:', 'data:'],
+				imgSrc: ["'self'", 'https:', 'data:'],
+				objectSrc: ["'none'"],
+				frameAncestors: ["'none'"],
+				scriptSrc: ["'self'"],
+				styleSrc: ["'self'", "'unsafe-inline'", 'https:'],
+			},
+		},
+		crossOriginResourcePolicy: { policy: 'cross-origin' },
+	}),
+)
 app.use(express.json())
 app.use(languageMiddleware)
+app.use(requestObservability)
 app.use(publicRateLimit)
 const port = Number(process.env.PORT ?? 4000)
 const allowedOrigins = [
@@ -164,6 +188,7 @@ app.use('/api/profile', profileRoutes)
 app.use('/api/preferences', preferencesRoutes)
 app.use('/api/achievements', achievementsRoutes)
 app.use('/api', userToolsRoutes)
+app.use(safeErrorHandler)
 export default app
 if (!process.env.VERCEL) {
 	startAlertChecker()

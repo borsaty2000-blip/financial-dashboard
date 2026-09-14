@@ -21,8 +21,10 @@ import {
 	CandlesService,
 	type CandleMarket,
 } from '../services/market/candles.service.js'
+import { analysisRateLimit } from '../middleware/rateLimit.js'
 
 export const analysisRoutes = Router()
+analysisRoutes.use(analysisRateLimit)
 
 function queryPrices(value: unknown) {
 	if (typeof value !== 'string') return []

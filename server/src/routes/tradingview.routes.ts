@@ -1,8 +1,10 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { Router, type Request } from 'express'
 import { publishTradingViewSignal } from '../services/tradingview/signal-bus.js'
+import { webhookRateLimit } from '../middleware/rateLimit.js'
 
 export const tradingViewRoutes = Router()
+tradingViewRoutes.use(webhookRateLimit)
 
 function isValidSecret(request: Request) {
 	const configured = process.env.TRADINGVIEW_WEBHOOK_SECRET
