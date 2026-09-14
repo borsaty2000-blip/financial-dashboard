@@ -242,3 +242,5 @@ export function runEducationalBacktest(
 		disclaimer: 'محاكاة تاريخية تعليمية وليست ضماناً للنتائج',
 	}
 }
+
+export * from './assistant'

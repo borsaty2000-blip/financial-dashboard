@@ -710,3 +710,7 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 أضيفت حزمة `@borsaty/strategies` كطبقة عقود مستقلة لمنشئ استراتيجيات بصري لاحقاً. تحتوي على سجل من 23 نوع node ضمن input/indicator/logic/action/risk/output، وتحقق DAG يمنع العقد المكررة والمراجع المفقودة والحلقات وself-loop، ويلزم مخرجاً واحداً. أضيف قالب RSI تعليمي ومحاكي backtest تاريخي يعيد win rate وaverage return وmax drawdown مع disclaimer واضح.
 
 المحاكي تعليمي فقط: لا يرسل أوامر، لا يتصل بوسيط، ولا يقدم ضماناً أو توصية استثمارية. نجح `npm run typecheck:packages` وsmoke test للتحقق من القالب، رفض cycle، ورفض أقل من 30 شمعة.
+
+## ملحق المرحلة 7 — AI Strategy Assistant Contract
+
+أضيف عقد typed لمساعد الاستراتيجيات يحدد الطلب والاستجابة وprovider قابل للحقن لاحقاً، مع التحقق من السؤال والرمز. التنفيذ الحالي fallback حتمي لا يستدعي LLM ولا يحتاج secrets أو credits؛ يعيد قالب RSI صالحاً، شرحاً تعليمياً، limitations، وdisclaimer. لا ينفذ صفقات ولا يقدم توصية مالية. smoke test يتحقق من الاستجابة الصحيحة ورفض السؤال الفارغ.
