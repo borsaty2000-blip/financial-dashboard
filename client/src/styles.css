@@ -4136,39 +4136,121 @@ html[dir='rtl'] body {
 
 .borsaty-public-footer {
 	display: grid;
-	grid-template-columns: 1fr auto;
-	gap: 25px 50px;
+	gap: 30px;
 	max-width: 1240px;
 	margin: 82px auto 0;
-	padding: 35px 24px 45px;
+	padding: 48px 24px 28px;
 	border-top: 1px solid #dce6eb;
+	background: linear-gradient(180deg, rgb(245 250 252 / 65%), transparent);
 }
 
-.borsaty-public-footer strong {
+.borsaty-public-footer__intro {
+	display: grid;
+	gap: 7px;
+}
+
+.borsaty-public-footer__intro strong {
 	color: #102b3e;
-	font-size: 18px;
+	font-size: 24px;
 }
 
-.borsaty-public-footer p {
+.borsaty-public-footer__intro p,
+.borsaty-public-footer__intro span {
 	margin: 6px 0 0;
 	color: #778892;
 	font-size: 11px;
 }
 
-.borsaty-public-footer nav {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 18px;
+.borsaty-public-footer__intro span {
+	color: #0b779d;
+	font-weight: 800;
+}
+
+.borsaty-public-footer__columns {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 24px;
+}
+
+.borsaty-public-footer__columns nav {
+	display: grid;
+	align-content: start;
+	gap: 10px;
+}
+
+.borsaty-public-footer__columns h3 {
+	margin: 0 0 5px;
+	color: #102b3e;
+	font-size: 13px;
 }
 
 .borsaty-public-footer a {
 	color: #496270;
 	font-size: 11px;
 	text-decoration: none;
+	transition: color 140ms ease-out;
+}
+
+.borsaty-public-footer a:hover,
+.borsaty-public-footer a:focus-visible {
+	color: #0878ae;
+	outline: none;
+}
+
+.borsaty-public-footer__bottom {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 18px;
+	padding-top: 18px;
+	border-top: 1px solid #e4edf0;
+}
+
+.borsaty-public-footer__bottom nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
 }
 
 .borsaty-public-footer__notice {
-	grid-column: 1 / -1;
+	margin: 0;
+	color: #778892;
+	font-size: 10px;
+}
+
+body.dark-mode .borsaty-public-footer {
+	border-color: #294858;
+	background: linear-gradient(180deg, rgb(13 47 62 / 45%), transparent);
+}
+
+body.dark-mode .borsaty-public-footer__intro strong,
+body.dark-mode .borsaty-public-footer__columns h3 {
+	color: #e3f1f5;
+}
+
+body.dark-mode .borsaty-public-footer a {
+	color: #a6c4ce;
+}
+
+body.dark-mode .borsaty-public-footer__bottom {
+	border-color: #294858;
+}
+
+@media (max-width: 720px) {
+	.borsaty-public-footer__columns {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+	.borsaty-public-footer__bottom {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+}
+
+@media (max-width: 420px) {
+	.borsaty-public-footer__columns {
+		grid-template-columns: 1fr 1fr;
+		gap: 22px 12px;
+	}
 }
 
 .borsaty-analysis-overview {

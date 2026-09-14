@@ -787,21 +787,79 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 }
 
 function PublicFooter() {
+	const columns = [
+		{
+			title: 'الأسواق',
+			links: [
+				['EGX', '/markets/egx'],
+				['TASI', '/markets/tasi'],
+				['الذهب والفضة', '/markets/commodities'],
+				['فاحص الأسهم', '/screener'],
+				['مقارنة الأسواق', '/compare/global'],
+			],
+		},
+		{
+			title: 'التحليل والأدوات',
+			links: [
+				['تحليل الأسهم', '/analysis/elliott'],
+				['Backtesting', '/backtest'],
+				['التقويم الاقتصادي', '/calendar'],
+				['المحفظة الافتراضية', '/portfolio'],
+				['قوائم المتابعة', '/watchlists'],
+			],
+		},
+		{
+			title: 'المحتوى',
+			links: [
+				['أخبار السوق', '/news'],
+				['المدونة', '/blog'],
+				['أكاديمية بورصتي', '/education'],
+				['مكتبة الفيديو', '/videos'],
+				['مجتمع بورصتي', '/community'],
+			],
+		},
+		{
+			title: 'عن المنصة',
+			links: [
+				['عن بورصتي', '/about'],
+				['المساعدة', '/help'],
+				['الدعم', '/support'],
+				['إمكانية الوصول', '/accessibility'],
+				['حقوق النشر', '/copyright'],
+			],
+		},
+	]
 	return (
 		<footer className="borsaty-public-footer">
-			<div>
+			<div className="borsaty-public-footer__intro">
 				<strong>بورصتي</strong>
 				<p>منصة عربية تعليمية لمتابعة الأسواق والتحليل المالي.</p>
+				<span>بيانات السوق · التحليل التعليمي · تجربة RTL</span>
 			</div>
-			<nav aria-label="روابط قانونية">
-				<a href="/about">عن المنصة</a>
-				<a href="/terms">الشروط</a>
-				<a href="/privacy">الخصوصية</a>
-				<a href="/disclaimer">إخلاء المسؤولية</a>
-			</nav>
-			<p className="borsaty-public-footer__notice">
-				المحتوى تعليمي ولا يمثل توصية استثمارية أو ضماناً للنتائج.
-			</p>
+			<div className="borsaty-public-footer__columns">
+				{columns.map((column) => (
+					<nav key={column.title} aria-label={column.title}>
+						<h3>{column.title}</h3>
+						{column.links.map(([label, path]) => (
+							<a href={path} key={path}>
+								{label}
+							</a>
+						))}
+					</nav>
+				))}
+			</div>
+			<div className="borsaty-public-footer__bottom">
+				<nav aria-label="السياسات">
+					<a href="/terms">الشروط</a>
+					<a href="/privacy">الخصوصية</a>
+					<a href="/disclaimer">إخلاء المسؤولية</a>
+					<a href="/acceptable-use">الاستخدام المقبول</a>
+					<a href="/cookies">ملفات الارتباط</a>
+				</nav>
+				<p className="borsaty-public-footer__notice">
+					المحتوى تعليمي ولا يمثل توصية استثمارية أو ضماناً للنتائج.
+				</p>
+			</div>
 		</footer>
 	)
 }
