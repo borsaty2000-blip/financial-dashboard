@@ -641,3 +641,20 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 التحقق: `prisma format` و`prisma validate` و`prisma generate` و`npm run typecheck` و`npm run build` و`python3 -m py_compile` ناجحة. اختبار الخادم المحلي أعاد Health 200، و`/api/v1/stocks` أعاد 401 دون مفتاح كما هو متوقع، وTelegram info 200، وAudio 200 مع fallback، وTelegram webhook 200، وAnalyst list 200. عند عدم توفر `DATABASE_URL` الصحيح يعيد Analyst profile/posts 503 صريحاً بدلاً من إسقاط الخادم. لم يتم النشر الخارجي ولم يتم تحصيل أي مدفوعات.
 
 القيود الخارجية المتبقية: يلزم تطبيق migration `20260914102000_add_global_revenue_features` على قاعدة الإنتاج، وإضافة مفاتيح Twilio وTelegram وStripe/PayPal فقط إذا أراد المستخدم تفعيل تلك الخدمات، كما يجب اعتبار أرقام الاستخدام والتوقعات تعليمية وعدم تقديمها كتوصية استثمارية.
+
+
+## ملحق pasted_content_33 — Mobile, Push, i18n, PDF and Security
+
+تم تنفيذ Part 1 بإنشاء نماذج `PushSubscription` و`PushNotification` وmigration `20260914110000_add_push_security`. أضيفت Push API للتسجيل والإلغاء والحالة وقائمة الإشعارات، وخدمة `push.service.ts` باستخدام Web Push/VAPID مع تعطيل الاشتراكات المنتهية تلقائياً، وربط Alert Checker والتقرير الأسبوعي بإشعارات Push. أضيف Service Worker يستقبل `push` ويفتح الرابط عند النقر، وصفحة `/settings/notifications` وhook لتفعيل الإشعارات. إعداد Firebase محفوظ اختيارياً عبر `client/src/services/firebase.ts` ومتغيرات البيئة؛ لا توجد أسرار Firebase في المستودع.
+
+تم تنفيذ Part 2 كتطبيق Expo مستقل داخل `BorsatyMobile/`، مع تبويبات Home وMarkets وAnalysis وPortfolio وProfile، وصفحة Stock Detail ديناميكية، API client مع cache دون اتصال، deep linking عبر `borsaty://stock/:symbol`، مشاركة التحليل، Socket.io للأسعار، Expo Notifications، SecureStore، وbiometric login اختياري. `npm run typecheck` لتطبيق الجوال ناجح. لم يتم تنفيذ توقيعات متجر Apple أو Google ولم يتم النشر، لأن ذلك يتطلب حسابات المتاجر وشهادات خارجية.
+
+تم تنفيذ Part 3 بإضافة i18next وReact bindings وكشف اللغة وحفظها في localStorage، وملفات `ar.json` و`en.json` و`fr.json`، ومحول لغة ثابت في الواجهة مع تبديل RTL للعربية وLTR للإنجليزية/الفرنسية، إضافة إلى middleware خادم يقرأ `Accept-Language`.
+
+تم تنفيذ Part 4 بخدمة PDFKit ومسارات حقيقية: `/api/reports/stock/:symbol/pdf` و`/api/reports/portfolio/pdf` و`/api/reports/weekly/pdf`. أضيفت أزرار التحميل في صفحة السهم والمحفظة والتقرير الأسبوعي. اختبار Stock PDF أعاد HTTP 200 و`application/pdf` بحجم 12081 بايت.
+
+تم تنفيذ Part 5 بإضافة حقول 2FA للمستخدم، نموذج `LoginHistory`، خدمة TOTP/QR، وواجهات `/api/security/status` و`/api/security/2fa/setup` و`confirm` و`disable` والجلسات وسجل الدخول. أصبح تسجيل الدخول يطلب رمز TOTP عند تفعيله، مع تسجيل الجلسة الناجحة. أضيفت صفحة `/settings/security` لإدارة 2FA والجلسات والسجل.
+
+نتائج التحقق: `prisma validate` و`prisma generate` و`npm run typecheck` و`npm run build` ناجحة، و91 اختباراً ناجحة، وفحص Python ناجح، وMobile TypeScript ناجح. Health أعاد 200، Push وSecurity أعادا 401 بدون جلسة كما هو صحيح، وStock PDF أعاد 200. لم يتم النشر، ولم يتم تفعيل Firebase أو Twilio أو VAPID أو حسابات المتاجر دون مفاتيح خارجية.
+
+القيود العملية: Web Push يتطلب `VAPID_PUBLIC_KEY` و`VAPID_PRIVATE_KEY` و`VAPID_SUBJECT`، وتطبيق Expo يحتاج `npm install` ثم EAS/Android Studio/Xcode عند البناء الفعلي. 2FA لا يصبح فعالاً للمستخدمين قبل تطبيق migration الجديدة على قاعدة الإنتاج. الترجمة الحالية توفر البنية والمفاتيح الأساسية وتبديل الاتجاه، بينما النصوص التاريخية الصلبة في الصفحات القديمة تحتاج دورة ترجمة لاحقة.
