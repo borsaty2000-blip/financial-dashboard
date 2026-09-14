@@ -17,9 +17,14 @@ export function WeeklyReportPage() {
 			<header className="page-heading">
 				<p className="eyebrow">Weekly Digest</p>
 				<h1>تقريرك الأسبوعي</h1>
-				<button className="primary-button" onClick={() => window.print()}>
-					تحميل / طباعة PDF
-				</button>
+				<div className="form-actions">
+					<button className="secondary-button" onClick={() => window.print()}>
+						طباعة
+					</button>
+					<a className="primary-button" href="/api/reports/weekly/pdf" download>
+						📄 تحميل PDF
+					</a>
+				</div>
 			</header>
 			{report ? (
 				<section className="analysis-card">

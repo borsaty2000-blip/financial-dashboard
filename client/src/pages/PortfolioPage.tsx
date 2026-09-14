@@ -56,7 +56,16 @@ export function PortfolioPage() {
 			</header>
 			<section className="tools-container">
 				<p className="eyebrow">Paper Trading</p>
-				<h1>المحفظة الافتراضية</h1>
+				<div className="page-heading">
+					<h1>المحفظة الافتراضية</h1>
+					<a
+						className="secondary-button"
+						href="/api/reports/portfolio/pdf"
+						download
+					>
+						📄 تحميل PDF
+					</a>
+				</div>
 				{error && <div className="analysis-error">{error}</div>}
 				{portfolio && (
 					<>

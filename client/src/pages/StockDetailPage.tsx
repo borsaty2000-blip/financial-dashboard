@@ -144,6 +144,13 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 					<button className="primary-button" onClick={addToWatchlist}>
 						＋ أضف إلى قائمتي
 					</button>
+					<a
+						className="secondary-button"
+						href={`/api/reports/stock/${normalized}/pdf`}
+						download
+					>
+						📄 PDF
+					</a>
 				</div>
 			</header>
 			{loading && (
