@@ -738,3 +738,9 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 أضيف `/api/openapi.json` بعقود أولية للمسارات المستقرة: health، التقرير، ملخص EGX/TASI، quote/candles، والمؤشرات/consensus. الوصف يذكر بوضوح أن الواجهات تعليمية ولا تنفذ صفقات أو تقدم ضمانات.
 
 أضيف `@sentry/node` خلف `SENTRY_DSN` اختياري؛ عند غياب المتغير لا تتم تهيئة Sentry ولا يلزم secret. اختبار التشغيل المحلي بدون DSN أعاد OpenAPI 3.0.3 بثمانية مسارات وhealth سليماً.
+
+## ملحق المرحلة 7 — Final QA Gate
+
+بعد آخر إصلاح، نجح lint المستهدف لصفحة Strategy Builder، ونجح `npm run typecheck` و`npm run typecheck:packages` و`npm run build` و`npm test -- --run` (19 ملفاً، 91 اختباراً)، كما تطابق `HEAD` مع `origin/main` في لحظة الفحص. سجل Git المحلي نظيف بعد commit `4957760`.
+
+لم ينجح `npm run lint` العام بسبب baseline debt سابق في صفحات متعددة (استعمال `any`، دوال function declarations، وتحذير setState داخل effect)، وليس بسبب الملفات الجديدة. كما أن `npm run format:check` العام يرصد 29 ملفاً قديماً غير منسق، خصوصاً ملفات Mobile وlegacy. لم أعد تنسيقها آلياً حتى لا أُدخل diff واسعاً غير متعلق بالمرحلة؛ يجب معالجتها في مهمة مستقلة أو اعتماد gate تدريجي موثق قبل إطلاق واسع.
