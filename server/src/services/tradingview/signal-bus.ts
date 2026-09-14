@@ -1,17 +1,45 @@
 import { EventEmitter } from 'node:events'
 import type { Server as HttpServer } from 'node:http'
 import { Server } from 'socket.io'
+import { LiveAnalysisService } from '../stream/live-analysis.service.js'
 
-export type TradingViewSignal = { symbol?: string; action?: string; price?: number; time?: string; [key: string]: unknown }
+export type TradingViewSignal = {
+	symbol?: string
+	action?: string
+	price?: number
+	time?: string
+	[key: string]: unknown
+}
 const bus = new EventEmitter()
 let socketServer: Server | null = null
 
 export function attachSignalSocket(httpServer: HttpServer) {
-	socketServer = new Server(httpServer, { cors: { origin: (process.env.CORS_ORIGINS ?? 'http://localhost:5173').split(','), credentials: true } })
+	socketServer = new Server(httpServer, {
+		cors: {
+			origin: (process.env.CORS_ORIGINS ?? 'http://localhost:5173').split(','),
+			credentials: true,
+		},
+	})
 	socketServer.on('connection', (socket) => {
 		socket.emit('tradingview:ready', { connected: true })
-		socket.on('analysis:subscribe', (symbol?: string) => socket.join(`analysis:${String(symbol ?? 'market').toUpperCase()}`))
+		socket.on('live:subscribe', (symbols: string[]) =>
+			LiveAnalysisService.subscribe(
+				socket.id,
+				Array.isArray(symbols) ? symbols : [],
+			),
+		)
+		socket.on('live:unsubscribe', (symbols: string[]) =>
+			LiveAnalysisService.unsubscribe(
+				socket.id,
+				Array.isArray(symbols) ? symbols : [],
+			),
+		)
+		socket.on('disconnect', () => LiveAnalysisService.removeSocket(socket.id))
+		socket.on('analysis:subscribe', (symbol?: string) =>
+			socket.join(`analysis:${String(symbol ?? 'market').toUpperCase()}`),
+		)
 	})
+	LiveAnalysisService.init(socketServer)
 	return socketServer
 }
 
@@ -22,9 +50,19 @@ export function publishTradingViewSignal(signal: TradingViewSignal) {
 }
 
 export function publishAnalysisStream(payload: unknown, symbol?: string) {
-	if (symbol) socketServer?.to(`analysis:${symbol.toUpperCase()}`).emit('analysis:stream', payload)
+	if (symbol)
+		socketServer
+			?.to(`analysis:${symbol.toUpperCase()}`)
+			.emit('analysis:stream', payload)
 	else socketServer?.emit('analysis:stream', payload)
 }
 
-export function onTradingViewSignal(listener: (signal: TradingViewSignal) => void) { bus.on('signal', listener); return () => bus.off('signal', listener) }
-export function publishUserNotification(userId: string, notification: unknown) { socketServer?.to(`user:${userId}`).emit('notification', notification) }
+export function onTradingViewSignal(
+	listener: (signal: TradingViewSignal) => void,
+) {
+	bus.on('signal', listener)
+	return () => bus.off('signal', listener)
+}
+export function publishUserNotification(userId: string, notification: unknown) {
+	socketServer?.to(`user:${userId}`).emit('notification', notification)
+}
