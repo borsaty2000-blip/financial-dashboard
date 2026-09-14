@@ -40,6 +40,7 @@ type DirectoryCompany = {
 	exchange?: string
 	price?: number | null
 	changePercent?: number | null
+	available?: boolean
 	freshness?: 'live' | 'delayed' | 'cached' | 'unavailable'
 }
 
@@ -148,15 +149,42 @@ function MarketDirectory({
 	prices: Map<string, MarketMover>
 }) {
 	const [query, setQuery] = useState('')
+	const [sortKey, setSortKey] = useState<
+		'symbol' | 'name' | 'price' | 'change'
+	>('symbol')
+	const [page, setPage] = useState(1)
+	const pageSize = 25
 	const filtered = useMemo(() => {
 		const normalized = query.trim().toLowerCase()
-		if (!normalized) return companies
-		return companies.filter((company) =>
-			`${company.displaySymbol ?? ''} ${company.symbol} ${company.name}`
-				.toLowerCase()
-				.includes(normalized),
-		)
-	}, [companies, query])
+		const matching = !normalized
+			? companies
+			: companies.filter((company) =>
+					`${company.displaySymbol ?? ''} ${company.symbol} ${company.name}`
+						.toLowerCase()
+						.includes(normalized),
+				)
+		return [...matching].sort((left, right) => {
+			if (sortKey === 'name') return left.name.localeCompare(right.name)
+			if (sortKey === 'price')
+				return (right.price ?? -Infinity) - (left.price ?? -Infinity)
+			if (sortKey === 'change')
+				return (
+					(right.changePercent ?? -Infinity) - (left.changePercent ?? -Infinity)
+				)
+			return (left.displaySymbol ?? left.symbol).localeCompare(
+				right.displaySymbol ?? right.symbol,
+			)
+		})
+	}, [companies, query, sortKey])
+	const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
+	const safePage = Math.min(page, pageCount)
+	const visibleCompanies = filtered.slice(
+		(safePage - 1) * pageSize,
+		safePage * pageSize,
+	)
+	const availableCount = companies.filter(
+		(company) => company.available || company.price != null,
+	).length
 
 	return (
 		<section className="borsaty-section borsaty-directory-section">
@@ -165,22 +193,45 @@ function MarketDirectory({
 					<span className="borsaty-kicker">دليل السوق الكامل</span>
 					<h2>{title}</h2>
 				</div>
-				<strong>
-					{filtered.length} من {companies.length} سهم
-				</strong>
+				<div className="borsaty-directory-heading-stats">
+					<strong>
+						{filtered.length} من {companies.length} سهم
+					</strong>
+					<span>{availableCount} بسعر متاح</span>
+				</div>
 			</div>
 			<div className="borsaty-directory-toolbar">
-				<label htmlFor={`${market.toLowerCase()}-directory-search`}>
-					بحث بالرمز أو اسم الشركة
+				<div>
+					<label htmlFor={`${market.toLowerCase()}-directory-search`}>
+						بحث بالرمز أو اسم الشركة
+					</label>
+					<input
+						id={`${market.toLowerCase()}-directory-search`}
+						value={query}
+						onChange={(event) => {
+							setQuery(event.target.value)
+							setPage(1)
+						}}
+						placeholder={
+							market === 'EGX' ? 'مثال: COMI أو البنك' : 'مثال: 2222 أو أرامكو'
+						}
+					/>
+				</div>
+				<label className="borsaty-directory-sort">
+					<span>ترتيب</span>
+					<select
+						value={sortKey}
+						onChange={(event) => {
+							setSortKey(event.target.value as typeof sortKey)
+							setPage(1)
+						}}
+					>
+						<option value="symbol">الرمز</option>
+						<option value="name">اسم الشركة</option>
+						<option value="price">السعر المتاح</option>
+						<option value="change">التغير</option>
+					</select>
 				</label>
-				<input
-					id={`${market.toLowerCase()}-directory-search`}
-					value={query}
-					onChange={(event) => setQuery(event.target.value)}
-					placeholder={
-						market === 'EGX' ? 'مثال: COMI أو البنك' : 'مثال: 2222 أو أرامكو'
-					}
-				/>
 			</div>
 			{companies.length ? (
 				<div className="borsaty-directory-table-wrap">
@@ -191,17 +242,18 @@ function MarketDirectory({
 								<th>الشركة</th>
 								<th>السعر</th>
 								<th>التغير</th>
+								<th>الحالة</th>
 							</tr>
 						</thead>
 						<tbody>
-							{filtered.map((company) => {
+							{visibleCompanies.map((company) => {
 								const mover = prices.get(company.symbol)
 								const displaySymbol = company.displaySymbol ?? company.symbol
 								const price = mover?.price ?? company.price ?? undefined
 								const change =
 									mover?.changePercent ?? company.changePercent ?? undefined
 								const status =
-									mover?.freshness === 'live'
+									(company.freshness ?? mover?.freshness) === 'live'
 										? 'live'
 										: price != null
 											? 'cached'
@@ -218,6 +270,9 @@ function MarketDirectory({
 													aria-hidden="true"
 												/>
 												<b>{displaySymbol}</b>
+												{displaySymbol !== company.symbol && (
+													<small>{company.symbol}</small>
+												)}
 											</button>
 										</td>
 										<td>{company.name}</td>
@@ -235,6 +290,12 @@ function MarketDirectory({
 										>
 											{change == null ? '—' : formatEnglishPercent(change)}
 										</td>
+										<td>
+											<span className={`borsaty-availability is-${status}`}>
+												<i className="borsaty-status-dot" aria-hidden="true" />
+												{status === 'unavailable' ? 'دليل فقط' : 'متاح'}
+											</span>
+										</td>
 									</tr>
 								)
 							})}
@@ -243,6 +304,34 @@ function MarketDirectory({
 					{filtered.length === 0 && (
 						<div className="borsaty-empty-state">
 							لا توجد نتائج مطابقة للبحث.
+						</div>
+					)}
+					{filtered.length > 0 && (
+						<div
+							className="borsaty-directory-pagination"
+							aria-label="صفحات دليل الشركات"
+						>
+							<span>
+								صفحة {safePage} من {pageCount}
+							</span>
+							<div>
+								<button
+									type="button"
+									disabled={safePage === 1}
+									onClick={() => setPage((current) => Math.max(1, current - 1))}
+								>
+									السابق
+								</button>
+								<button
+									type="button"
+									disabled={safePage === pageCount}
+									onClick={() =>
+										setPage((current) => Math.min(pageCount, current + 1))
+									}
+								>
+									التالي
+								</button>
+							</div>
 						</div>
 					)}
 				</div>
@@ -272,21 +361,30 @@ function PublicHeader() {
 					<button
 						onClick={() => toggle('markets')}
 						aria-expanded={openMenu === 'markets'}
+						aria-haspopup="menu"
 					>
-						الأسواق <span>⌄</span>
+						الأسواق{' '}
+						<span className="public-nav-chevron" aria-hidden="true">
+							⌄
+						</span>
 					</button>
 					{openMenu === 'markets' && (
-						<div className="public-dropdown">
-							<button onClick={() => navigate('/markets/egx')}>
+						<div className="public-dropdown" role="menu">
+							<button role="menuitem" onClick={() => navigate('/markets/egx')}>
 								البورصة المصرية
 							</button>
-							<button onClick={() => navigate('/markets/tasi')}>
+							<button role="menuitem" onClick={() => navigate('/markets/tasi')}>
 								السوق السعودي
 							</button>
-							<button onClick={() => navigate('/markets/commodities')}>
+							<button
+								role="menuitem"
+								onClick={() => navigate('/markets/commodities')}
+							>
 								الذهب والفضة
 							</button>
-							<button onClick={() => navigate('/screener')}>فاحص الأسهم</button>
+							<button role="menuitem" onClick={() => navigate('/screener')}>
+								فاحص الأسهم
+							</button>
 						</div>
 					)}
 				</div>
@@ -294,19 +392,31 @@ function PublicHeader() {
 					<button
 						onClick={() => toggle('analysis')}
 						aria-expanded={openMenu === 'analysis'}
+						aria-haspopup="menu"
 					>
-						التحليل <span>⌄</span>
+						التحليل{' '}
+						<span className="public-nav-chevron" aria-hidden="true">
+							⌄
+						</span>
 					</button>
 					{openMenu === 'analysis' && (
-						<div className="public-dropdown">
-							<button onClick={() => navigate('/analysis/elliott')}>
+						<div className="public-dropdown" role="menu">
+							<button
+								role="menuitem"
+								onClick={() => navigate('/analysis/elliott')}
+							>
 								Elliott Wave
 							</button>
-							<button onClick={() => navigate('/analysis/gann')}>Gann</button>
-							<button onClick={() => navigate('/backtest')}>
+							<button
+								role="menuitem"
+								onClick={() => navigate('/analysis/gann')}
+							>
+								Gann
+							</button>
+							<button role="menuitem" onClick={() => navigate('/backtest')}>
 								الاختبار التاريخي
 							</button>
-							<button onClick={() => navigate('/strategies')}>
+							<button role="menuitem" onClick={() => navigate('/strategies')}>
 								منشئ الاستراتيجيات
 							</button>
 						</div>

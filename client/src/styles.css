@@ -4822,3 +4822,300 @@ html[dir='rtl'] body {
 		grid-template-columns: 1fr;
 	}
 }
+
+/* Public market polish: opaque surfaces and accessible states */
+.borsaty-public-nav > button,
+.borsaty-public-nav > button:visited,
+.public-nav-group > button {
+	color: #d7e8f1;
+}
+
+.public-nav-group > button {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	border: 1px solid transparent;
+}
+
+.public-nav-group > button:hover,
+.public-nav-group > button[aria-expanded='true'] {
+	border-color: rgb(105 190 226 / 32%);
+	background: #123e58;
+	color: #fff;
+}
+
+.public-nav-chevron {
+	display: inline-block;
+	font-size: 15px;
+	line-height: 1;
+	transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.public-nav-group > button[aria-expanded='true'] .public-nav-chevron {
+	transform: rotate(180deg);
+}
+
+.public-dropdown {
+	min-width: 230px;
+	padding: 9px;
+	border: 1px solid #c6dbe5;
+	background: #ffffff;
+	box-shadow:
+		0 20px 46px rgb(8 34 52 / 22%),
+		0 2px 8px rgb(8 34 52 / 8%);
+}
+
+.public-dropdown button {
+	min-height: 42px;
+	border: 1px solid transparent;
+	background: #ffffff;
+	color: #173c50;
+	font-weight: 700;
+}
+
+.public-dropdown button:hover,
+.public-dropdown button:focus-visible {
+	border-color: #a7d7e8;
+	background: #eaf7fb;
+	color: #056b9c;
+	outline: none;
+}
+
+.public-dropdown button:active {
+	background: #d8eff7;
+}
+
+.borsaty-public-page button:focus-visible,
+.borsaty-public-page input:focus-visible,
+.borsaty-public-page select:focus-visible {
+	outline: 3px solid rgb(36 155 202 / 38%);
+	outline-offset: 2px;
+}
+
+.borsaty-directory-heading-stats {
+	display: grid;
+	justify-items: end;
+	gap: 5px;
+}
+
+.borsaty-directory-heading-stats strong {
+	color: #0878ae;
+	font-size: 13px;
+	white-space: nowrap;
+}
+
+.borsaty-directory-heading-stats span {
+	color: #718691;
+	font-size: 11px;
+	white-space: nowrap;
+}
+
+.borsaty-directory-toolbar > div:first-child {
+	display: grid;
+	flex: 1;
+	gap: 6px;
+}
+
+.borsaty-directory-sort {
+	display: grid;
+	min-width: 155px;
+	gap: 6px;
+	color: #6b7e89;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.borsaty-directory-sort select {
+	min-height: 43px;
+	padding: 0 12px;
+	border: 1px solid #d1e1e8;
+	border-radius: 10px;
+	background: #ffffff;
+	color: #173242;
+	font: inherit;
+	font-size: 12px;
+}
+
+.borsaty-directory-table {
+	min-width: 820px;
+}
+
+.borsaty-directory-table th {
+	background: #eaf4f8;
+	color: #365968;
+	letter-spacing: 0.01em;
+}
+
+.borsaty-directory-table tbody tr:nth-child(even) {
+	background: #fbfdfe;
+}
+
+.borsaty-directory-table tbody tr:hover {
+	background: #edf8fb;
+}
+
+.borsaty-directory-symbol {
+	flex-wrap: wrap;
+	justify-content: flex-start;
+}
+
+.borsaty-directory-symbol b {
+	font-family: 'JetBrains Mono', monospace;
+	letter-spacing: 0.02em;
+}
+
+.borsaty-directory-symbol small {
+	flex-basis: 100%;
+	padding-right: 15px;
+	color: #8a9ca5;
+	font:
+		10px 'JetBrains Mono',
+		monospace;
+}
+
+.borsaty-availability {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	color: #168253;
+	font-size: 11px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.borsaty-availability.is-unavailable {
+	color: #788b94;
+}
+
+.borsaty-availability .borsaty-status-dot {
+	width: 7px;
+	height: 7px;
+	flex-basis: 7px;
+}
+
+.borsaty-directory-pagination {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 13px 16px;
+	border-top: 1px solid #e3edf1;
+	background: #f8fbfc;
+	color: #617682;
+	font-size: 11px;
+}
+
+.borsaty-directory-pagination > div {
+	display: flex;
+	gap: 7px;
+}
+
+.borsaty-directory-pagination button {
+	min-width: 72px;
+	padding: 8px 10px;
+	border: 1px solid #c7dce5;
+	border-radius: 8px;
+	background: #ffffff;
+	color: #17617e;
+	font: inherit;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.borsaty-directory-pagination button:hover:not(:disabled) {
+	border-color: #6cb8d4;
+	background: #eaf7fb;
+}
+
+.borsaty-directory-pagination button:disabled {
+	cursor: not-allowed;
+	opacity: 0.45;
+}
+
+body.dark-mode .public-dropdown {
+	border-color: #2c566a;
+	background: #102d3e;
+	box-shadow: 0 20px 46px rgb(0 0 0 / 38%);
+}
+
+body.dark-mode .public-dropdown button {
+	background: #102d3e;
+	color: #e6f4f8;
+}
+
+body.dark-mode .public-dropdown button:hover,
+body.dark-mode .public-dropdown button:focus-visible {
+	border-color: #287a9c;
+	background: #174a61;
+	color: #ffffff;
+}
+
+body.dark-mode .borsaty-directory-table-wrap,
+body.dark-mode .borsaty-directory-sort select,
+body.dark-mode .borsaty-directory-pagination button {
+	border-color: #294b5b;
+	background: #102d3e;
+	color: #e6f4f8;
+}
+
+body.dark-mode .borsaty-directory-table th {
+	background: #183e50;
+	color: #d3e8ee;
+}
+
+body.dark-mode .borsaty-directory-table td {
+	border-color: #1f4353;
+	color: #c5d9df;
+}
+
+body.dark-mode .borsaty-directory-table tbody tr:nth-child(even),
+body.dark-mode .borsaty-directory-pagination {
+	background: #0e2838;
+}
+
+body.dark-mode .borsaty-directory-table tbody tr:hover {
+	background: #174356;
+}
+
+body.dark-mode .borsaty-directory-heading-stats span,
+body.dark-mode .borsaty-availability.is-unavailable,
+body.dark-mode .borsaty-directory-pagination {
+	color: #9bb9c4;
+}
+
+@media (max-width: 700px) {
+	.borsaty-directory-heading-stats {
+		justify-items: start;
+	}
+
+	.borsaty-directory-toolbar {
+		gap: 12px;
+	}
+
+	.borsaty-directory-sort {
+		min-width: 0;
+	}
+}
+
+/* Keep dropdown item styles above the global dark-header button rule. */
+.borsaty-public-header .public-dropdown button {
+	background: #ffffff;
+	color: #173c50;
+}
+
+.borsaty-public-header .public-dropdown button:hover,
+.borsaty-public-header .public-dropdown button:focus-visible {
+	background: #eaf7fb;
+	color: #056b9c;
+}
+
+body.dark-mode .borsaty-public-header .public-dropdown button {
+	background: #102d3e;
+	color: #e6f4f8;
+}
+
+body.dark-mode .borsaty-public-header .public-dropdown button:hover,
+body.dark-mode .borsaty-public-header .public-dropdown button:focus-visible {
+	background: #174a61;
+	color: #ffffff;
+}

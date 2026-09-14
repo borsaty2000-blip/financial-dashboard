@@ -74,3 +74,35 @@ test('Saudi directory falls back to Twelve Data EOD without claiming live data',
 		globalThis.fetch = originalFetch
 	}
 })
+
+test('live directory enrichment only changes rows with a returned quote', async () => {
+	const { mergeQuotes } = await import('./src/routes/live-market.routes.js')
+	const companies = [
+		{
+			symbol: 'EGS60121C018',
+			displaySymbol: 'COMI',
+			name: 'Commercial International Bank',
+			price: null,
+			available: false,
+		},
+		{
+			symbol: 'EGS00000C000',
+			name: 'Unavailable Example',
+			price: null,
+			available: false,
+		},
+	]
+	const result = mergeQuotes(companies, [
+		{
+			symbol: 'EGS60121C018',
+			price: 42.5,
+			changePercent: 1.25,
+			freshness: 'delayed',
+		},
+	])
+
+	assert.equal((result[0] as Record<string, unknown>).price, 42.5)
+	assert.equal((result[0] as Record<string, unknown>).available, true)
+	assert.equal((result[1] as Record<string, unknown>).price, null)
+	assert.equal((result[1] as Record<string, unknown>).available, false)
+})

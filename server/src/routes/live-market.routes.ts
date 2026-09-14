@@ -130,6 +130,31 @@ async function quotes(symbols: string[], market: 'EGX' | 'TASI') {
 	)
 }
 
+export function mergeQuotes(
+	companies: unknown[],
+	quoteRows: Array<{
+		symbol: string
+		price: number
+		changePercent: number | null
+		freshness: string
+	}>,
+) {
+	const bySymbol = new Map(quoteRows.map((quote) => [quote.symbol, quote]))
+	return companies.map((company) => {
+		if (!company || typeof company !== 'object') return company
+		const row = company as Record<string, unknown>
+		const quote = bySymbol.get(String(row.symbol ?? ''))
+		if (!quote) return row
+		return {
+			...row,
+			price: quote.price,
+			changePercent: quote.changePercent,
+			available: true,
+			freshness: quote.freshness,
+		}
+	})
+}
+
 liveMarketRoutes.get('/live', async (_request, response) => {
 	try {
 		if (liveCache && liveCache.expiresAt > Date.now())
@@ -145,7 +170,15 @@ liveMarketRoutes.get('/live', async (_request, response) => {
 		const directorySymbols = directory.egx.map((item) =>
 			String((item as { symbol: string }).symbol),
 		)
-		const topMovers = await quotes(directorySymbols, 'EGX')
+		const tasiSymbols = directory.tasi
+			.slice(0, 12)
+			.map((item) => String((item as { symbol: string }).symbol))
+		const [topMovers, topTasi] = await Promise.all([
+			quotes(directorySymbols, 'EGX'),
+			quotes(tasiSymbols, 'TASI'),
+		])
+		const enrichedEgx = mergeQuotes(directory.egx, topMovers)
+		const enrichedTasi = mergeQuotes(directory.tasi, topTasi)
 		const result = {
 			indices: {
 				egx30: indexCard(egxData.egx30, egx),
@@ -157,8 +190,12 @@ liveMarketRoutes.get('/live', async (_request, response) => {
 			},
 			topMovers,
 			topTraded: topMovers.slice(0, 10),
-			companies: directory.egx,
-			directories: directory,
+			companies: enrichedEgx,
+			directories: { egx: enrichedEgx, tasi: enrichedTasi },
+			coverage: {
+				egx: { total: directory.egx.length, quoted: topMovers.length },
+				tasi: { total: directory.tasi.length, quoted: topTasi.length },
+			},
 			latestSignals: [],
 			news,
 			available:
