@@ -9,6 +9,12 @@ export default defineConfig({
 	resolve: {
 		tsconfigPaths: true,
 		dedupe: ['react', 'react-dom'],
+		alias: {
+			'@': fileURLToPath(new URL('./src', import.meta.url)),
+		},
+	},
+	optimizeDeps: {
+		include: ['react', 'react-dom'],
 	},
 	build: {
 		rollupOptions: {

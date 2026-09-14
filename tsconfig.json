@@ -5,6 +5,7 @@
 		"module": "ESNext",
 		"moduleResolution": "Bundler",
 		"paths": {
+			"@/*": ["./client/src/*"],
 			"@client/*": ["./client/src/*"],
 			"@borsaty/strategies": ["./packages/strategies/src/index.ts"]
 		},

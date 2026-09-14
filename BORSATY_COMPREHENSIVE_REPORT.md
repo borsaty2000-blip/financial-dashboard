@@ -750,3 +750,7 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 ظهر في المعاينة خطأ `Cannot read properties of null (reading 'useContext')`. السبب المثبت كان تشغيل Vite من جذر المستودع، ما جعل optimizer يخلط React 19.3.0 من root مع React 19.2.8 الخاص بـclient. تم تثبيت Vite على مجلد `client` وإضافة `resolve.dedupe` لـ`react` و`react-dom`.
 
 بعد الإصلاح: الصفحة الرئيسية تحمل بنجاح، التقرير المالي يعود عبر Backend محلي، `/api/health` و`/api/financial-report` يعيدان 200، ونجح build و19 ملف اختبار/91 اختباراً. لم يتم نشر خارجي.
+
+## إصلاح جذري لـDuplicate React — 14 سبتمبر 2026
+
+تم حذف `node_modules` و`client/node_modules` وملفي lock وإعادة التثبيت. نُقلت حزم i18n و`lightweight-charts` الأمامية من الجذر إلى العميل؛ أصبح `npm ls react` في الجذر فارغاً، بينما تستخدم كل حزم العميل React/React DOM 19.3.0 deduped. أضيف إلى Vite تثبيت root على `client` وdedupe وalias `@` و`optimizeDeps` لReact. نجح TypeScript وbuild و91 اختباراً، وعملت الصفحة الرئيسية وStrategy Builder في المتصفح بلا console errors. التفاصيل الكاملة في [`docs/qa/duplicate-react-fix-2026-09-14.md`](docs/qa/duplicate-react-fix-2026-09-14.md).
