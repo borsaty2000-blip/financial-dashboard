@@ -13,3 +13,11 @@
 ## قرار التكامل
 
 ترتيب المصادر في الكود هو مزود مرخص متاح أولاً، ثم fallback موثوق متأخر. المصدر لا يخلق قيمة سعرية، ويحمل كل رد `source` و`freshness` و`delay_minutes`. لا تُفعّل `TWELVE_DATA_REALTIME=true` إلا بعد تأكيد أن الاشتراك يتضمن entitlement لحظياً لكل فئة أصل وبورصة مستخدمة.
+
+## Production verification after 7613a37
+
+تم دفع `7613a37` إلى `origin/main` ووصل الإصدار إلى `borsatyai.com`. أعاد `/api/health` حالة 200، وعادت مسارات quote والشموع والمعادن وملخصا EGX وTASI بحالة HTTP 200.
+
+لكن إعداد Vercel الحالي يحتوي على `DATABASE_URL` وJWT وCORS وغيرها، ولا يحتوي على `TWELVE_DATA_API_KEY` أو `SAHMK_API_KEY` أو `FINNHUB_API_KEY` أو `POLYGON_API_KEY`. لذلك استخدم الإنتاج fallback Yahoo Finance المتأخر: السعر المقاس لـCOMI كان 138.17، وسعر 2222 كان 25.66، وكلها موسومة `freshness=delayed`، بينما عاد دليل شركات EGX بحالة `available=false` ورسالة `TWELVE_DATA_API_KEY is not configured`. الأخبار عادت `available=false` بلا أرقام أو أخبار مصطنعة.
+
+هذا يثبت أن التطبيق لا ينهار عند غياب المفاتيح، لكنه لا يثبت البث اللحظي. يلزم إضافة مفاتيح المزودين إلى Vercel Production/Preview عبر قناة أسرار آمنة، ثم إعادة deploy وإعادة اختبار entitlement الفعلي لكل مزود. سيبقى `TWELVE_DATA_REALTIME=false` حتى يثبت المزود أن الاشتراك الحالي يدعم realtime.
