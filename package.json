@@ -13,7 +13,7 @@
 		"test:auth": "tsx --test server/auth.validator.test.ts",
 		"test:watch": "npm --prefix client run test:watch",
 		"coverage": "npm --prefix client run coverage",
-		"typecheck:packages": "tsc -p packages/types/tsconfig.json && tsc -p packages/utils/tsconfig.json && tsc -p packages/design-system/tsconfig.json && tsc -p packages/charts/tsconfig.json",
+		"typecheck:packages": "tsc -p packages/types/tsconfig.json && tsc -p packages/utils/tsconfig.json && tsc -p packages/design-system/tsconfig.json && tsc -p packages/charts/tsconfig.json && tsc -p packages/widgets/tsconfig.json",
 		"format": "prettier --write .",
 		"format:check": "prettier --check ."
 	},
