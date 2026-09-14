@@ -20,12 +20,20 @@ export function AnalystsPage() {
 					analysts.map((item) => (
 						<article key={item.id}>
 							<h2>
-								{item.displayName ?? item.user?.fullName ?? item.user?.username}
+								<a href={`/analysts/${item.user?.username ?? item.id}`}>
+									{item.displayName ??
+										item.user?.fullName ??
+										item.user?.username}
+								</a>
 							</h2>
 							<p>{item.bio ?? 'لا توجد نبذة'}</p>
 							<small>
 								{item.specialties?.join('، ') || 'تخصصات غير محددة'}
 							</small>
+							<div>
+								{item.isVerified ? 'موثق' : 'قيد المراجعة'} ·{' '}
+								{item.rating ?? '—'} / 5 · {item.totalSubscribers ?? 0} مشترك
+							</div>
 						</article>
 					))
 				) : (
