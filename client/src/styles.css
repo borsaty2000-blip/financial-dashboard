@@ -2368,3 +2368,15 @@ body.dark-mode {
 		border-radius: 0;
 	}
 }
+
+.live-analysis-notice { position: fixed; inset-inline-end: 18px; bottom: 18px; z-index: 40; background: #0b6bcb; color: white; border-radius: 10px; padding: 10px 14px; box-shadow: 0 8px 24px rgba(0,0,0,.18); font-size: 13px; }
+.stock-ai-grid, .metric-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.stock-ai-grid > div, .metric-grid > div { display: grid; gap: 6px; padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.stock-ai-grid strong, .metric-grid strong { font-size: 22px; }
+.stock-ai-grid small, .metric-grid small { color: var(--muted); }
+.simulator-form { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; }
+.simulator-form label { display: grid; gap: 6px; min-width: 150px; }
+.simulator-form input, .simulator-form select { min-height: 42px; padding: 8px 10px; border: 1px solid #d0d5dd; border-radius: 8px; background: white; }
+.equity-curve { position: relative; height: 220px; margin: 20px 0; border-radius: 12px; background: linear-gradient(180deg, rgba(0,166,81,.13), transparent); overflow: hidden; }
+.equity-curve span { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #00a651; transform: translate(-50%, 50%); }
+@media (max-width: 640px) { .stock-ai-grid, .metric-grid { grid-template-columns: 1fr; } .simulator-form { display: grid; } .simulator-form .primary-button, .simulator-form .secondary-button { width: 100%; } .live-analysis-notice { inset-inline: 12px; bottom: 74px; text-align: center; } }

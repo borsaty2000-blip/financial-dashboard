@@ -558,3 +558,16 @@ Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
 اختبارات API: `/api/health` أعاد 200، وWatchlist وUnread Count أعادا 401 بدون Bearer Token كما هو مطلوب أمنياً، وMarket Candles أعاد 200 مع حالة البيانات المتاحة/غير المتاحة حسب المصدر. TypeScript وBuild وFormat Check و91 اختباراً ناجحة.
 
 تمت محاولة `npx prisma migrate dev --name add_watchlist_alerts`، لكنها توقفت بـPrisma P1012 لأن `DATABASE_URL` الحالي لا يبدأ بـ`postgresql://` أو `postgres://`. لم يتم اختلاق اتصال أو تطبيق migration على قاعدة غير صالحة.
+
+
+## ملحق pasted_content_28 — AI, Automation, Developer Platform and Mobile Extensions
+
+تم تنفيذ ميزات المرحلة الجديدة محلياً دون نشر خارجي. أضيف محرك Ensemble يضم ARIMA وLSTM وProphet وXGBoost وRandom Forest مع وزن عكسي لـMSE، وثقة موضحة، وبدائل آمنة عند غياب الحزم الاختيارية. أضيف تحليل مشاعر عربي يستخدم نموذج Transformers عند تهيئته، ويعود إلى قاموس عربي محدود ومعلن عند عدم توفر النموذج أو الأخبار. أضيف كشف شذوذ يجمع Isolation Forest وAutoEncoder ويعيد درجة وحالة الشذوذ دون تحويلها إلى توصية.
+
+أضيفت صفحة `/simulator` لمحاكاة الاستثمار التاريخي، وصفحة `/shariah` للفحص الشرعي المتقدم بخمس منهجيات وتطهير توزيعات وشهادة قابلة للتنزيل بصيغة JSON قابلة للأرشفة والطباعة. أضيفت قناة `analysis:stream` إلى Socket.io مع مكوّن `NotificationLive`، وخدمات Smart Portfolio وإعادة التوازن التعليمية، وتقرير أسبوعي محمي، وتوأم رقمي وصفي، ومقارنة عالمية صريحة لا تعرض قيماً غير متوفرة.
+
+أضيفت Developer API keys مع تخزين hash، وإلغاء المفتاح، وعداد الاستخدام، وطلب انضمام المحللين، إضافة إلى Webhooks اختيارية لـWhatsApp وTelegram وواجهة صوتية ترجع نصاً قابلاً للقراءة محلياً عند غياب gTTS. أضيف migration incremental للنماذج `api_keys` و`analyst_profiles`، وملف `requirements-optional.txt` للحزم الثقيلة الاختيارية.
+
+التحقق: `npm run typecheck` ناجح، `npm run build` ناجح، 91 اختبار واجهة ناجحة في 19 ملفاً، واختبارات Python السابقة ناجحة، واختبار HTTP لـEnsemble والمشاعر وكشف الشذوذ ناجح. اختبار Python أكد خمسة نماذج Ensemble، وEndpoint المشاعر أعاد حالة متاحة مع صفر أخبار عند غياب موصل الأخبار بدلاً من اختلاق أخبار. لم يتم النشر الخارجي.
+
+القيود المعروفة: Prophet وXGBoost وTransformers وgTTS اختيارية ولم تُثبّت في بيئة الإنتاج تلقائياً؛ عند غيابها تظهر حالة fallback صريحة. الشهادة الحالية JSON وليست PDF ثنائي؛ يمكن طباعتها إلى PDF من المتصفح، أو إضافة مولد PDF لاحقاً. المقارنة العالمية لا تعرض أرقاماً حتى يتم ربط مصدر موثوق لها. يجب تطبيق migration الجديد في بيئة قاعدة البيانات قبل استخدام Developer API في الإنتاج.
