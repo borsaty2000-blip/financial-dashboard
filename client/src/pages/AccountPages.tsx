@@ -7,7 +7,7 @@ import {
 } from 'react'
 import { api } from '../lib/api'
 import { navigate } from '../router'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '../hooks/useAuth'
 import AvatarUploader from '../components/AvatarUploader'
 
 function Shell({ children }: { children: ReactNode }) {
