@@ -6415,3 +6415,66 @@ body.dark-mode .language-switcher {
 body.dark-mode .language-switcher select {
 	color: #effbff;
 }
+
+/* Orchestration layer shared by the advanced analysis center. */
+.analysis-orchestration-panel {
+	display: grid;
+	grid-template-columns: 1.15fr 1fr;
+	gap: 24px;
+	margin: 24px 0;
+	padding: 24px;
+	border: 1px solid #cfe4eb;
+	border-radius: 18px;
+	background: linear-gradient(135deg, #f7fcfd, #fff);
+	box-shadow: 0 14px 36px rgb(12 61 81 / 7%);
+}
+.analysis-orchestration-panel h2 {
+	margin: 8px 0;
+	color: #103348;
+	font-size: clamp(21px, 3vw, 30px);
+}
+.analysis-orchestration-panel p {
+	max-width: 680px;
+	margin: 0;
+	color: #617782;
+	font-size: 13px;
+	line-height: 1.9;
+}
+.analysis-orchestration-steps {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	align-content: center;
+}
+.analysis-orchestration-steps span {
+	padding: 14px;
+	border: 1px solid #dfebef;
+	border-radius: 12px;
+	background: #fff;
+	color: #415e69;
+	font-size: 12px;
+}
+.analysis-orchestration-steps b {
+	display: block;
+	margin-bottom: 7px;
+	color: #0b88ad;
+	font-family: 'JetBrains Mono', monospace;
+}
+@media (max-width: 720px) {
+	.analysis-orchestration-panel {
+		grid-template-columns: 1fr;
+		padding: 19px;
+	}
+}
+body.dark-mode .analysis-orchestration-panel {
+	border-color: #2b5666;
+	background: linear-gradient(135deg, #102f3e, #0d2634);
+}
+body.dark-mode .analysis-orchestration-panel h2 {
+	color: #effbff;
+}
+body.dark-mode .analysis-orchestration-steps span {
+	border-color: #2b5666;
+	background: #14394a;
+	color: #c9e1e7;
+}

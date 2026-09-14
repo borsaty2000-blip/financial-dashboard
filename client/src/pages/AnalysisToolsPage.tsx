@@ -92,6 +92,13 @@ export function BacktestPage() {
 	const [consensus, setConsensus] = useState<ConsensusResult | null>(null)
 	const [error, setError] = useState('')
 	const prices = useMemo(() => parseNumbers(pricesText), [pricesText])
+	const openCockpit = () => {
+		const normalized = symbol
+			.trim()
+			.toUpperCase()
+			.replace(/[^A-Z0-9.-]/g, '')
+		if (normalized) navigate(`/stock/${normalized}`)
+	}
 	async function run() {
 		setError('')
 		setResult(null)
@@ -126,7 +133,39 @@ export function BacktestPage() {
 						اختبر سلوك الاستراتيجية تاريخياً، ثم قارنها بدرجة توافق المحركات.
 					</p>
 				</div>
+				<button
+					className="secondary-button"
+					type="button"
+					onClick={openCockpit}
+				>
+					فتح غرفة التحليل الكاملة ←
+				</button>
 			</header>
+			<section className="analysis-orchestration-panel">
+				<div>
+					<span className="eyebrow">تحليل متعدد الطبقات</span>
+					<h2>لا نخلط بين الإشارة والدليل</h2>
+					<p>
+						تبدأ القراءة من بيانات السعر، ثم تُراجع بالمؤشرات والموجات والزوايا،
+						وتُقاس المخاطر، ثم تُختبر الفرضية تاريخياً. كل طبقة تظهر مستقلة قبل
+						عرض الإجماع، وأي طبقة بلا بيانات تبقى غير متاحة.
+					</p>
+				</div>
+				<div className="analysis-orchestration-steps">
+					<span>
+						<b>01</b> البيانات والاتجاه
+					</span>
+					<span>
+						<b>02</b> المؤشرات والموجات
+					</span>
+					<span>
+						<b>03</b> المخاطر والتوقع
+					</span>
+					<span>
+						<b>04</b> الاختبار والإجماع
+					</span>
+				</div>
+			</section>
 			<section className="analysis-controls">
 				<label>
 					الرمز
