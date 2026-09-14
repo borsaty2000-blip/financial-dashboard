@@ -312,6 +312,25 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 	])
 	const arimaForecast = numberValue(arimaResult, ['forecast', '0'])
 	const lstmForecast = numberValue(lstmResult, ['forecast', '0'])
+	const analysisEnginesAvailable = [
+		indicatorResult,
+		elliottResult,
+		gannResult,
+		consensusResult,
+		statisticalResult,
+		arimaResult,
+		lstmResult,
+		backtestResult,
+	].filter((result) => Object.keys(result).length > 0).length
+	const signalExplanation = consensusSignal
+		? `الإجماع الحالي المسجل هو ${consensusSignal}. تتم قراءته مع المؤشرات والموجات، ولا يُستخدم منفرداً.`
+		: 'لم يكتمل إجماع المحركات لهذا الرمز؛ ستظهر القراءة عند توفر بيانات صالحة.'
+	const riskExplanation = numberValue(statisticalResult, ['var_95'])
+		? 'تظهر مقاييس التقلب وVaR وSharpe لتوضيح المخاطر التاريخية قبل تفسير أي حركة سعرية.'
+		: 'لا تتوفر مقاييس مخاطر كافية حالياً؛ لذلك لا نضع حكماً رقمياً على المخاطرة.'
+	const validationExplanation = numberValue(backtestResult, ['win_rate'])
+		? 'الاختبار التاريخي يعرض سلوك الفرضية على بيانات سابقة، ولا يثبت نجاحها في المستقبل.'
+		: 'لم تتوفر نتيجة اختبار تاريخي مكتملة لهذا الرمز؛ لا يتم استبدالها بتقدير.'
 
 	return (
 		<main className="stock-detail-page" dir="rtl">
@@ -528,6 +547,38 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 								</small>
 							</div>
 						</div>
+					</section>
+					<section className="analysis-card analysis-reading-panel">
+						<div className="panel-title">
+							<div>
+								<h2>كيف نقرأ هذه النتائج؟</h2>
+								<p className="muted">
+									شرح مختصر يربط المخرجات بالسياق بدلاً من ترك المستخدم أمام
+									أرقام منفصلة.
+								</p>
+							</div>
+							<span className="eyebrow">
+								{analysisEnginesAvailable}/8 محركات
+							</span>
+						</div>
+						<div className="analysis-reading-grid">
+							<div>
+								<span>الإشارة المركبة</span>
+								<strong>{signalExplanation}</strong>
+							</div>
+							<div>
+								<span>سياق المخاطر</span>
+								<strong>{riskExplanation}</strong>
+							</div>
+							<div>
+								<span>التحقق التاريخي</span>
+								<strong>{validationExplanation}</strong>
+							</div>
+						</div>
+						<p className="analysis-reading-note">
+							النتيجة التعليمية الأقوى هي التي تتفق فيها عدة محركات مع بيانات
+							سعرية كافية. عند اختلافها، نعرض الاختلاف بدلاً من إخفائه.
+						</p>
 					</section>
 					<section className="analysis-card stock-ai-grid">
 						<div>

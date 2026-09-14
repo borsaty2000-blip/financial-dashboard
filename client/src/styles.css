@@ -6168,3 +6168,46 @@ body.dark-mode .analysis-method-card h3 {
 		grid-template-columns: 1fr;
 	}
 }
+
+/* Interpretive layer for the stock-analysis cockpit. */
+.analysis-reading-panel {
+	border-color: #cfe4eb;
+	background: linear-gradient(135deg, #f8fcfd, #fff);
+}
+.analysis-reading-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
+}
+.analysis-reading-grid > div {
+	display: grid;
+	gap: 8px;
+	padding: 17px;
+	border: 1px solid #dfebef;
+	border-radius: 13px;
+	background: #fff;
+}
+.analysis-reading-grid span {
+	color: #0b789b;
+	font-size: 11px;
+	font-weight: 900;
+}
+.analysis-reading-grid strong {
+	color: #38515d;
+	font-size: 12px;
+	line-height: 1.9;
+}
+.analysis-reading-note {
+	margin: 16px 0 0;
+	padding: 12px 15px;
+	border-right: 3px solid #e8b943;
+	background: #fffaf0;
+	color: #6c5d39;
+	font-size: 11px;
+	line-height: 1.9;
+}
+@media (max-width: 720px) {
+	.analysis-reading-grid {
+		grid-template-columns: 1fr;
+	}
+}
