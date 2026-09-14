@@ -624,3 +624,20 @@ Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
 نتيجة اختبار endpoints المحلية: Health 200، IPO 200، IPO upcoming 200، Dividends 200، Earnings 200، Splits 200، Forex 200، Commodities 200، Crypto 200، ETF 200، Bonds 200، Comparison periods 200، Insider recent 200، Ownership 200. Currency rates أعاد 502 في بيئة الاختبار لأن مزود Frankfurter الخارجي لم يكن متاحاً، وتبقى الواجهة تعرض عدم التوفر بدلاً من رقم مصطنع. `npm run typecheck` و`npm run build` و91 اختباراً ناجحة.
 
 Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa` للأسواق الإضافية، `b2a47c8` لمحول العملات والمفضلة، `91c6b31` للمقارنة الشاملة، و`e54bc6b` للحوكمة والإفصاحات.
+
+
+## ملحق pasted_content_32 — Global Revenue Features
+
+تم دمج الميزات الخمس المطلوبة بالترتيب. في Part 1 توسعت نماذج `ApiKey` و`ApiUsageLog` و`ApiSubscription` مع حدود FREE/PRO/ENTERPRISE، وتوليد مفاتيح `bors_`، والتحقق عبر `X-API-Key`، وسجل الاستخدام، وحدود يومية، ومسارات `/api/v1/stocks` و`candles` و`analysis` و`market/summary` و`news`. أضيفت صفحة `/developer/dashboard` لعرض المفاتيح والاستخدام والتوثيق، وصفحة `/developer/docs` بأمثلة cURL وJavaScript وPython. namespace Socket.io الفعلي هو `/api/v1/ws/prices` مع بقاء القناة العامة للتوافق.
+
+في Part 2 اكتملت طبقة Analyst Program: التقديم، تعديل الملف، قائمة المحللين، الملف العام، المقالات التحليلية، أنواع المنشورات، المشاعر، المنشورات المدفوعة كحقل، الاشتراك والإلغاء، الاشتراكات الحالية، ولوحات `/analysts/dashboard` و`/my/subscriptions`، بالإضافة إلى خدمة checkout آمنة لا تحصّل أي مبلغ عند غياب Stripe أو PayPal. أضيفت حقول التحقق والتقييم والإيرادات وmigration incremental.
+
+في Part 3 أصبح زر الاستماع في صفحة السهم يستدعي `/api/analysis/:symbol/audio`، ويحاول TTS عربي عبر gTTS من خدمة Python، ثم يعود إلى Web Speech API عند عدم تشغيل Python أو عدم تهيئة gTTS. عدم وجود `PYTHON_SERVICE_URL` أو مزود TTS لا يُخفى؛ يعاد رد صريح بأن الصوت غير متاح.
+
+في Part 4 أضيفت `WhatsAppSubscription`، ومسارات التفعيل والتحقق والحالة والإرسال، وربط Alert Checker بإرسال PRICE بعد تحقق المستخدم. الإرسال الحقيقي يتطلب `TWILIO_ACCOUNT_SID` و`TWILIO_AUTH_TOKEN` و`TWILIO_WHATSAPP_FROM`؛ دونها يعاد 503 واضح ولا يتم الادعاء بإرسال الرسالة.
+
+في Part 5 أضيفت `TelegramSubscription`، وربط webhook بالمحادثات، ومسار `/api/telegram/link`، ومعلومات البوت، وصفحة `/settings/telegram`، ورابط سريع داخل غلاف التطبيق. كما اكتمل Python bot الاختياري بأوامر `/start` و`/help` و`/analyze` و`/top` و`/news` و`/portfolio` و`/alert`. التشغيل الفعلي يتطلب `TELEGRAM_BOT_TOKEN` واسم المستخدم من BotFather.
+
+التحقق: `prisma format` و`prisma validate` و`prisma generate` و`npm run typecheck` و`npm run build` و`python3 -m py_compile` ناجحة. اختبار الخادم المحلي أعاد Health 200، و`/api/v1/stocks` أعاد 401 دون مفتاح كما هو متوقع، وTelegram info 200، وAudio 200 مع fallback، وTelegram webhook 200، وAnalyst list 200. عند عدم توفر `DATABASE_URL` الصحيح يعيد Analyst profile/posts 503 صريحاً بدلاً من إسقاط الخادم. لم يتم النشر الخارجي ولم يتم تحصيل أي مدفوعات.
+
+القيود الخارجية المتبقية: يلزم تطبيق migration `20260914102000_add_global_revenue_features` على قاعدة الإنتاج، وإضافة مفاتيح Twilio وTelegram وStripe/PayPal فقط إذا أراد المستخدم تفعيل تلك الخدمات، كما يجب اعتبار أرقام الاستخدام والتوقعات تعليمية وعدم تقديمها كتوصية استثمارية.
