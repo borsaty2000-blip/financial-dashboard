@@ -1,7 +1,7 @@
 {
 	"version": 2,
-	"buildCommand": "npx prisma generate && npx prisma migrate deploy && npm run build",
-	"installCommand": "npm install --include=dev && npm --prefix client install --include=dev",
+	"buildCommand": "npx prisma generate && npm run build",
+	"installCommand": "npm install --include=dev --fetch-retries=5 --fetch-retry-mintimeout=20000 --fetch-retry-maxtimeout=120000 && npm --prefix client install --include=dev --fetch-retries=5 --fetch-retry-mintimeout=20000 --fetch-retry-maxtimeout=120000",
 	"outputDirectory": "client/dist",
 	"functions": {
 		"api/index.ts": {
