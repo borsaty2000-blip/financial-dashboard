@@ -21,6 +21,7 @@ jobs:
       - run: npm ci
       - run: npm --prefix client ci
       - run: npm run typecheck
+      - run: npm run typecheck:packages
       - run: npm run build
       - run: npm test
       - run: npm run format:check
