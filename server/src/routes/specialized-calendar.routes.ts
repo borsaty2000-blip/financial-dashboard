@@ -9,12 +9,10 @@ import {
 } from '../services/calendar/specialized.service.js'
 
 export const specializedCalendarRoutes = Router()
-specializedCalendarRoutes.get('/ipo', async (_request, response) =>
-	response.json({
-		data: await getIPO(false),
-		count: (await getIPO(false)).length,
-	}),
-)
+specializedCalendarRoutes.get('/ipo', async (_request, response) => {
+	const data = await getIPO(false)
+	return response.json({ data, count: data.length })
+})
 specializedCalendarRoutes.get('/ipo/upcoming', async (_request, response) => {
 	const data = await getIPO(true)
 	return response.json({ data, count: data.length })

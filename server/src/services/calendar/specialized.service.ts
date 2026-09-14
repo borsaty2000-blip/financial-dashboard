@@ -95,10 +95,10 @@ const clean = (value: any) =>
 		),
 	)
 async function seed(
-	table: 'ipoEvent' | 'dividendEvent' | 'earningsEvent' | 'splitEvent',
+	table: 'iPOEvent' | 'dividendEvent' | 'earningsEvent' | 'splitEvent',
 ) {
 	const data =
-		table === 'ipoEvent'
+		table === 'iPOEvent'
 			? seedIPO()
 			: table === 'dividendEvent'
 				? seedDividends()
@@ -113,7 +113,7 @@ async function seed(
 }
 export async function getIPO(upcoming = false) {
 	const fallback = seedIPO()
-	await seed('ipoEvent')
+	await seed('iPOEvent')
 	try {
 		const data = await prisma.iPOEvent.findMany({
 			where: upcoming ? { ipoDate: { gte: new Date() } } : undefined,

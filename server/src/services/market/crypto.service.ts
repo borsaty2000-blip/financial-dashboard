@@ -1,4 +1,56 @@
 const base = 'https://api.coingecko.com/api/v3'
+const topIds = [
+	'bitcoin',
+	'ethereum',
+	'tether',
+	'binancecoin',
+	'solana',
+	'usd-coin',
+	'xrp',
+	'dogecoin',
+	'cardano',
+	'avalanche-2',
+	'tron',
+	'shiba-inu',
+	'polkadot',
+	'chainlink',
+	'polygon',
+	'wrapped-bitcoin',
+	'dai',
+	'litecoin',
+	'uniswap',
+	'bitcoin-cash',
+	'internet-computer',
+	'leo-token',
+	'near',
+	'aptos',
+	'unus-sed-leo',
+	'stellar',
+	'cosmos',
+	'monero',
+	'ethereum-classic',
+	'filecoin',
+	'hedera-hashgraph',
+	'cronos',
+	'arbitrum',
+	'vechain',
+	'optimism',
+	'maker',
+	'aave',
+	'the-graph',
+	'kaspa',
+	'theta',
+	'algorand',
+	'fantom',
+	'flow',
+	'elrond-egld',
+	'tezos',
+	'quant',
+	'jupiter-exchange-solana',
+	'bittensor',
+	'pancakeswap-token',
+	'the-sandbox',
+]
 async function json(path: string) {
 	const response = await fetch(`${base}${path}`, {
 		headers: { accept: 'application/json' },
@@ -15,7 +67,20 @@ export class CryptoService {
 			)
 			return { data, count: data.length, source: 'CoinGecko', available: true }
 		} catch {
-			return { data: [], count: 0, source: 'unavailable', available: false }
+			return {
+				data: topIds.map((id) => ({
+					id,
+					symbol: id,
+					name: id,
+					current_price: null,
+					market_cap: null,
+					price_change_percentage_24h: null,
+					available: false,
+				})),
+				count: topIds.length,
+				source: 'unavailable',
+				available: false,
+			}
 		}
 	}
 	static async get(symbol: string) {

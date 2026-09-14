@@ -607,3 +607,20 @@ Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
 نتائج الاختبار: `npm run typecheck` ناجح، `npm run build` ناجح، و91 اختباراً ناجحة، `python3 -m py_compile` ناجح، و`prisma validate/generate` ناجحان عند إزالة `DATABASE_URL` الموروث غير الصالح من جلسة التشغيل. Health 200، Quote 200، Fundamentals 200 مع حالة توفر صريحة، Calendar 200، News 200، Presets 200، Screener scan 200، وPortfolio Analytics 401 بدون جلسة كما هو متوقع.
 
 القيود: المصدر الحي الحقيقي يتطلب مفاتيح `TWELVE_DATA_API_KEY` و`SAHMK_API_KEY` و`POLYGON_API_KEY`؛ البث كل ثانية لا يعني أن المزود نفسه يرسل tick جديداً كل ثانية، بل يعيد نشر أحدث quote متاح. الأخبار تعتمد على توفر RSS، وAraBERT يتطلب تشغيل خدمة Python وحزمة النموذج، كما يجب تطبيق migrations الثلاث الجديدة على قاعدة الإنتاج قبل الاعتماد على التخزين التاريخي والتقويم والماسح المحفوظ.
+
+
+## ملحق pasted_content_31 — Specialized Calendars, Additional Markets, Comparison and Governance
+
+تم تنفيذ Part 1 إلى Part 5 بالترتيب المطلوب. أضيفت نماذج Prisma وmigration لتقويم IPO والتوزيعات والنتائج والانقسامات، إضافة إلى InsiderTrade. البيانات اليدوية seed واضحة وموسومة داخلياً كـ fallback، وعددها 12 طرحاً، 12 توزيعاً، 12 نتيجة، و6 انقسامات، مع endpoints للعرض والقادم، ومسار إدارة POST للـIPO محمي بـ`ADMIN_USER_IDS`، وصفحة موحدة بأربع مسارات: `/calendar/ipo` و`/calendar/dividends` و`/calendar/earnings` و`/calendar/splits`، مع عداد تنازلي وتذكير محمي.
+
+في Part 2 أضيفت ForexService بما يزيد على 50 زوجاً و7 أزواج رئيسية، وCommoditiesService بخمس عشرة سلعة ضمن الطاقة والمعادن والزراعة والثمينة، وCryptoService باستخدام CoinGecko لأفضل 50 عملة مع قائمة رموز fallback عند تعذر المزود، وETFService بأربعة صناديق مصرية/سعودية، وBondsService بأربعة إصدارات حكومية مع عدم اختلاق العائد أو السعر. أضيفت صفحات `/markets/forex` و`/markets/commodities` و`/markets/crypto` و`/markets/etf` و`/markets/bonds`.
+
+في Part 3 أضيف CurrencyService باستخدام Frankfurter للتحويل والأسعار التاريخية، endpoint `POST /api/tools/convert` و`GET /api/tools/rates` و`GET /api/tools/historical`، ومكون محول عملات قابل للفتح من التطبيق مع حفظ الأزواج المفضلة محلياً.
+
+في Part 4 أضيفت مقارنة القطاعات والفترات وقائمة المتابعة: `/api/comparison/sectors` و`/api/comparison/periods` و`/api/comparison/watchlist`، وصفحات `/compare/sectors` و`/compare/periods` و`/compare/watchlist`. تحسب المقارنة الأداء من الشموع المتاحة ومتوسط P/E عند توفره، وتعرض null/شرطة عند غياب المصدر.
+
+في Part 5 أضيفت `/api/insider-trades/recent` و`/api/insider-trades/:symbol` و`/api/ownership/:symbol` وقسم الحوكمة إلى صفحة السهم، مع 12 سجلاً fallback للتداولات الداخلية وملكية لا تعرض نسباً غير موثقة عند عدم توفر الإفصاح.
+
+نتيجة اختبار endpoints المحلية: Health 200، IPO 200، IPO upcoming 200، Dividends 200، Earnings 200، Splits 200، Forex 200، Commodities 200، Crypto 200، ETF 200، Bonds 200، Comparison periods 200، Insider recent 200، Ownership 200. Currency rates أعاد 502 في بيئة الاختبار لأن مزود Frankfurter الخارجي لم يكن متاحاً، وتبقى الواجهة تعرض عدم التوفر بدلاً من رقم مصطنع. `npm run typecheck` و`npm run build` و91 اختباراً ناجحة.
+
+Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa` للأسواق الإضافية، `b2a47c8` لمحول العملات والمفضلة، `91c6b31` للمقارنة الشاملة، و`e54bc6b` للحوكمة والإفصاحات.
