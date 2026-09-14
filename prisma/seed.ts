@@ -3,6 +3,11 @@ import {
 	educationCatalog,
 	lessonTemplates,
 } from '../server/src/services/education/catalog.js'
+import { knowledgeCatalog } from '../server/src/services/support/knowledge.catalog.js'
+import {
+	currencyCatalog,
+	marketCatalog,
+} from '../server/src/services/regional/regional.service.js'
 
 const prisma = new PrismaClient()
 
@@ -256,7 +261,71 @@ async function main() {
 			},
 		})
 	}
-	console.log(`Seeded ${educationCatalog.length} courses and forum categories.`)
+	for (const article of knowledgeCatalog) {
+		await prisma.knowledgeArticle.upsert({
+			where: { slug: article.slug },
+			update: {
+				title: article.title,
+				content: article.content,
+				category: article.category,
+				tags: article.tags,
+				isPublished: true,
+			},
+			create: {
+				slug: article.slug,
+				title: article.title,
+				content: article.content,
+				category: article.category,
+				tags: article.tags,
+				isPublished: true,
+			},
+		})
+	}
+	for (const market of marketCatalog) {
+		await prisma.market.upsert({
+			where: { code: market.code },
+			update: {
+				name: market.name,
+				nameEn: market.nameEn,
+				nameAr: market.name,
+				country: market.country,
+				currency: market.currency,
+				timezone: market.timezone,
+				regulator: market.regulator,
+				isActive: market.active,
+				workingDays: ['SUN', 'MON', 'TUE', 'WED', 'THU'],
+				tradingHours: { open: '10:00', close: '15:00' },
+			},
+			create: {
+				code: market.code,
+				name: market.name,
+				nameEn: market.nameEn,
+				nameAr: market.name,
+				country: market.country,
+				currency: market.currency,
+				timezone: market.timezone,
+				regulator: market.regulator,
+				isActive: market.active,
+				workingDays: ['SUN', 'MON', 'TUE', 'WED', 'THU'],
+				tradingHours: { open: '10:00', close: '15:00' },
+			},
+		})
+	}
+	for (const currency of currencyCatalog) {
+		await prisma.currency.upsert({
+			where: { code: currency.code },
+			update: { name: currency.name, symbol: currency.symbol, isActive: true },
+			create: {
+				code: currency.code,
+				name: currency.name,
+				symbol: currency.symbol,
+				isActive: true,
+			},
+		})
+	}
+	console.log(
+		`Seeded ${educationCatalog.length} courses, ${knowledgeCatalog.length} help articles, and regional catalogs.`,
+	)
 }
 
 main()
