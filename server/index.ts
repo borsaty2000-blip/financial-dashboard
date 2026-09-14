@@ -36,6 +36,10 @@ import { calendarRoutes } from './src/routes/calendar.routes.js'
 import { newsRoutes } from './src/routes/news.routes.js'
 import { screenerRoutes } from './src/routes/screener.routes.js'
 import { specializedCalendarRoutes } from './src/routes/specialized-calendar.routes.js'
+import {
+	additionalMarketsRoutes,
+	currencyRoutes,
+} from './src/routes/additional-markets.routes.js'
 
 const app = express()
 app.use(express.json())
@@ -106,6 +110,8 @@ app.use('/api/market', marketRoutes)
 app.use('/api/fundamentals', fundamentalsRoutes)
 app.use('/api/calendar', calendarRoutes)
 app.use('/api/calendar', specializedCalendarRoutes)
+app.use('/api/market', additionalMarketsRoutes)
+app.use('/api/tools', currencyRoutes)
 app.use('/api/news', newsRoutes)
 app.use('/api/screener', screenerRoutes)
 app.use('/api/analysis', analysisRoutes)

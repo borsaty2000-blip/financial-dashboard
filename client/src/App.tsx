@@ -42,6 +42,8 @@ import { NewsPage } from './pages/NewsPage'
 import { AdvancedScreenerPage } from './pages/AdvancedScreenerPage'
 import { PortfolioAnalyticsPage } from './pages/PortfolioAnalyticsPage'
 import { SpecializedCalendarsPage } from './pages/SpecializedCalendarsPage'
+import { AdditionalMarketsPage } from './pages/AdditionalMarketsPage'
+import { CurrencyConverter } from './components/CurrencyConverter'
 import NotificationLive from './components/NotificationLive'
 import { LiveAnalysisFeed } from './components/Analysis/LiveAnalysisFeed'
 
@@ -112,6 +114,12 @@ function RoutedApp() {
 		return <SpecializedCalendarsPage kind="earnings" />
 	if (path === '/calendar/splits')
 		return <SpecializedCalendarsPage kind="splits" />
+	if (path === '/markets/forex') return <AdditionalMarketsPage kind="forex" />
+	if (path === '/markets/commodities')
+		return <AdditionalMarketsPage kind="commodities" />
+	if (path === '/markets/crypto') return <AdditionalMarketsPage kind="crypto" />
+	if (path === '/markets/etf') return <AdditionalMarketsPage kind="etf" />
+	if (path === '/markets/bonds') return <AdditionalMarketsPage kind="bonds" />
 	if (path === '/news') return <NewsPage />
 	if (path === '/screener') return <AdvancedScreenerPage />
 	if (path === '/portfolio/analytics')
@@ -163,6 +171,7 @@ export function App() {
 					<RoutedApp />
 					<MobileChrome />
 					<GlobalSearch />
+					<CurrencyConverter />
 					<InstallPrompt />
 					<NotificationLive />
 					<LiveAnalysisFeed />
