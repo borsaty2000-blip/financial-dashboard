@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { requireAuth } from '../middleware/auth.js'
 import { prisma } from '../lib/prisma.js'
 import { createAnalystCheckout } from '../services/analyst/payment.service.js'
+import { sendBulkPush } from '../services/notifications/push.service.js'
 export const analystsRoutes = Router()
 const profileSchema = z.object({
 	displayName: z.string().min(2).max(80),
@@ -82,11 +83,22 @@ analystsRoutes.post('/posts', requireAuth, async (request, response) => {
 	})
 	if (!profile || profile.status !== 'APPROVED')
 		return response.status(403).json({ error: 'يجب اعتماد ملف المحلل أولاً' })
-	return response.status(201).json(
-		await prisma.analystPost.create({
-			data: { analystId: profile.id, ...parsed.data },
-		}),
+	const post = await prisma.analystPost.create({
+		data: { analystId: profile.id, ...parsed.data },
+	})
+	const subscribers = await prisma.analystSubscription.findMany({
+		where: { analystId: profile.userId, status: 'ACTIVE' },
+		select: { subscriberId: true },
+	})
+	void sendBulkPush(
+		subscribers.map((subscriber) => subscriber.subscriberId),
+		{
+			title: `تحليل جديد من ${profile.displayName}`,
+			body: post.title,
+			link: `/analysts/${profile.userId}`,
+		},
 	)
+	return response.status(201).json(post)
 })
 analystsRoutes.get('/:username/posts', async (request, response) => {
 	try {

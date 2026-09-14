@@ -559,7 +559,6 @@ Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
 
 تمت محاولة `npx prisma migrate dev --name add_watchlist_alerts`، لكنها توقفت بـPrisma P1012 لأن `DATABASE_URL` الحالي لا يبدأ بـ`postgresql://` أو `postgres://`. لم يتم اختلاق اتصال أو تطبيق migration على قاعدة غير صالحة.
 
-
 ## ملحق pasted_content_28 — AI, Automation, Developer Platform and Mobile Extensions
 
 تم تنفيذ ميزات المرحلة الجديدة محلياً دون نشر خارجي. أضيف محرك Ensemble يضم ARIMA وLSTM وProphet وXGBoost وRandom Forest مع وزن عكسي لـMSE، وثقة موضحة، وبدائل آمنة عند غياب الحزم الاختيارية. أضيف تحليل مشاعر عربي يستخدم نموذج Transformers عند تهيئته، ويعود إلى قاموس عربي محدود ومعلن عند عدم توفر النموذج أو الأخبار. أضيف كشف شذوذ يجمع Isolation Forest وAutoEncoder ويعيد درجة وحالة الشذوذ دون تحويلها إلى توصية.
@@ -571,7 +570,6 @@ Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
 التحقق: `npm run typecheck` ناجح، `npm run build` ناجح، 91 اختبار واجهة ناجحة في 19 ملفاً، واختبارات Python السابقة ناجحة، واختبار HTTP لـEnsemble والمشاعر وكشف الشذوذ ناجح. اختبار Python أكد خمسة نماذج Ensemble، وEndpoint المشاعر أعاد حالة متاحة مع صفر أخبار عند غياب موصل الأخبار بدلاً من اختلاق أخبار. لم يتم النشر الخارجي.
 
 القيود المعروفة: Prophet وXGBoost وTransformers وgTTS اختيارية ولم تُثبّت في بيئة الإنتاج تلقائياً؛ عند غيابها تظهر حالة fallback صريحة. الشهادة الحالية JSON وليست PDF ثنائي؛ يمكن طباعتها إلى PDF من المتصفح، أو إضافة مولد PDF لاحقاً. المقارنة العالمية لا تعرض أرقاماً حتى يتم ربط مصدر موثوق لها. يجب تطبيق migration الجديد في بيئة قاعدة البيانات قبل استخدام Developer API في الإنتاج.
-
 
 ## ملحق pasted_content_29 — Parts 6–15 Completion
 
@@ -588,7 +586,6 @@ Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
 التحقق النهائي: `npm run typecheck` ناجح، `npm run build` ناجح، و91 اختباراً ناجحة. `npx prisma validate` و`npx prisma generate` ناجحان عند إزالة متغير `DATABASE_URL` الموروث غير الصالح من جلسة التشغيل حتى يقرأ Prisma القيمة المحلية الصحيحة من `.env`. اختبارات HTTP أعادت Health 200، والتقارير والمطور وDeveloper API أعادت 401 بدون مصادقة كما هو متوقع، وGlobal Comparison أعاد 200 مع حالة توفر صريحة. لم يتم النشر الخارجي ولم يتم دفع commits إلى origin.
 
 عدد commits Parts 6–15: 10 commits، من `2e28908` حتى `557777d`، إضافة إلى commit نهائي مشترك للواجهة والتوثيق. القيود الخارجية: WhatsApp وTelegram وgTTS وموصل الأخبار تحتاج مفاتيح أو حزم اختيارية؛ Analyst subscriptions تحتاج تطبيق migration على قاعدة الإنتاج قبل الاستخدام.
-
 
 ## ملحق pasted_content_30 — Reliable Data, Fundamentals, Calendar, News, Screener and Portfolio Analytics
 
@@ -608,7 +605,6 @@ Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
 
 القيود: المصدر الحي الحقيقي يتطلب مفاتيح `TWELVE_DATA_API_KEY` و`SAHMK_API_KEY` و`POLYGON_API_KEY`؛ البث كل ثانية لا يعني أن المزود نفسه يرسل tick جديداً كل ثانية، بل يعيد نشر أحدث quote متاح. الأخبار تعتمد على توفر RSS، وAraBERT يتطلب تشغيل خدمة Python وحزمة النموذج، كما يجب تطبيق migrations الثلاث الجديدة على قاعدة الإنتاج قبل الاعتماد على التخزين التاريخي والتقويم والماسح المحفوظ.
 
-
 ## ملحق pasted_content_31 — Specialized Calendars, Additional Markets, Comparison and Governance
 
 تم تنفيذ Part 1 إلى Part 5 بالترتيب المطلوب. أضيفت نماذج Prisma وmigration لتقويم IPO والتوزيعات والنتائج والانقسامات، إضافة إلى InsiderTrade. البيانات اليدوية seed واضحة وموسومة داخلياً كـ fallback، وعددها 12 طرحاً، 12 توزيعاً، 12 نتيجة، و6 انقسامات، مع endpoints للعرض والقادم، ومسار إدارة POST للـIPO محمي بـ`ADMIN_USER_IDS`، وصفحة موحدة بأربع مسارات: `/calendar/ipo` و`/calendar/dividends` و`/calendar/earnings` و`/calendar/splits`، مع عداد تنازلي وتذكير محمي.
@@ -624,7 +620,6 @@ Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
 نتيجة اختبار endpoints المحلية: Health 200، IPO 200، IPO upcoming 200، Dividends 200، Earnings 200، Splits 200، Forex 200، Commodities 200، Crypto 200، ETF 200، Bonds 200، Comparison periods 200، Insider recent 200، Ownership 200. Currency rates أعاد 502 في بيئة الاختبار لأن مزود Frankfurter الخارجي لم يكن متاحاً، وتبقى الواجهة تعرض عدم التوفر بدلاً من رقم مصطنع. `npm run typecheck` و`npm run build` و91 اختباراً ناجحة.
 
 Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa` للأسواق الإضافية، `b2a47c8` لمحول العملات والمفضلة، `91c6b31` للمقارنة الشاملة، و`e54bc6b` للحوكمة والإفصاحات.
-
 
 ## ملحق pasted_content_32 — Global Revenue Features
 
@@ -642,7 +637,6 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 
 القيود الخارجية المتبقية: يلزم تطبيق migration `20260914102000_add_global_revenue_features` على قاعدة الإنتاج، وإضافة مفاتيح Twilio وTelegram وStripe/PayPal فقط إذا أراد المستخدم تفعيل تلك الخدمات، كما يجب اعتبار أرقام الاستخدام والتوقعات تعليمية وعدم تقديمها كتوصية استثمارية.
 
-
 ## ملحق pasted_content_33 — Mobile, Push, i18n, PDF and Security
 
 تم تنفيذ Part 1 بإنشاء نماذج `PushSubscription` و`PushNotification` وmigration `20260914110000_add_push_security`. أضيفت Push API للتسجيل والإلغاء والحالة وقائمة الإشعارات، وخدمة `push.service.ts` باستخدام Web Push/VAPID مع تعطيل الاشتراكات المنتهية تلقائياً، وربط Alert Checker والتقرير الأسبوعي بإشعارات Push. أضيف Service Worker يستقبل `push` ويفتح الرابط عند النقر، وصفحة `/settings/notifications` وhook لتفعيل الإشعارات. إعداد Firebase محفوظ اختيارياً عبر `client/src/services/firebase.ts` ومتغيرات البيئة؛ لا توجد أسرار Firebase في المستودع.
@@ -658,3 +652,7 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 نتائج التحقق: `prisma validate` و`prisma generate` و`npm run typecheck` و`npm run build` ناجحة، و91 اختباراً ناجحة، وفحص Python ناجح، وMobile TypeScript ناجح. Health أعاد 200، Push وSecurity أعادا 401 بدون جلسة كما هو صحيح، وStock PDF أعاد 200. لم يتم النشر، ولم يتم تفعيل Firebase أو Twilio أو VAPID أو حسابات المتاجر دون مفاتيح خارجية.
 
 القيود العملية: Web Push يتطلب `VAPID_PUBLIC_KEY` و`VAPID_PRIVATE_KEY` و`VAPID_SUBJECT`، وتطبيق Expo يحتاج `npm install` ثم EAS/Android Studio/Xcode عند البناء الفعلي. 2FA لا يصبح فعالاً للمستخدمين قبل تطبيق migration الجديدة على قاعدة الإنتاج. الترجمة الحالية توفر البنية والمفاتيح الأساسية وتبديل الاتجاه، بينما النصوص التاريخية الصلبة في الصفحات القديمة تحتاج دورة ترجمة لاحقة.
+
+### تصحيح تكاملات Part 1
+
+أضيفت إشعارات Push عند منح إنجاز جديد لأول مرة، وعند نشر محلل معتمد لتحليل جديد للمشتركين النشطين، مع عدم تعطيل استجابة الطلب إذا كانت VAPID غير مهيأة. كما أصبح محول اللغة يحفظ اللغة في `localStorage` ويرسلها إلى ملف المستخدم عند وجود جلسة.

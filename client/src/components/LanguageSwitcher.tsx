@@ -1,15 +1,24 @@
 import { useTranslation } from 'react-i18next'
 import { supportedLanguages } from '../i18n'
+import { api } from '../lib/api'
 export function LanguageSwitcher() {
 	const { i18n, t } = useTranslation()
 	const current = i18n.language.split('-')[0]
+	const change = (language: string) => {
+		void i18n.changeLanguage(language)
+		if (localStorage.getItem('borsaty_access_token'))
+			void api('/api/profile', {
+				method: 'PUT',
+				body: JSON.stringify({ language }),
+			}).catch(() => undefined)
+	}
 	return (
 		<label className="language-switcher" title={t('common.language')}>
 			<span aria-hidden="true">🌐</span>
 			<select
 				aria-label={t('common.language')}
 				value={current}
-				onChange={(event) => void i18n.changeLanguage(event.target.value)}
+				onChange={(event) => change(event.target.value)}
 			>
 				{supportedLanguages.map((language) => (
 					<option key={language.code} value={language.code}>

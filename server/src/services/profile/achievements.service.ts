@@ -1,4 +1,5 @@
 import { prisma } from '../../lib/prisma.js'
+import { sendPush } from '../notifications/push.service.js'
 
 const actionToCode: Record<string, string> = {
 	USER_REGISTERED: 'FIRST_LOGIN',
@@ -58,7 +59,10 @@ export async function getAchievementProgress(userId: string) {
 export async function awardAchievement(userId: string, code: string) {
 	const achievement = await prisma.achievement.findUnique({ where: { code } })
 	if (!achievement) return null
-	return prisma.userAchievement.upsert({
+	const existing = await prisma.userAchievement.findUnique({
+		where: { userId_achievementId: { userId, achievementId: achievement.id } },
+	})
+	const result = await prisma.userAchievement.upsert({
 		where: { userId_achievementId: { userId, achievementId: achievement.id } },
 		update: { progress: 100, completed: true, completedAt: new Date() },
 		create: {
@@ -70,6 +74,13 @@ export async function awardAchievement(userId: string, code: string) {
 		},
 		include: { achievement: true },
 	})
+	if (!existing)
+		void sendPush(userId, {
+			title: 'إنجاز جديد في بورصتي',
+			body: `أكملت إنجاز: ${achievement.nameAr}`,
+			link: '/achievements',
+		})
+	return result
 }
 export async function checkAndAward(userId: string, action: string) {
 	const code = actionToCode[action]
