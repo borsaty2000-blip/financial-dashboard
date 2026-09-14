@@ -37,7 +37,7 @@ function Shell({ children }: { children: ReactNode }) {
 		<div className="app-shell" dir="rtl">
 			<header className="topbar">
 				<button className="brand" onClick={() => navigate('/dashboard')}>
-					بورصتي <span>BORSATY</span>
+					<img src="/branding/borsatyai-logo.png" alt="BorsatyAI" />
 				</button>
 				<label className="global-search">
 					<span aria-hidden="true">⌕</span>

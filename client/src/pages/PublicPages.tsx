@@ -500,9 +500,8 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 	return (
 		<header ref={headerRef} className="borsaty-public-header">
 			<button className="borsaty-public-brand" onClick={() => go('/')}>
-				<span>ب</span>
-				<strong>بورصتي</strong>
-				<small>BORSATY</small>
+				<img src="/branding/borsatyai-logo.png" alt="BorsatyAI" />
+				<span className="sr-only">بورصتي</span>
 			</button>
 			<nav className="borsaty-public-nav" aria-label="التنقل الرئيسي">
 				<HeaderMenu
@@ -832,7 +831,7 @@ function PublicFooter() {
 	return (
 		<footer className="borsaty-public-footer">
 			<div className="borsaty-public-footer__intro">
-				<strong>بورصتي</strong>
+				<img src="/branding/borsatyai-logo.png" alt="BorsatyAI" />
 				<p>منصة عربية تعليمية لمتابعة الأسواق والتحليل المالي.</p>
 				<span>بيانات السوق · التحليل التعليمي · تجربة RTL</span>
 			</div>

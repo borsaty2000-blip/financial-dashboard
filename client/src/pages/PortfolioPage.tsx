@@ -47,7 +47,7 @@ export function PortfolioPage() {
 		<main className="tools-page" dir="rtl">
 			<header className="tool-header">
 				<button className="brand" onClick={() => navigate('/')}>
-					بورصتي <span>BORSATY</span>
+					<img src="/branding/borsatyai-logo.png" alt="BorsatyAI" />
 				</button>
 				<nav>
 					<button onClick={() => navigate('/watchlists')}>قوائمي</button>

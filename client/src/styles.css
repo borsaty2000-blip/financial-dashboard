@@ -6211,3 +6211,104 @@ body.dark-mode .analysis-method-card h3 {
 		grid-template-columns: 1fr;
 	}
 }
+
+/* Unified BorsatyAI brand mark across public and analysis surfaces. */
+.borsaty-public-brand {
+	display: flex;
+	min-width: 116px;
+	align-items: center;
+	justify-content: flex-start;
+}
+.borsaty-public-brand img {
+	display: block;
+	width: 112px;
+	height: 54px;
+	object-fit: contain;
+	object-position: center;
+}
+.borsaty-public-footer__intro img {
+	display: block;
+	width: 170px;
+	height: 94px;
+	object-fit: contain;
+	object-position: right center;
+	margin-right: -12px;
+}
+.stock-brand {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 112px;
+	height: 62px;
+	border-radius: 12px;
+	background: rgb(255 255 255 / 78%);
+}
+.stock-brand img {
+	width: 104px;
+	height: 58px;
+	object-fit: contain;
+}
+@media (max-width: 640px) {
+	.borsaty-public-brand {
+		min-width: 82px;
+	}
+	.borsaty-public-brand img {
+		width: 82px;
+		height: 48px;
+	}
+	.borsaty-public-footer__intro img {
+		width: 145px;
+		height: 80px;
+	}
+	.stock-detail-header {
+		flex-wrap: wrap;
+	}
+	.stock-brand {
+		order: -1;
+		width: 92px;
+		height: 52px;
+	}
+	.stock-brand img {
+		width: 86px;
+		height: 48px;
+	}
+}
+
+/* Brand mark sizing for authenticated and mobile shells. */
+.topbar .brand,
+.tool-header .brand {
+	display: flex;
+	align-items: center;
+	padding: 0;
+}
+.topbar .brand img,
+.tool-header .brand img {
+	display: block;
+	width: 104px;
+	height: 52px;
+	object-fit: contain;
+}
+.mobile-logo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+}
+.mobile-logo img {
+	display: block;
+	width: 88px;
+	height: 48px;
+	object-fit: contain;
+}
+@media (max-width: 640px) {
+	.topbar .brand img,
+	.tool-header .brand img {
+		width: 88px;
+		height: 46px;
+	}
+	.mobile-logo img {
+		width: 78px;
+		height: 44px;
+	}
+}

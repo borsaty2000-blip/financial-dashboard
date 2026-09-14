@@ -159,7 +159,7 @@ export default function MobileChrome() {
 					<Menu size={22} />
 				</button>
 				<button className="mobile-logo" onClick={() => navigate('/')}>
-					بورصتي
+					<img src="/branding/borsatyai-logo.png" alt="BorsatyAI" />
 				</button>
 				<div className="mobile-actions">
 					<button
