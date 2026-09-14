@@ -6043,3 +6043,128 @@ body.dark-mode .borsaty-row-analysis {
 		transform: none;
 	}
 }
+
+/* Evidence-led analysis overview panels. */
+.analysis-method-panel,
+.analysis-evidence-panel {
+	margin-top: 34px;
+	padding: 28px;
+	border: 1px solid #dce8ed;
+	border-radius: 20px;
+	background: linear-gradient(135deg, #f7fbfc, #fff);
+	box-shadow: 0 16px 42px rgb(18 53 74 / 6%);
+}
+.analysis-method-panel__lead h2,
+.analysis-evidence-panel h2 {
+	margin: 8px 0;
+	color: #102b3e;
+	font-size: clamp(22px, 3vw, 34px);
+}
+.analysis-method-panel__lead p {
+	max-width: 650px;
+	margin: 0;
+	color: #617680;
+	font-size: 13px;
+	line-height: 1.9;
+}
+.analysis-method-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 12px;
+	margin-top: 24px;
+}
+.analysis-method-card {
+	padding: 17px;
+	border: 1px solid #e0ebef;
+	border-radius: 14px;
+	background: #fff;
+}
+.analysis-method-card > strong {
+	color: #0a89af;
+	font:
+		800 12px 'JetBrains Mono',
+		monospace;
+}
+.analysis-method-card h3 {
+	margin: 18px 0 7px;
+	color: #143446;
+	font-size: 15px;
+}
+.analysis-method-card p {
+	margin: 0;
+	color: #6c7e87;
+	font-size: 11px;
+	line-height: 1.8;
+}
+.analysis-evidence-panel {
+	display: grid;
+	grid-template-columns: 0.8fr 1.2fr;
+	gap: 24px;
+	background: #0b2b3d;
+	color: #fff;
+}
+.analysis-evidence-panel h2 {
+	color: #fff;
+}
+.analysis-evidence-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+}
+.analysis-evidence-grid span {
+	padding: 12px;
+	border: 1px solid rgb(164 222 232 / 18%);
+	border-radius: 10px;
+	background: rgb(255 255 255 / 5%);
+	color: #b7ced5;
+	font-size: 11px;
+}
+.analysis-evidence-grid b {
+	display: block;
+	margin-bottom: 4px;
+	color: #f2c75c;
+}
+.analysis-method-actions {
+	display: flex;
+	grid-column: 1 / -1;
+	align-items: center;
+	gap: 16px;
+	margin-top: 2px;
+}
+.analysis-evidence-panel .borsaty-text-button {
+	color: #bfeaf0;
+}
+body.dark-mode .analysis-method-panel {
+	border-color: #294858;
+	background: linear-gradient(135deg, #102e3d, #0d2634);
+}
+body.dark-mode .analysis-method-card {
+	border-color: #294858;
+	background: #13394a;
+}
+body.dark-mode .analysis-method-panel__lead h2,
+body.dark-mode .analysis-method-card h3 {
+	color: #e4f3f6;
+}
+@media (max-width: 720px) {
+	.analysis-method-panel,
+	.analysis-evidence-panel {
+		padding: 20px;
+	}
+	.analysis-method-grid,
+	.analysis-evidence-panel {
+		grid-template-columns: 1fr;
+	}
+	.analysis-evidence-grid {
+		grid-template-columns: 1fr 1fr;
+	}
+	.analysis-method-actions {
+		align-items: stretch;
+		flex-direction: column;
+	}
+}
+@media (max-width: 420px) {
+	.analysis-evidence-grid {
+		grid-template-columns: 1fr;
+	}
+}

@@ -1289,6 +1289,100 @@ export function AnalysisOverviewPage({
 						فتح التحليل
 					</button>
 				</div>
+				<section className="analysis-method-panel">
+					<div className="analysis-method-panel__lead">
+						<span className="borsaty-kicker">منهجية قابلة للمراجعة</span>
+						<h2>كيف نبني قراءة السهم؟</h2>
+						<p>
+							لا نعتمد على إشارة واحدة. نعرض كل محرك منفصلاً، ثم نقارن نقاط
+							الاتفاق والاختلاف قبل تكوين صورة تعليمية متوازنة.
+						</p>
+					</div>
+					<div className="analysis-method-grid">
+						{(isElliott
+							? [
+									[
+										'01',
+										'هيكل الموجات',
+										'قراءة الموجة الحالية والاتجاه والسيناريو البديل.',
+									],
+									[
+										'02',
+										'السياق السعري',
+										'مقارنة الحركة مع الشموع المتاحة، لا مع افتراضات غير موجودة.',
+									],
+									[
+										'03',
+										'الثقة التعليمية',
+										'عرض درجة الثقة كاحتمال تحليلي لا كضمان للنتيجة.',
+									],
+								]
+							: [
+									[
+										'01',
+										'الزوايا والدورات',
+										'قراءة الزوايا الزمنية والسعرية ضمن السلسلة المتاحة.',
+									],
+									[
+										'02',
+										'المستويات',
+										'استخراج الدعم والمقاومة عندما تسمح البيانات بذلك.',
+									],
+									[
+										'03',
+										'السيناريوهات',
+										'تحديد مناطق المراجعة بدلاً من تقديم هدف قطعي.',
+									],
+								]
+						).map(([number, title, text]) => (
+							<div className="analysis-method-card" key={number}>
+								<strong>{number}</strong>
+								<h3>{title}</h3>
+								<p>{text}</p>
+							</div>
+						))}
+					</div>
+				</section>
+				<section className="analysis-evidence-panel">
+					<div>
+						<span className="borsaty-kicker">مصفوفة الأدلة</span>
+						<h2>من الإشارة إلى القرار القابل للمراجعة</h2>
+					</div>
+					<div className="analysis-evidence-grid">
+						<span>
+							<b>المؤشرات</b> RSI · MACD · SMA
+						</span>
+						<span>
+							<b>الموجات</b> Elliott Wave
+						</span>
+						<span>
+							<b>الزوايا</b> Gann
+						</span>
+						<span>
+							<b>المخاطر</b> Volatility · VaR · Sharpe
+						</span>
+						<span>
+							<b>الاختبار</b> Win rate · Drawdown
+						</span>
+						<span>
+							<b>التوقع</b> ARIMA · LSTM
+						</span>
+					</div>
+					<div className="analysis-method-actions">
+						<button
+							className="borsaty-solid-button"
+							onClick={() => navigate('/stock/COMI')}
+						>
+							شاهد لوحة التحليل المدمج ←
+						</button>
+						<button
+							className="borsaty-text-button"
+							onClick={() => navigate('/backtest')}
+						>
+							اختبر الفرضية تاريخياً
+						</button>
+					</div>
+				</section>
 				<div className="borsaty-empty-state is-warning">
 					<strong>تنبيه مهم</strong>
 					<p>
