@@ -159,6 +159,7 @@ export function AlertsPage() {
 	const [target, setTarget] = useState('100')
 	const [condition, setCondition] = useState('ABOVE')
 	const [notifications, setNotifications] = useState<Notification[]>([])
+	const [phone, setPhone] = useState('')
 	const [loading, setLoading] = useState(true)
 	async function load() {
 		setLoading(true)
@@ -182,6 +183,16 @@ export function AlertsPage() {
 			body: JSON.stringify({ symbol, condition, targetValue: Number(target) }),
 		})
 		void load()
+	}
+	async function sendWhatsApp() {
+		if (!phone) return
+		await api('/api/alerts/whatsapp', {
+			method: 'POST',
+			body: JSON.stringify({
+				to: phone,
+				message: `تنبيه بورصتي: ${symbol} ${condition} ${target}`,
+			}),
+		})
 	}
 	return (
 		<main className="tools-page" dir="rtl">
@@ -219,6 +230,14 @@ export function AlertsPage() {
 					/>
 					<button className="primary-button" onClick={create}>
 						إنشاء تنبيه
+					</button>
+					<input
+						placeholder="رقم WhatsApp"
+						value={phone}
+						onChange={(event) => setPhone(event.target.value)}
+					/>
+					<button className="secondary-button" onClick={sendWhatsApp}>
+						إرسال عبر WhatsApp
 					</button>
 				</div>
 				{loading ? (
