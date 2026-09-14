@@ -6,6 +6,8 @@ const hasProviderCredentials = [
 	'SAHMK_API_KEY',
 	'FINNHUB_API_KEY',
 ].every(configured)
+const runExternalProviderTests =
+	hasProviderCredentials && process.env.RUN_LIVE_PROVIDER_TESTS === 'true'
 
 async function request(url: string, init?: RequestInit) {
 	const response = await fetch(url, {
@@ -18,7 +20,7 @@ async function request(url: string, init?: RequestInit) {
 	}
 }
 
-describe.runIf(hasProviderCredentials)(
+describe.runIf(runExternalProviderTests)(
 	'live market provider credentials',
 	() => {
 		it('receives all configured provider keys in the test environment', () => {

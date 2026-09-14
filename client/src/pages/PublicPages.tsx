@@ -24,6 +24,24 @@ type NewsItem = {
 	category?: string
 }
 
+type LiveIndex = {
+	value: number | null
+	changePercent: number | null
+	freshness: 'live' | 'delayed' | 'cached' | 'unavailable'
+	available: boolean
+}
+
+type UnifiedLive = {
+	indices?: Record<string, LiveIndex>
+	companies?: Array<{
+		symbol: string
+		name: string
+		currency?: string
+		available?: boolean
+	}>
+	news?: NewsItem[]
+}
+
 const numberFrom = (value: unknown, keys: string[]): number | undefined => {
 	if (typeof value === 'number' && Number.isFinite(value)) return value
 	if (!value || typeof value !== 'object') return undefined
@@ -99,7 +117,7 @@ function MarketMetric({ card }: { card: MarketCard }) {
 				}`}
 			>
 				{card.change == null
-					? 'البيانات غير متاحة حالياً'
+					? '—'
 					: `${card.change > 0 ? '+' : ''}${card.change.toFixed(2)}%`}
 			</div>
 		</article>
@@ -107,6 +125,9 @@ function MarketMetric({ card }: { card: MarketCard }) {
 }
 
 function PublicHeader() {
+	const [openMenu, setOpenMenu] = useState<string | null>(null)
+	const toggle = (menu: string) =>
+		setOpenMenu((current) => (current === menu ? null : menu))
 	return (
 		<header className="borsaty-public-header">
 			<button className="borsaty-public-brand" onClick={() => navigate('/')}>
@@ -114,11 +135,53 @@ function PublicHeader() {
 				<strong>بورصتي</strong>
 				<small>BORSATY</small>
 			</button>
-			<nav aria-label="التنقل الرئيسي">
-				<button onClick={() => navigate('/markets/egx')}>السوق المصري</button>
-				<button onClick={() => navigate('/markets/tasi')}>السوق السعودي</button>
-				<button onClick={() => navigate('/analysis/elliott')}>التحليل</button>
-				<button onClick={() => navigate('/strategies')}>الاستراتيجيات</button>
+			<nav className="borsaty-public-nav" aria-label="التنقل الرئيسي">
+				<div className="public-nav-group">
+					<button
+						onClick={() => toggle('markets')}
+						aria-expanded={openMenu === 'markets'}
+					>
+						الأسواق <span>⌄</span>
+					</button>
+					{openMenu === 'markets' && (
+						<div className="public-dropdown">
+							<button onClick={() => navigate('/markets/egx')}>
+								البورصة المصرية
+							</button>
+							<button onClick={() => navigate('/markets/tasi')}>
+								السوق السعودي
+							</button>
+							<button onClick={() => navigate('/markets/commodities')}>
+								الذهب والفضة
+							</button>
+							<button onClick={() => navigate('/screener')}>فاحص الأسهم</button>
+						</div>
+					)}
+				</div>
+				<div className="public-nav-group">
+					<button
+						onClick={() => toggle('analysis')}
+						aria-expanded={openMenu === 'analysis'}
+					>
+						التحليل <span>⌄</span>
+					</button>
+					{openMenu === 'analysis' && (
+						<div className="public-dropdown">
+							<button onClick={() => navigate('/analysis/elliott')}>
+								Elliott Wave
+							</button>
+							<button onClick={() => navigate('/analysis/gann')}>Gann</button>
+							<button onClick={() => navigate('/backtest')}>
+								الاختبار التاريخي
+							</button>
+							<button onClick={() => navigate('/strategies')}>
+								منشئ الاستراتيجيات
+							</button>
+						</div>
+					)}
+				</div>
+				<button onClick={() => navigate('/news')}>الأخبار</button>
+				<button onClick={() => navigate('/education')}>التعليم</button>
 			</nav>
 			<div className="borsaty-public-actions">
 				<button
@@ -162,18 +225,27 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 	const [egx, setEgx] = useState<MarketEnvelope | null>(null)
 	const [tasi, setTasi] = useState<MarketEnvelope | null>(null)
 	const [news, setNews] = useState<NewsItem[]>([])
+	const [live, setLive] = useState<UnifiedLive | null>(null)
 
 	useEffect(() => {
 		let active = true
 		void Promise.all([
+			safeJson<UnifiedLive>('/api/v1/market/live'),
 			safeJson<MarketEnvelope>('/api/market/egx/summary'),
 			safeJson<MarketEnvelope>('/api/market/tasi/summary'),
 			safeJson<{ data?: NewsItem[] }>('/api/news?limit=6'),
-		]).then(([nextEgx, nextTasi, nextNews]) => {
+		]).then(([nextLive, nextEgx, nextTasi, nextNews]) => {
 			if (!active) return
+			setLive(nextLive)
 			setEgx(nextEgx)
 			setTasi(nextTasi)
-			setNews(Array.isArray(nextNews?.data) ? nextNews.data.slice(0, 6) : [])
+			setNews(
+				Array.isArray(nextLive?.news)
+					? nextLive.news.slice(0, 6)
+					: Array.isArray(nextNews?.data)
+						? nextNews.data.slice(0, 6)
+						: [],
+			)
 		})
 		return () => {
 			active = false
@@ -181,6 +253,31 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 	}, [])
 
 	const cards = useMemo<MarketCard[]>(() => {
+		if (live?.indices) {
+			const labels: Array<[string, string, string]> = [
+				['egx30', 'EGX30', 'السوق المصري'],
+				['egx70', 'EGX70', 'السوق المصري'],
+				['egx100', 'EGX100', 'السوق المصري'],
+				['tasi', 'TASI', 'السوق السعودي'],
+				['gold', 'GOLD', 'الذهب'],
+				['silver', 'SILVER', 'الفضة'],
+			]
+			return labels.map(([key, label, caption]) => {
+				const item = live.indices?.[key]
+				return {
+					label,
+					caption,
+					value: item?.value ?? undefined,
+					change: item?.changePercent ?? undefined,
+					status:
+						item?.available && item.freshness === 'live'
+							? 'live'
+							: item?.available
+								? 'cached'
+								: 'unavailable',
+				}
+			})
+		}
 		const egxData = egx?.data
 		const tasiData = tasi?.data
 		const tasiValue = numberFrom(tasiData, [
@@ -245,7 +342,7 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 				status: egx?.available && silver ? toStatus(egx) : 'unavailable',
 			},
 		]
-	}, [egx, tasi])
+	}, [egx, live, tasi])
 
 	const heroTitle =
 		focus === 'EGX'
@@ -400,6 +497,35 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 						<div className="borsaty-empty-state">
 							<strong>لا توجد أخبار متاحة الآن</strong>
 							<p>سيتم عرض الأخبار تلقائياً عند عودة الخدمة.</p>
+						</div>
+					)}
+				</section>
+
+				<section className="borsaty-section">
+					<div className="borsaty-section__heading">
+						<div>
+							<span className="borsaty-kicker">دليل السوق</span>
+							<h2>أسهم EGX المتاحة</h2>
+						</div>
+						<span>{live?.companies?.length ?? 0} شركة</span>
+					</div>
+					{live?.companies?.length ? (
+						<div className="borsaty-company-grid">
+							{live.companies.slice(0, 40).map((company) => (
+								<button
+									key={company.symbol}
+									onClick={() => navigate(`/stock/${company.symbol}`)}
+								>
+									<b>{company.symbol}</b>
+									<span>{company.name}</span>
+									<small>السعر — حتى تتوفر شمعة موثوقة</small>
+								</button>
+							))}
+						</div>
+					) : (
+						<div className="borsaty-empty-state">
+							<strong>دليل الشركات غير متاح حالياً</strong>
+							<p>لن يتم عرض أسماء أو أسعار تجريبية.</p>
 						</div>
 					)}
 				</section>

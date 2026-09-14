@@ -4337,3 +4337,269 @@ html[dir='rtl'] body {
 		transition-duration: 0.01ms !important;
 	}
 }
+
+.borsaty-public-nav {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.public-nav-group {
+	position: relative;
+}
+
+.borsaty-public-nav > button,
+.public-nav-group > button {
+	padding: 9px 11px;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	color: #5c7480;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.borsaty-public-nav > button:hover,
+.public-nav-group > button:hover,
+.public-nav-group > button[aria-expanded='true'] {
+	background: #eaf5fa;
+	color: #0878ae;
+}
+
+.public-dropdown {
+	position: absolute;
+	z-index: 30;
+	top: calc(100% + 8px);
+	right: 0;
+	display: grid;
+	min-width: 205px;
+	gap: 4px;
+	padding: 8px;
+	border: 1px solid #d6e5eb;
+	border-radius: 13px;
+	background: #fff;
+	box-shadow: 0 18px 40px rgb(18 53 74 / 15%);
+}
+
+.public-dropdown button {
+	padding: 10px 12px;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	color: #294654;
+	font-size: 12px;
+	text-align: right;
+	cursor: pointer;
+}
+
+.public-dropdown button:hover {
+	background: #eff8fb;
+	color: #0878ae;
+}
+
+.borsaty-company-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 10px;
+}
+
+.borsaty-company-grid button {
+	display: flex;
+	min-height: 115px;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+	padding: 14px;
+	border: 1px solid #dce7ec;
+	border-radius: 12px;
+	background: #fff;
+	color: #264452;
+	text-align: right;
+	cursor: pointer;
+	transition: 150ms ease;
+}
+
+.borsaty-company-grid button:hover {
+	transform: translateY(-2px);
+	border-color: #84c5dd;
+	box-shadow: 0 12px 25px rgb(18 53 74 / 9%);
+}
+
+.borsaty-company-grid b {
+	font:
+		800 14px 'JetBrains Mono',
+		monospace;
+	color: #0878ae;
+}
+
+.borsaty-company-grid span {
+	font-size: 11px;
+	line-height: 1.5;
+}
+
+.borsaty-company-grid small {
+	margin-top: auto;
+	color: #8999a1;
+	font-size: 9px;
+}
+
+.ai-assistant-widget {
+	position: fixed;
+	z-index: 80;
+	right: 22px;
+	bottom: 22px;
+}
+
+.ai-assistant-fab {
+	padding: 13px 17px;
+	border: 0;
+	border-radius: 999px;
+	background: #123c4e;
+	box-shadow: 0 14px 34px rgb(18 60 78 / 25%);
+	color: #fff;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.ai-assistant-panel {
+	position: absolute;
+	right: 0;
+	bottom: 58px;
+	display: flex;
+	width: min(380px, calc(100vw - 28px));
+	height: min(600px, calc(100vh - 120px));
+	flex-direction: column;
+	overflow: hidden;
+	border: 1px solid #cfe0e7;
+	border-radius: 18px;
+	background: #f7fbfc;
+	box-shadow: 0 24px 60px rgb(18 53 74 / 22%);
+}
+
+.ai-assistant-panel > header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 15px 17px;
+	background: #123c4e;
+	color: #fff;
+}
+
+.ai-assistant-panel > header div {
+	display: grid;
+	gap: 4px;
+}
+
+.ai-assistant-panel > header small {
+	color: #b9d5df;
+	font-size: 10px;
+}
+
+.ai-assistant-panel > header button {
+	border: 0;
+	background: transparent;
+	color: #fff;
+	font-size: 22px;
+	cursor: pointer;
+}
+
+.ai-assistant-messages {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 10px;
+	overflow: auto;
+	padding: 14px;
+}
+
+.ai-assistant-welcome,
+.ai-message {
+	padding: 11px 13px;
+	border-radius: 12px;
+	background: #fff;
+	color: #38515e;
+	font-size: 12px;
+	line-height: 1.8;
+}
+
+.ai-assistant-welcome > div {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 10px;
+}
+
+.ai-assistant-welcome button {
+	padding: 6px 9px;
+	border: 1px solid #cce1e9;
+	border-radius: 8px;
+	background: #f1f9fb;
+	color: #0878ae;
+	font-size: 10px;
+	cursor: pointer;
+}
+
+.ai-message.user {
+	align-self: flex-start;
+	background: #e3f3f8;
+}
+
+.ai-message p {
+	margin: 0;
+}
+
+.ai-result-card {
+	display: grid;
+	gap: 6px;
+	margin-top: 9px;
+	padding: 9px;
+	border-radius: 9px;
+	background: #edf7f9;
+}
+
+.ai-result-card span,
+.ai-result-card small {
+	color: #53717d;
+	font-size: 10px;
+}
+
+.ai-assistant-panel form {
+	display: flex;
+	gap: 7px;
+	padding: 12px;
+	border-top: 1px solid #dce9ed;
+	background: #fff;
+}
+
+.ai-assistant-panel form input {
+	min-width: 0;
+	flex: 1;
+	padding: 10px;
+	border: 1px solid #cbdde4;
+	border-radius: 9px;
+	font: inherit;
+}
+
+.ai-assistant-panel form button {
+	padding: 0 13px;
+	border: 0;
+	border-radius: 9px;
+	background: #0878ae;
+	color: #fff;
+	cursor: pointer;
+}
+
+@media (max-width: 800px) {
+	.borsaty-public-nav {
+		display: none;
+	}
+
+	.borsaty-company-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.ai-assistant-widget {
+		right: 12px;
+		bottom: 74px;
+	}
+}

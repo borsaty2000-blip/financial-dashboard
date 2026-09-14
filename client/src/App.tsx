@@ -65,6 +65,7 @@ import { SecuritySettingsPage } from './pages/SecuritySettingsPage'
 import { EducationPage } from './pages/EducationPages'
 import { VoiceAssistantWidget } from './components/VoiceAssistantWidget'
 import { LiveChatWidget } from './components/LiveChatWidget'
+import AIAssistantWidget from './components/AIAssistantWidget'
 import { HelpPage, SupportPage, TicketsPage } from './pages/SupportPages'
 import { RegionalSettingsPage } from './pages/RegionalSettingsPage'
 import {
@@ -376,6 +377,7 @@ export function App() {
 					<NotificationLive />
 					<LiveAnalysisFeed />
 					<VoiceAssistantWidget />
+					<AIAssistantWidget />
 					<LiveChatWidget />
 				</ToastProvider>
 			</AuthProvider>

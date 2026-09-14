@@ -4,11 +4,19 @@ import { api } from '../lib/api'
 export function NewsPage() {
 	const [filters, setFilters] = useState({ category: '', symbol: '' })
 	const [items, setItems] = useState<any[]>([])
+	const [loading, setLoading] = useState(true)
+	const [error, setError] = useState('')
 	useEffect(() => {
+		setLoading(true)
+		setError('')
 		const q = new URLSearchParams(filters)
 		void api<{ data: any[] }>(`/api/news?${q}`)
-			.then((result) => setItems(result.data))
-			.catch(() => setItems([]))
+			.then((result) => setItems(Array.isArray(result.data) ? result.data : []))
+			.catch(() => {
+				setItems([])
+				setError('تعذر تحميل الأخبار من المصادر الحالية.')
+			})
+			.finally(() => setLoading(false))
 	}, [filters])
 	return (
 		<main className="analysis-page news-page" dir="rtl">
@@ -59,7 +67,9 @@ export function NewsPage() {
 					</article>
 				))}
 			</section>
-			{!items.length && (
+			{loading && <div className="analysis-card">جارٍ تحميل الأخبار...</div>}
+			{error && !loading && <div className="analysis-error">{error}</div>}
+			{!loading && !error && !items.length && (
 				<div className="analysis-card">
 					لا تتوفر أخبار من المصادر الحالية حالياً.
 				</div>
