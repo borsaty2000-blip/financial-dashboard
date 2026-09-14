@@ -5122,7 +5122,7 @@ body.dark-mode .borsaty-public-header .public-dropdown button:focus-visible {
 
 /* Interactive market-terminal mega menus */
 .public-mega-menu {
-	width: min(680px, calc(100vw - 32px));
+	width: min(760px, calc(100vw - 32px));
 	padding: 14px;
 }
 
@@ -5141,6 +5141,7 @@ body.dark-mode .borsaty-public-header .public-dropdown button:focus-visible {
 
 .public-menu-intro {
 	display: grid;
+	min-height: 190px;
 	align-content: start;
 	gap: 8px;
 	padding: 14px;
@@ -5311,6 +5312,12 @@ body.dark-mode .borsaty-public-header .public-dropdown button:focus-visible {
 	background: #075d83;
 }
 
+.public-menu-all-link:focus-visible,
+.public-menu-cta:focus-visible {
+	outline: 3px solid rgb(36 155 202 / 38%);
+	outline-offset: 2px;
+}
+
 .public-news-menu > .public-menu-all-link {
 	grid-column: 1 / -1;
 	text-align: center;
@@ -5351,7 +5358,7 @@ body.dark-mode .public-news-menu-list button:focus-visible {
 @media (max-width: 800px) {
 	.public-mega-menu {
 		right: -16px;
-		width: min(620px, calc(100vw - 24px));
+		width: min(680px, calc(100vw - 24px));
 	}
 }
 

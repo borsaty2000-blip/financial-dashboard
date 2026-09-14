@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { navigate } from '../router'
 import { formatEnglishNumber, formatEnglishPercent } from '../lib/format'
@@ -379,6 +379,7 @@ function HeaderMenu({
 				}}
 				aria-expanded={isOpen}
 				aria-haspopup="menu"
+				aria-controls={`public-menu-${id}`}
 			>
 				{label}{' '}
 				<span className="public-nav-chevron" aria-hidden="true">
@@ -386,7 +387,11 @@ function HeaderMenu({
 				</span>
 			</button>
 			{isOpen && (
-				<div className="public-dropdown public-mega-menu" role="menu">
+				<div
+					id={`public-menu-${id}`}
+					className="public-dropdown public-mega-menu"
+					role="menu"
+				>
 					{children}
 				</div>
 			)}
@@ -424,6 +429,7 @@ function MenuLink({
 
 function PublicHeader({ live, news }: PublicHeaderProps) {
 	const [openMenu, setOpenMenu] = useState<string | null>(null)
+	const headerRef = useRef<HTMLElement | null>(null)
 	const toggle = (menu: string) =>
 		setOpenMenu((current) => (current === menu ? null : menu))
 	const go = (path: string) => {
@@ -434,15 +440,27 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 		const closeOnEscape = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') setOpenMenu(null)
 		}
+		const closeOnOutsidePress = (event: PointerEvent) => {
+			if (
+				headerRef.current &&
+				!headerRef.current.contains(event.target as Node)
+			) {
+				setOpenMenu(null)
+			}
+		}
 		document.addEventListener('keydown', closeOnEscape)
-		return () => document.removeEventListener('keydown', closeOnEscape)
+		document.addEventListener('pointerdown', closeOnOutsidePress)
+		return () => {
+			document.removeEventListener('keydown', closeOnEscape)
+			document.removeEventListener('pointerdown', closeOnOutsidePress)
+		}
 	}, [])
 
 	const indices = live?.indices ?? {}
 	const egxCount = live?.directories?.egx?.length ?? 0
 	const tasiCount = live?.directories?.tasi?.length ?? 0
 	return (
-		<header className="borsaty-public-header">
+		<header ref={headerRef} className="borsaty-public-header">
 			<button className="borsaty-public-brand" onClick={() => go('/')}>
 				<span>ب</span>
 				<strong>بورصتي</strong>
@@ -468,6 +486,12 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 									<b>{tasiCount || '—'}</b> TASI
 								</span>
 							</div>
+							<button
+								className="public-menu-cta"
+								onClick={() => go('/markets/egx')}
+							>
+								فتح مركز الأسواق ←
+							</button>
 						</div>
 						<div className="public-menu-links">
 							<MenuLink
@@ -525,6 +549,12 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 							<div className="public-menu-feature">
 								Elliott · Gann · RSI · Backtest
 							</div>
+							<button
+								className="public-menu-cta"
+								onClick={() => go('/analysis/elliott')}
+							>
+								فتح مركز التحليل ←
+							</button>
 						</div>
 						<div className="public-menu-links">
 							<MenuLink
@@ -661,6 +691,12 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 							<span className="public-menu-eyebrow">أكاديمية بورصتي</span>
 							<strong>تعلّم بإيقاعك</strong>
 							<p>محتوى عربي لفهم السوق وإدارة الفرضيات والمخاطر.</p>
+							<button
+								className="public-menu-cta"
+								onClick={() => go('/education')}
+							>
+								ابدأ رحلة التعلم ←
+							</button>
 						</div>
 						<div className="public-menu-links">
 							<MenuLink
