@@ -44,6 +44,7 @@ import { PortfolioAnalyticsPage } from './pages/PortfolioAnalyticsPage'
 import { SpecializedCalendarsPage } from './pages/SpecializedCalendarsPage'
 import { AdditionalMarketsPage } from './pages/AdditionalMarketsPage'
 import { CurrencyConverter } from './components/CurrencyConverter'
+import { ComprehensiveComparisonPage } from './pages/ComprehensiveComparisonPage'
 import NotificationLive from './components/NotificationLive'
 import { LiveAnalysisFeed } from './components/Analysis/LiveAnalysisFeed'
 
@@ -120,6 +121,16 @@ function RoutedApp() {
 	if (path === '/markets/crypto') return <AdditionalMarketsPage kind="crypto" />
 	if (path === '/markets/etf') return <AdditionalMarketsPage kind="etf" />
 	if (path === '/markets/bonds') return <AdditionalMarketsPage kind="bonds" />
+	if (path === '/compare/sectors')
+		return <ComprehensiveComparisonPage kind="sectors" />
+	if (path === '/compare/periods')
+		return <ComprehensiveComparisonPage kind="periods" />
+	if (path === '/compare/watchlist')
+		return (
+			<ProtectedRoute>
+				<ComprehensiveComparisonPage kind="watchlist" />
+			</ProtectedRoute>
+		)
 	if (path === '/news') return <NewsPage />
 	if (path === '/screener') return <AdvancedScreenerPage />
 	if (path === '/portfolio/analytics')

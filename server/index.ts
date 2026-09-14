@@ -40,6 +40,7 @@ import {
 	additionalMarketsRoutes,
 	currencyRoutes,
 } from './src/routes/additional-markets.routes.js'
+import { comprehensiveComparisonRoutes } from './src/routes/comprehensive-comparison.routes.js'
 
 const app = express()
 app.use(express.json())
@@ -112,6 +113,7 @@ app.use('/api/calendar', calendarRoutes)
 app.use('/api/calendar', specializedCalendarRoutes)
 app.use('/api/market', additionalMarketsRoutes)
 app.use('/api/tools', currencyRoutes)
+app.use('/api/comparison', comprehensiveComparisonRoutes)
 app.use('/api/news', newsRoutes)
 app.use('/api/screener', screenerRoutes)
 app.use('/api/analysis', analysisRoutes)
