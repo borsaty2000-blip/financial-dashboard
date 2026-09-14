@@ -8,33 +8,35 @@ datasource db {
 }
 
 model User {
-  id             String            @id @default(uuid())
-  email          String            @unique
-  username       String            @unique
-  passwordHash   String
-  fullName       String?
-  avatarUrl      String?
-  bio            String?           @db.VarChar(500)
-  country        String?           @default("EG")
-  language       String            @default("ar")
-  isVerified     Boolean           @default(false)
-  isActive       Boolean           @default(true)
-  lastLoginAt    DateTime?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  preference     UserPreference?
-  achievements   UserAchievement[]
-  sessions       Session[]
-  passwordResets PasswordReset[]
-  following      Follow[]          @relation("Following")
-  followers      Follow[]          @relation("Followers")
-  watchlists     Watchlist[]
-  priceAlerts    PriceAlert[]
-  notifications  Notification[]
-  portfolio      Portfolio?
-  orders         Order[]
-  apiKeys        ApiKey[]
-  analystProfile AnalystProfile?
+  id                   String                @id @default(uuid())
+  email                String                @unique
+  username             String                @unique
+  passwordHash         String
+  fullName             String?
+  avatarUrl            String?
+  bio                  String?               @db.VarChar(500)
+  country              String?               @default("EG")
+  language             String                @default("ar")
+  isVerified           Boolean               @default(false)
+  isActive             Boolean               @default(true)
+  lastLoginAt          DateTime?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  preference           UserPreference?
+  achievements         UserAchievement[]
+  sessions             Session[]
+  passwordResets       PasswordReset[]
+  following            Follow[]              @relation("Following")
+  followers            Follow[]              @relation("Followers")
+  watchlists           Watchlist[]
+  priceAlerts          PriceAlert[]
+  notifications        Notification[]
+  portfolio            Portfolio?
+  orders               Order[]
+  apiKeys              ApiKey[]
+  analystProfile       AnalystProfile?
+  analystSubscriptions AnalystSubscription[] @relation("Subscriber")
+  analystSubscribers   AnalystSubscription[] @relation("Analyst")
 
   @@index([email])
   @@index([username])
@@ -263,4 +265,18 @@ model AnalystProfile {
   updatedAt   DateTime @updatedAt
 
   @@map("analyst_profiles")
+}
+
+model AnalystSubscription {
+  id           String   @id @default(uuid())
+  subscriberId String
+  analystId    String
+  subscriber   User     @relation("Subscriber", fields: [subscriberId], references: [id], onDelete: Cascade)
+  analyst      User     @relation("Analyst", fields: [analystId], references: [id], onDelete: Cascade)
+  status       String   @default("ACTIVE")
+  createdAt    DateTime @default(now())
+
+  @@unique([subscriberId, analystId])
+  @@index([analystId])
+  @@map("analyst_subscriptions")
 }
