@@ -53,6 +53,11 @@ import { voiceRoutes } from './src/routes/voice.routes.js'
 import { enterpriseRoutes } from './src/routes/enterprise.routes.js'
 import { referralsRoutes } from './src/routes/referrals.routes.js'
 import { blogRoutes } from './src/routes/blog.routes.js'
+import { supportRoutes } from './src/routes/support.routes.js'
+import { attachLiveChatSocket } from './src/services/support/live-chat.service.js'
+import { regionalRoutes } from './src/routes/regional.routes.js'
+import { seoRoutes } from './src/routes/seo.routes.js'
+import { marketingRoutes } from './src/routes/marketing.routes.js'
 
 const app = express()
 app.use(express.json())
@@ -110,6 +115,7 @@ app.get('/api/financial-report', (_request, response) =>
 app.get('/api/health', (_request, response) =>
 	response.json({ ok: true, service: 'financial-dashboard-api' }),
 )
+app.use('/', seoRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/market', marketRoutes)
 app.use('/api/fundamentals', fundamentalsRoutes)
@@ -145,6 +151,9 @@ app.use('/api', voiceRoutes)
 app.use('/api', enterpriseRoutes)
 app.use('/api', referralsRoutes)
 app.use('/api', blogRoutes)
+app.use('/api', supportRoutes)
+app.use('/api', regionalRoutes)
+app.use('/api', marketingRoutes)
 app.use('/api', telegramRoutes)
 app.use('/api/analysts', analystsRoutes)
 app.use(
@@ -159,7 +168,8 @@ export default app
 if (!process.env.VERCEL) {
 	startAlertChecker()
 	const httpServer = createServer(app)
-	attachSignalSocket(httpServer)
+	const socketServer = attachSignalSocket(httpServer)
+	attachLiveChatSocket(socketServer)
 	httpServer.listen(port, () =>
 		console.log(`Server running at http://localhost:${port}`),
 	)
