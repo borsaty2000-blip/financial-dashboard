@@ -57,6 +57,15 @@ import { LiveAnalysisFeed } from './components/Analysis/LiveAnalysisFeed'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { NotificationSettingsPage } from './pages/NotificationSettingsPage'
 import { SecuritySettingsPage } from './pages/SecuritySettingsPage'
+import { EducationPage } from './pages/EducationPages'
+import { VoiceAssistantWidget } from './components/VoiceAssistantWidget'
+import {
+	BlogPage,
+	CommunityPage,
+	EnterprisePage,
+	ReferralPage,
+	VideoLibraryPage,
+} from './pages/MarketLeadershipPages'
 
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
@@ -146,6 +155,58 @@ function RoutedApp() {
 				<SecuritySettingsPage />
 			</ProtectedRoute>
 		)
+	if (path === '/education') return <EducationPage />
+	if (path === '/education/my-courses')
+		return (
+			<ProtectedRoute>
+				<EducationPage mode="my" />
+			</ProtectedRoute>
+		)
+	if (path === '/education/certificates')
+		return (
+			<ProtectedRoute>
+				<EducationPage mode="certificates" />
+			</ProtectedRoute>
+		)
+	if (path.startsWith('/education/') && path.includes('/lessons/'))
+		return (
+			<ProtectedRoute>
+				<EducationPage mode="lesson" id={path.split('/lessons/')[1] ?? ''} />
+			</ProtectedRoute>
+		)
+	if (path.startsWith('/education/'))
+		return <EducationPage mode="course" id={path.slice('/education/'.length)} />
+	if (path === '/community') return <CommunityPage />
+	if (path === '/community/leaderboard')
+		return <CommunityPage mode="leaderboard" />
+	if (path.startsWith('/community/topics/'))
+		return (
+			<CommunityPage
+				mode="topic"
+				id={path.slice('/community/topics/'.length)}
+			/>
+		)
+	if (path === '/community/categories' || path === '/community/new')
+		return <CommunityPage />
+	if (path === '/videos') return <VideoLibraryPage />
+	if (path.startsWith('/videos/'))
+		return <VideoLibraryPage id={path.slice('/videos/'.length)} />
+	if (path === '/webinars') return <VideoLibraryPage webinars />
+	if (
+		path === '/enterprise' ||
+		path === '/enterprise/apply' ||
+		path === '/organization/dashboard'
+	)
+		return <EnterprisePage />
+	if (path === '/referrals')
+		return (
+			<ProtectedRoute>
+				<ReferralPage />
+			</ProtectedRoute>
+		)
+	if (path === '/blog') return <BlogPage />
+	if (path.startsWith('/blog/'))
+		return <BlogPage slug={path.slice('/blog/'.length)} />
 	if (path === '/twin')
 		return (
 			<ProtectedRoute>
@@ -239,6 +300,7 @@ export function App() {
 					<InstallPrompt />
 					<NotificationLive />
 					<LiveAnalysisFeed />
+					<VoiceAssistantWidget />
 				</ToastProvider>
 			</AuthProvider>
 		</ErrorBoundary>

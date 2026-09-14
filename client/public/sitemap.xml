@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://borsatyai.com/</loc></url>
+  <url><loc>https://borsatyai.com/education</loc></url>
+  <url><loc>https://borsatyai.com/community</loc></url>
+  <url><loc>https://borsatyai.com/videos</loc></url>
+  <url><loc>https://borsatyai.com/webinars</loc></url>
+  <url><loc>https://borsatyai.com/enterprise</loc></url>
+  <url><loc>https://borsatyai.com/blog</loc></url>
+  <url><loc>https://borsatyai.com/compare</loc></url>
+  <url><loc>https://borsatyai.com/markets/forex</loc></url>
+  <url><loc>https://borsatyai.com/markets/commodities</loc></url>
+  <url><loc>https://borsatyai.com/markets/crypto</loc></url>
+  <url><loc>https://borsatyai.com/markets/etf</loc></url>
+  <url><loc>https://borsatyai.com/markets/bonds</loc></url>
   <url><loc>https://borsatyai.com/login</loc></url>
   <url><loc>https://borsatyai.com/register</loc></url>
   <url><loc>https://borsatyai.com/terms</loc></url>

@@ -42,6 +42,18 @@ model User {
   pushSubscriptions    PushSubscription[]
   pushNotifications    PushNotification[]
   loginHistory         LoginHistory[]
+  coursesTaught        Course[]              @relation("CourseInstructor")
+  enrollments          CourseEnrollment[]
+  certificates         Certificate[]
+  forumTopics          ForumTopic[]
+  forumReplies         ForumReply[]
+  reputation           UserReputation?
+  videos               Video[]               @relation("VideoAuthor")
+  webinarsHosted       Webinar[]             @relation("WebinarHost")
+  organizationMembers  OrganizationMember[]
+  referralsSent        Referral[]            @relation("Referrer")
+  referralsReceived    Referral[]            @relation("Referred")
+  referralCode         ReferralCode?
   twoFactorSecret      String?
   twoFactorEnabled     Boolean               @default(false)
 
@@ -563,4 +575,259 @@ model InsiderTrade {
 
   @@index([symbol, transactionDate])
   @@map("insider_trades")
+}
+
+model Course {
+  id            String             @id @default(uuid())
+  title         String
+  titleEn       String?
+  description   String             @db.Text
+  level         String
+  category      String
+  duration      Int
+  thumbnail     String?
+  price         Float              @default(0)
+  isFree        Boolean            @default(true)
+  instructorId  String?
+  instructor    User?              @relation("CourseInstructor", fields: [instructorId], references: [id])
+  lessons       Lesson[]
+  enrollments   CourseEnrollment[]
+  rating        Float              @default(0)
+  totalStudents Int                @default(0)
+  isPublished   Boolean            @default(false)
+  createdAt     DateTime           @default(now())
+
+  @@index([level, category])
+  @@map("courses")
+}
+
+model Lesson {
+  id        String   @id @default(uuid())
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title     String
+  content   String   @db.Text
+  videoUrl  String?
+  duration  Int
+  order     Int
+  quiz      Json?
+  resources String[] @default([])
+
+  @@index([courseId, order])
+  @@map("lessons")
+}
+
+model CourseEnrollment {
+  id               String    @id @default(uuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId         String
+  course           Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress         Int       @default(0)
+  completedLessons String[]  @default([])
+  score            Int?
+  certificateId    String?   @unique
+  enrolledAt       DateTime  @default(now())
+  completedAt      DateTime?
+
+  @@unique([userId, courseId])
+  @@map("course_enrollments")
+}
+
+model Certificate {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId         String
+  certificateUrl   String
+  verificationCode String   @unique
+  issuedAt         DateTime @default(now())
+
+  @@index([userId])
+  @@map("certificates")
+}
+
+model ForumCategory {
+  id     String       @id @default(uuid())
+  name   String
+  nameEn String?
+  icon   String?
+  order  Int          @default(0)
+  topics ForumTopic[]
+
+  @@map("forum_categories")
+}
+
+model ForumTopic {
+  id          String        @id @default(uuid())
+  categoryId  String
+  category    ForumCategory @relation(fields: [categoryId], references: [id])
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  title       String
+  content     String        @db.Text
+  tags        String[]      @default([])
+  views       Int           @default(0)
+  replyCount  Int           @default(0)
+  isPinned    Boolean       @default(false)
+  isLocked    Boolean       @default(false)
+  lastReplyAt DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+  replies     ForumReply[]
+
+  @@index([categoryId, createdAt])
+  @@map("forum_topics")
+}
+
+model ForumReply {
+  id        String     @id @default(uuid())
+  topicId   String
+  topic     ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  content   String     @db.Text
+  likes     Int        @default(0)
+  isAnswer  Boolean    @default(false)
+  createdAt DateTime   @default(now())
+
+  @@index([topicId, createdAt])
+  @@map("forum_replies")
+}
+
+model UserReputation {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  points          Int      @default(0)
+  level           String   @default("NEWBIE")
+  badges          String[] @default([])
+  helpfulAnswers  Int      @default(0)
+  acceptedAnswers Int      @default(0)
+  updatedAt       DateTime @updatedAt
+
+  @@map("user_reputations")
+}
+
+model Video {
+  id          String   @id @default(uuid())
+  title       String
+  description String?  @db.Text
+  url         String
+  thumbnail   String?
+  duration    Int      @default(0)
+  category    String
+  symbol      String?
+  authorId    String
+  author      User     @relation("VideoAuthor", fields: [authorId], references: [id])
+  views       Int      @default(0)
+  likes       Int      @default(0)
+  isPremium   Boolean  @default(false)
+  publishedAt DateTime @default(now())
+
+  @@index([category, publishedAt])
+  @@map("videos")
+}
+
+model Webinar {
+  id           String   @id @default(uuid())
+  title        String
+  description  String   @db.Text
+  hostId       String
+  host         User     @relation("WebinarHost", fields: [hostId], references: [id])
+  scheduledAt  DateTime
+  duration     Int      @default(60)
+  maxAttendees Int?
+  attendees    Int      @default(0)
+  meetingUrl   String?
+  recordingUrl String?
+  status       String   @default("SCHEDULED")
+
+  @@index([scheduledAt])
+  @@map("webinars")
+}
+
+model Organization {
+  id           String               @id @default(uuid())
+  name         String
+  nameEn       String?
+  type         String
+  tier         String               @default("BASIC")
+  maxUsers     Int                  @default(10)
+  logoUrl      String?
+  website      String?
+  contactEmail String
+  contactPhone String?
+  isVerified   Boolean              @default(false)
+  isActive     Boolean              @default(true)
+  createdAt    DateTime             @default(now())
+  members      OrganizationMember[]
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String       @default("MEMBER")
+  joinedAt       DateTime     @default(now())
+
+  @@unique([organizationId, userId])
+  @@map("organization_members")
+}
+
+model Referral {
+  id           String    @id @default(uuid())
+  referrerId   String
+  referrer     User      @relation("Referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  referredId   String
+  referred     User      @relation("Referred", fields: [referredId], references: [id], onDelete: Cascade)
+  code         String    @unique
+  status       String    @default("PENDING")
+  rewardAmount Float?
+  rewardType   String?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([referrerId])
+  @@map("referrals")
+}
+
+model ReferralCode {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code        String   @unique
+  uses        Int      @default(0)
+  maxUses     Int?
+  totalReward Float    @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@map("referral_codes")
+}
+
+model BlogPost {
+  id             String    @id @default(uuid())
+  slug           String    @unique
+  title          String
+  titleEn        String?
+  excerpt        String?
+  content        String    @db.Text
+  coverImage     String?
+  authorId       String?
+  category       String
+  tags           String[]  @default([])
+  seoTitle       String?
+  seoDescription String?
+  isPublished    Boolean   @default(false)
+  publishedAt    DateTime?
+  views          Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([isPublished, publishedAt])
+  @@map("blog_posts")
 }

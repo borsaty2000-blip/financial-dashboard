@@ -46,13 +46,19 @@ import { pushRoutes } from './src/routes/push.routes.js'
 import { languageMiddleware } from './src/middleware/language.js'
 import { reportsRoutes } from './src/routes/reports.routes.js'
 import { securityRoutes } from './src/routes/security.routes.js'
+import { educationRoutes } from './src/routes/education.routes.js'
+import { communityRoutes } from './src/routes/community.routes.js'
+import { videoRoutes } from './src/routes/video.routes.js'
+import { voiceRoutes } from './src/routes/voice.routes.js'
+import { enterpriseRoutes } from './src/routes/enterprise.routes.js'
+import { referralsRoutes } from './src/routes/referrals.routes.js'
+import { blogRoutes } from './src/routes/blog.routes.js'
 
 const app = express()
 app.use(express.json())
 app.use(languageMiddleware)
 app.use(publicRateLimit)
 const port = Number(process.env.PORT ?? 4000)
-
 const allowedOrigins = [
 	'https://borsatyai.com',
 	'https://www.borsatyai.com',
@@ -76,13 +82,9 @@ app.use((request, response, next) => {
 		'Access-Control-Allow-Headers',
 		'Content-Type,Authorization,X-API-Key',
 	)
-	if (request.method === 'OPTIONS') {
-		response.sendStatus(204)
-		return
-	}
+	if (request.method === 'OPTIONS') return response.sendStatus(204)
 	next()
 })
-
 const dataCandidates = [
 	fileURLToPath(new URL('./data.json', import.meta.url)),
 	path.join(process.cwd(), 'server', 'data.json'),
@@ -93,25 +95,21 @@ const financialData: unknown = dataPath
 	? JSON.parse(readFileSync(dataPath, 'utf8'))
 	: { periods: [], company: { id: '', name: '', values: [], children: [] } }
 const avatarsDirectory = fileURLToPath(new URL('./avatars', import.meta.url))
-
-app.get('/api/avatars/:fileName', (request, response, next) => {
+app.get('/api/avatars/:fileName', (request, response, next) =>
 	response.sendFile(
 		request.params.fileName,
 		{ root: avatarsDirectory },
 		(error) => {
 			if (error) next(error)
 		},
-	)
-})
-
-app.get('/api/financial-report', (_request, response) => {
-	response.json(financialData)
-})
-
-app.get('/api/health', (_request, response) => {
-	response.json({ ok: true, service: 'financial-dashboard-api' })
-})
-
+	),
+)
+app.get('/api/financial-report', (_request, response) =>
+	response.json(financialData),
+)
+app.get('/api/health', (_request, response) =>
+	response.json({ ok: true, service: 'financial-dashboard-api' }),
+)
 app.use('/api/auth', authRoutes)
 app.use('/api/market', marketRoutes)
 app.use('/api/fundamentals', fundamentalsRoutes)
@@ -140,6 +138,13 @@ app.use('/api/alerts', whatsappRoutes)
 app.use('/api/push', pushRoutes)
 app.use('/api/reports', reportsRoutes)
 app.use('/api/security', securityRoutes)
+app.use('/api', educationRoutes)
+app.use('/api', communityRoutes)
+app.use('/api', videoRoutes)
+app.use('/api', voiceRoutes)
+app.use('/api', enterpriseRoutes)
+app.use('/api', referralsRoutes)
+app.use('/api', blogRoutes)
 app.use('/api', telegramRoutes)
 app.use('/api/analysts', analystsRoutes)
 app.use(
@@ -150,14 +155,12 @@ app.use('/api/profile', profileRoutes)
 app.use('/api/preferences', preferencesRoutes)
 app.use('/api/achievements', achievementsRoutes)
 app.use('/api', userToolsRoutes)
-
 export default app
-
 if (!process.env.VERCEL) {
 	startAlertChecker()
 	const httpServer = createServer(app)
 	attachSignalSocket(httpServer)
-	httpServer.listen(port, () => {
-		console.log(`Server running at http://localhost:${port}`)
-	})
+	httpServer.listen(port, () =>
+		console.log(`Server running at http://localhost:${port}`),
+	)
 }

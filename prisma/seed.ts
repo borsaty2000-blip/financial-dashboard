@@ -1,4 +1,8 @@
 import { PrismaClient } from '@prisma/client'
+import {
+	educationCatalog,
+	lessonTemplates,
+} from '../server/src/services/education/catalog.js'
 
 const prisma = new PrismaClient()
 
@@ -205,6 +209,54 @@ async function main() {
 		})
 	}
 	console.log(`Seeded ${achievements.length} achievements.`)
+	for (const courseData of educationCatalog) {
+		const existing = await prisma.course.findFirst({
+			where: { title: courseData.title },
+		})
+		const course = existing
+			? await prisma.course.update({
+					where: { id: existing.id },
+					data: { ...courseData, isPublished: true },
+				})
+			: await prisma.course.create({
+					data: { ...courseData, isPublished: true },
+				})
+		for (const lessonData of lessonTemplates(course.title)) {
+			await prisma.lesson.upsert({
+				where: { id: `${course.id}-${lessonData.order}` },
+				update: lessonData,
+				create: {
+					id: `${course.id}-${lessonData.order}`,
+					courseId: course.id,
+					...lessonData,
+				},
+			})
+		}
+	}
+	for (const category of [
+		['general', 'نقاش عام', 'General', '💬', 1],
+		['egx', 'البورصة المصرية', 'EGX', '🇪🇬', 2],
+		['tasi', 'السوق السعودي', 'TASI', '🇸🇦', 3],
+		['education', 'التعلم والتحليل', 'Learning', '📚', 4],
+	] as const) {
+		await prisma.forumCategory.upsert({
+			where: { id: category[0] },
+			update: {
+				name: category[1],
+				nameEn: category[2],
+				icon: category[3],
+				order: category[4],
+			},
+			create: {
+				id: category[0],
+				name: category[1],
+				nameEn: category[2],
+				icon: category[3],
+				order: category[4],
+			},
+		})
+	}
+	console.log(`Seeded ${educationCatalog.length} courses and forum categories.`)
 }
 
 main()
