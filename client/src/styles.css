@@ -2457,3 +2457,42 @@ html[dir='rtl'] body { font-family: Cairo, Inter, system-ui, sans-serif; }
 .voice-input input { min-width: 0; flex: 1; padding: 11px; border: 1px solid #d9e2ef; border-radius: 8px; }
 .voice-answer { margin-top: 12px; padding: 11px; border-radius: 9px; background: #edf5ff; line-height: 1.8; }
 @media (max-width: 760px) { .education-grid { grid-template-columns: 1fr; } .education-page, .leadership-page { padding: 24px 14px 100px; } .education-hero-card, .education-lesson-list article { align-items: stretch; flex-direction: column; } .voice-fab { inset-inline-end: 14px; } .voice-panel { inset-inline-end: 14px; } }
+
+
+.support-page { max-width: 1180px; }
+.support-hero, .knowledge-article, .support-form, .ticket-thread { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; box-shadow: var(--shadow); }
+.support-hero { margin-bottom: 18px; }
+.support-search { display: flex; gap: 10px; align-items: center; margin: 18px 0; }
+.support-search input, .support-form input, .support-form select, .support-form textarea { width: 100%; border: 1px solid var(--border); border-radius: 9px; padding: 12px; background: #fff; color: #18222b; }
+.support-form { display: grid; gap: 12px; max-width: 720px; }
+.support-form textarea { min-height: 160px; resize: vertical; }
+.support-form.inline { display: flex; max-width: none; margin-top: 14px; }
+.knowledge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.knowledge-card { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; color: inherit; text-decoration: none; transition: transform .15s, box-shadow .15s; }
+.knowledge-card:hover { transform: translateY(-2px); box-shadow: 0 10px 22px #102a4318; }
+.knowledge-card span { color: var(--primary); font-size: 12px; font-weight: 700; }
+.knowledge-card h2 { font-size: 16px; margin: 9px 0; }
+.knowledge-card p { color: var(--muted); line-height: 1.7; font-size: 13px; }
+.ticket-list { display: grid; gap: 8px; }
+.ticket-list a { display: grid; grid-template-columns: 140px 1fr 120px; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; color: inherit; text-decoration: none; }
+.ticket-list em { color: var(--primary); font-style: normal; font-size: 12px; }
+.ticket-meta { margin: 10px 0; color: var(--muted); }
+.ticket-thread { display: grid; gap: 8px; }
+.ticket-thread p { padding: 12px; background: var(--soft); border-radius: 8px; margin: 0; line-height: 1.7; }
+.live-chat-widget { position: fixed; inset-inline-end: 18px; bottom: 82px; z-index: 70; }
+.chat-fab { border-radius: 999px; background: var(--primary); color: #fff; padding: 13px 18px; box-shadow: 0 8px 20px #0071bc44; font-weight: 700; }
+.chat-panel { width: min(360px, calc(100vw - 28px)); background: #fff; border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 18px 40px #102a4330; overflow: hidden; margin-bottom: 10px; }
+.chat-panel header { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: #17222c; color: #fff; }
+.chat-panel header button { background: none; color: #fff; font-size: 20px; }
+.chat-messages { padding: 12px; min-height: 130px; max-height: 260px; overflow: auto; }
+.chat-messages p { background: var(--soft); border-radius: 8px; padding: 8px; font-size: 13px; line-height: 1.6; }
+.chat-panel form { display: flex; gap: 6px; border-top: 1px solid var(--border); padding: 10px; }
+.chat-panel input { flex: 1; min-width: 0; border: 1px solid var(--border); border-radius: 7px; padding: 8px; }
+.chat-panel form button { background: var(--primary); color: #fff; border-radius: 7px; padding: 8px 10px; }
+@media (max-width: 720px) { .knowledge-grid { grid-template-columns: 1fr; } .support-search, .support-form.inline { flex-direction: column; align-items: stretch; } .ticket-list a { grid-template-columns: 1fr; gap: 4px; } .live-chat-widget { inset-inline-end: 12px; } }
+
+.regional-settings-page .settings-card { max-width: 620px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; box-shadow: var(--shadow); }
+.regional-settings-page label { display: grid; gap: 8px; font-weight: 700; }
+.regional-settings-page select { border: 1px solid var(--border); border-radius: 9px; padding: 12px; background: #fff; }
+.regional-summary { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin: 18px 0; padding: 14px; background: var(--soft); border-radius: 10px; }
+.regional-summary strong { color: var(--primary); font-size: 22px; }

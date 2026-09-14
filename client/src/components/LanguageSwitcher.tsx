@@ -3,7 +3,9 @@ import { supportedLanguages } from '../i18n'
 import { api } from '../lib/api'
 export function LanguageSwitcher() {
 	const { i18n, t } = useTranslation()
-	const current = i18n.language.split('-')[0]
+	const current = supportedLanguages.some((item) => item.code === i18n.language)
+		? i18n.language
+		: 'ar'
 	const change = (language: string) => {
 		void i18n.changeLanguage(language)
 		if (localStorage.getItem('borsaty_access_token'))

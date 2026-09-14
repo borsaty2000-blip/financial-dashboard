@@ -15,9 +15,14 @@ import {
 } from './pages/AccountPages'
 import {
 	AboutPage,
+	AcceptableUsePage,
+	AccessibilityPage,
+	CookiePolicyPage,
+	CopyrightPage,
 	DisclaimerPage,
 	NotFoundPage,
 	PrivacyPage,
+	RefundPolicyPage,
 	TermsPage,
 } from './pages/LegalPages'
 import { BacktestPage, CandlestickPage } from './pages/AnalysisToolsPage'
@@ -59,6 +64,9 @@ import { NotificationSettingsPage } from './pages/NotificationSettingsPage'
 import { SecuritySettingsPage } from './pages/SecuritySettingsPage'
 import { EducationPage } from './pages/EducationPages'
 import { VoiceAssistantWidget } from './components/VoiceAssistantWidget'
+import { LiveChatWidget } from './components/LiveChatWidget'
+import { HelpPage, SupportPage, TicketsPage } from './pages/SupportPages'
+import { RegionalSettingsPage } from './pages/RegionalSettingsPage'
 import {
 	BlogPage,
 	CommunityPage,
@@ -82,6 +90,35 @@ function RoutedApp() {
 	if (path === '/privacy') return <PrivacyPage />
 	if (path === '/disclaimer') return <DisclaimerPage />
 	if (path === '/about') return <AboutPage />
+	if (path === '/cookie-policy') return <CookiePolicyPage />
+	if (path === '/acceptable-use') return <AcceptableUsePage />
+	if (path === '/refund-policy') return <RefundPolicyPage />
+	if (path === '/copyright') return <CopyrightPage />
+	if (path === '/accessibility') return <AccessibilityPage />
+	if (path === '/support') return <SupportPage />
+	if (path === '/support/tickets')
+		return (
+			<ProtectedRoute>
+				<TicketsPage />
+			</ProtectedRoute>
+		)
+	if (path === '/support/tickets/new')
+		return (
+			<ProtectedRoute>
+				<TicketsPage create />
+			</ProtectedRoute>
+		)
+	if (path.startsWith('/support/tickets/'))
+		return (
+			<ProtectedRoute>
+				<TicketsPage detail id={path.slice('/support/tickets/'.length)} />
+			</ProtectedRoute>
+		)
+	if (path === '/help') return <HelpPage />
+	if (path.startsWith('/help/article/'))
+		return <HelpPage slug={path.slice('/help/article/'.length)} />
+	if (path.startsWith('/help/'))
+		return <HelpPage category={path.slice('/help/'.length)} />
 	if (path === '/backtest') return <BacktestPage />
 	if (path === '/candlestick') return <CandlestickPage />
 	if (path === '/simulator') return <SimulatorPage />
@@ -153,6 +190,12 @@ function RoutedApp() {
 		return (
 			<ProtectedRoute>
 				<SecuritySettingsPage />
+			</ProtectedRoute>
+		)
+	if (path === '/settings/regional')
+		return (
+			<ProtectedRoute>
+				<RegionalSettingsPage />
 			</ProtectedRoute>
 		)
 	if (path === '/education') return <EducationPage />
@@ -301,6 +344,7 @@ export function App() {
 					<NotificationLive />
 					<LiveAnalysisFeed />
 					<VoiceAssistantWidget />
+					<LiveChatWidget />
 				</ToastProvider>
 			</AuthProvider>
 		</ErrorBoundary>
