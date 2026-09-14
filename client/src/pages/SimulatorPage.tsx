@@ -89,7 +89,7 @@ export function SimulatorPage() {
 						<div>
 							<span>القيمة النهائية</span>
 							<strong>
-								{result.finalValue.toLocaleString('ar-EG', {
+								{result.finalValue.toLocaleString('ar-EG-u-nu-latn', {
 									maximumFractionDigits: 2,
 								})}{' '}
 								EGP

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { navigate } from '../router'
+import { formatEnglishNumber, formatEnglishPercent } from '../lib/format'
 
 type MarketEnvelope<T = unknown> = {
 	available?: boolean
@@ -100,12 +101,7 @@ const toStatus = (envelope: MarketEnvelope | null): MarketCard['status'] => {
 const quoteValue = (value: unknown) =>
 	numberFrom(value, ['value', 'price', 'close', 'indexValue', 'index_value'])
 
-const formatValue = (value?: number) =>
-	value == null
-		? '—'
-		: new Intl.NumberFormat('ar-EG', {
-				maximumFractionDigits: 2,
-			}).format(value)
+const formatValue = (value?: number) => formatEnglishNumber(value)
 
 function MarketMetric({ card }: { card: MarketCard }) {
 	return (
@@ -134,9 +130,7 @@ function MarketMetric({ card }: { card: MarketCard }) {
 								: ''
 				}`}
 			>
-				{card.change == null
-					? '—'
-					: `${card.change > 0 ? '+' : ''}${card.change.toFixed(2)}%`}
+				{card.change == null ? '—' : formatEnglishPercent(card.change)}
 			</div>
 		</article>
 	)
@@ -239,9 +233,7 @@ function MarketDirectory({
 															: ''
 											}
 										>
-											{change == null
-												? '—'
-												: `${change > 0 ? '+' : ''}${change.toFixed(2)}%`}
+											{change == null ? '—' : formatEnglishPercent(change)}
 										</td>
 									</tr>
 								)

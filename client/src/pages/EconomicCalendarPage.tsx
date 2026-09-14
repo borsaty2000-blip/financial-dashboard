@@ -72,7 +72,9 @@ export function EconomicCalendarPage() {
 			<section className="analysis-card calendar-list">
 				{events.map((event) => (
 					<article key={event.eventKey}>
-						<time>{new Date(event.date).toLocaleDateString('ar-EG')}</time>
+						<time>
+							{new Date(event.date).toLocaleDateString('ar-EG-u-nu-latn')}
+						</time>
 						<b>{event.title}</b>
 						<span className={`importance ${event.importance.toLowerCase()}`}>
 							{event.importance === 'HIGH' ? 'عالٍ' : 'متوسط'}

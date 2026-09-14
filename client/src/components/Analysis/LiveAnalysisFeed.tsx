@@ -49,10 +49,13 @@ export function LiveAnalysisFeed({
 						</span>
 						<strong>{update.consensus?.score ?? '—'}/100</strong>
 						<small>
-							{new Date(update.timestamp).toLocaleTimeString('ar-EG', {
-								hour: '2-digit',
-								minute: '2-digit',
-							})}
+							{new Date(update.timestamp).toLocaleTimeString(
+								'ar-EG-u-nu-latn',
+								{
+									hour: '2-digit',
+									minute: '2-digit',
+								},
+							)}
 						</small>
 					</div>
 				))

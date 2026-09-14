@@ -59,7 +59,7 @@ export function NewsPage() {
 						<p>{item.summary}</p>
 						<small>
 							{item.category} ·{' '}
-							{new Date(item.publishedAt).toLocaleString('ar-EG')}
+							{new Date(item.publishedAt).toLocaleString('ar-EG-u-nu-latn')}
 						</small>
 						<a href={item.url} target="_blank" rel="noreferrer">
 							الخبر الكامل

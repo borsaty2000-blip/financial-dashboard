@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
+import { formatEnglishDate } from '../lib/format'
 export function SecuritySettingsPage() {
 	const [enabled, setEnabled] = useState(false)
 	const [setup, setSetup] = useState<{ secret: string; qrCode: string } | null>(
@@ -110,7 +111,7 @@ export function SecuritySettingsPage() {
 						<span>{session.userAgent || 'جهاز غير معروف'}</span>
 						<small>
 							{session.ipAddress || '—'} ·{' '}
-							{new Date(session.createdAt).toLocaleString()}
+							{formatEnglishDate(session.createdAt)}
 						</small>
 					</div>
 				))}
@@ -119,8 +120,7 @@ export function SecuritySettingsPage() {
 					<div className="session-item" key={entry.id}>
 						<span>{entry.success ? 'دخول ناجح' : 'دخول فاشل'}</span>
 						<small>
-							{entry.ipAddress || '—'} ·{' '}
-							{new Date(entry.createdAt).toLocaleString()}
+							{entry.ipAddress || '—'} · {formatEnglishDate(entry.createdAt)}
 						</small>
 					</div>
 				))}

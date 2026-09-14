@@ -97,7 +97,9 @@ export function SpecializedCalendarsPage({ kind }: { kind: Kind }) {
 										: item.ratio}
 						</strong>
 						<time>
-							{new Date(dateOf(item, kind)).toLocaleDateString('ar-EG')}
+							{new Date(dateOf(item, kind)).toLocaleDateString(
+								'ar-EG-u-nu-latn',
+							)}
 						</time>
 						<span className="countdown">{countdown(dateOf(item, kind))}</span>
 						{kind === 'dividends' && <small>Yield {item.yieldPercent}%</small>}

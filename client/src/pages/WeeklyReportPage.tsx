@@ -72,7 +72,7 @@ export function WeeklyReportPage() {
 				<h2>السجل</h2>
 				{history.map((item) => (
 					<p key={item.id}>
-						{new Date(item.createdAt).toLocaleDateString('ar-EG')} —{' '}
+						{new Date(item.createdAt).toLocaleDateString('ar-EG-u-nu-latn')} —{' '}
 						{item.data?.period}
 					</p>
 				))}

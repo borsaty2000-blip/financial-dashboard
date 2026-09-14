@@ -161,7 +161,9 @@ export function VideoLibraryPage({
 						<h2>{item.title}</h2>
 						<p>{item.description}</p>
 						{webinars ? (
-							<p>{new Date(item.scheduledAt).toLocaleString('ar-EG')}</p>
+							<p>
+								{new Date(item.scheduledAt).toLocaleString('ar-EG-u-nu-latn')}
+							</p>
 						) : (
 							<a className="primary-button" href={`/videos/${item.id}`}>
 								مشاهدة

@@ -9,6 +9,7 @@ import { api } from '../lib/api'
 import { navigate } from '../router'
 import { useAuth } from '../hooks/useAuth'
 import AvatarUploader from '../components/AvatarUploader'
+import { formatEnglishNumber, formatEnglishPercent } from '../lib/format'
 
 function Shell({ children }: { children: ReactNode }) {
 	const { user, logout } = useAuth()
@@ -715,7 +716,7 @@ export function DashboardPage() {
 									label={symbol}
 									value={
 										market[symbol]?.value
-											? `${market[symbol].value.toLocaleString()} ${market[symbol].changePercent != null ? `${market[symbol].changePercent > 0 ? '+' : ''}${market[symbol].changePercent.toFixed(2)}%` : ''}`
+											? `${formatEnglishNumber(market[symbol].value)} ${formatEnglishPercent(market[symbol].changePercent)}`
 											: '—'
 									}
 									tone={

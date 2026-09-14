@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../lib/api'
 import { useLivePrice } from '../hooks/useLivePrice'
+import {
+	formatEnglishNumber,
+	formatEnglishPercent,
+	formatEnglishScalar,
+} from '../lib/format'
 
 type Candle = { date: string; close: number; volume: number }
 type Scalar = string | number | null | undefined
@@ -20,6 +25,20 @@ type FeaturePayload = {
 	anomalyCount?: number
 }
 type FeatureResponse = FeaturePayload & { data?: FeaturePayload }
+type AnalysisResponse = {
+	data?: Record<string, unknown>
+	[key: string]: unknown
+}
+type IntegratedAnalysis = {
+	indicators: AnalysisResponse | null
+	elliott: AnalysisResponse | null
+	gann: AnalysisResponse | null
+	consensus: AnalysisResponse | null
+	statistical: AnalysisResponse | null
+	arima: AnalysisResponse | null
+	lstm: AnalysisResponse | null
+	backtest: AnalysisResponse | null
+}
 type FinancialStatement = {
 	filingDate?: Scalar
 	period?: Scalar
@@ -44,6 +63,38 @@ type Ownership = {
 	shareholders?: Array<{ name: string; percentage: number | null }>
 }
 
+const analysisPayload = (response: AnalysisResponse | null) => {
+	if (response?.data && typeof response.data === 'object') return response.data
+	return response ?? {}
+}
+
+const nestedValue = (value: unknown, path: string[]) => {
+	let current = value
+	for (const key of path) {
+		if (!current || typeof current !== 'object') return undefined
+		current = (current as Record<string, unknown>)[key]
+	}
+	return current
+}
+
+const numberValue = (value: unknown, path: string[] = []) => {
+	const candidate = nestedValue(value, path)
+	if (typeof candidate === 'number' && Number.isFinite(candidate))
+		return candidate
+	if (typeof candidate === 'string' && candidate.trim() !== '') {
+		const parsed = Number(candidate)
+		if (Number.isFinite(parsed)) return parsed
+	}
+	return undefined
+}
+
+const stringValue = (value: unknown, path: string[] = []) => {
+	const candidate = nestedValue(value, path)
+	return typeof candidate === 'string' && candidate.trim()
+		? candidate
+		: undefined
+}
+
 export function StockDetailPage({ symbol }: { symbol: string }) {
 	const [data, setData] = useState<Candles | null>(null)
 	const [ensembleData, setEnsembleData] = useState<FeatureResponse | null>(null)
@@ -51,6 +102,17 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 		null,
 	)
 	const [anomalyData, setAnomalyData] = useState<FeatureResponse | null>(null)
+	const [integratedAnalysis, setIntegratedAnalysis] =
+		useState<IntegratedAnalysis>({
+			indicators: null,
+			elliott: null,
+			gann: null,
+			consensus: null,
+			statistical: null,
+			arima: null,
+			lstm: null,
+			backtest: null,
+		})
 	const [fundamentals, setFundamentals] = useState<Fundamentals | null>(null)
 	const [insiderTrades, setInsiderTrades] = useState<InsiderTrade[]>([])
 	const [ownership, setOwnership] = useState<Ownership | null>(null)
@@ -90,6 +152,57 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 		void api<FeatureResponse>(`/api/analysis/${normalized}/anomalies`)
 			.then(setAnomalyData)
 			.catch(() => undefined)
+		const optionalAnalysis = <T,>(path: string) =>
+			api<T>(path, { suppressToast: true }).catch(() => null)
+		void Promise.all([
+			optionalAnalysis<AnalysisResponse>(
+				`/api/analysis/${normalized}/indicators?market=${market}`,
+			),
+			optionalAnalysis<AnalysisResponse>(
+				`/api/analysis/${normalized}/elliott?market=${market}`,
+			),
+			optionalAnalysis<AnalysisResponse>(
+				`/api/analysis/${normalized}/gann?market=${market}`,
+			),
+			optionalAnalysis<AnalysisResponse>(
+				`/api/analysis/${normalized}/consensus?market=${market}`,
+			),
+			optionalAnalysis<AnalysisResponse>(
+				`/api/analysis/${normalized}/statistical?market=${market}`,
+			),
+			optionalAnalysis<AnalysisResponse>(
+				`/api/analysis/${normalized}/forecast/arima?market=${market}&steps=7`,
+			),
+			optionalAnalysis<AnalysisResponse>(
+				`/api/analysis/${normalized}/forecast/lstm?market=${market}&steps=7`,
+			),
+			optionalAnalysis<AnalysisResponse>(
+				`/api/backtest/${normalized}/indicators?market=${market}&lookback=30&horizon=7`,
+			),
+		]).then(
+			([
+				indicators,
+				elliott,
+				gann,
+				consensus,
+				statistical,
+				arima,
+				lstm,
+				backtest,
+			]) => {
+				if (!cancelled)
+					setIntegratedAnalysis({
+						indicators,
+						elliott,
+						gann,
+						consensus,
+						statistical,
+						arima,
+						lstm,
+						backtest,
+					})
+			},
+		)
 		void api<Fundamentals>(`/api/fundamentals/${normalized}`)
 			.then(setFundamentals)
 			.catch(() => undefined)
@@ -144,7 +257,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 		}
 	}
 	const listen = async () => {
-		const text = `السعر الحالي لسهم ${normalized} هو ${stats.last?.close?.toFixed(2) ?? 'غير متاح'}. التغير ${stats.changePercent?.toFixed(2) ?? 'غير متاح'} بالمئة.`
+		const text = `السعر الحالي لسهم ${normalized} هو ${formatEnglishNumber(stats.last?.close)}. التغير ${formatEnglishPercent(stats.changePercent)}.`
 		try {
 			const response = await fetch(
 				`${import.meta.env.VITE_API_URL ?? ''}/api/analysis/${normalized}/audio`,
@@ -179,6 +292,26 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 		['أعلى 52 أسبوعاً', fundamentals?.keyRatios?.fiftyTwoWeekHigh],
 		['أدنى 52 أسبوعاً', fundamentals?.keyRatios?.fiftyTwoWeekLow],
 	]
+	const indicatorResult = analysisPayload(integratedAnalysis.indicators)
+	const elliottResult = analysisPayload(integratedAnalysis.elliott)
+	const gannResult = analysisPayload(integratedAnalysis.gann)
+	const consensusResult = analysisPayload(integratedAnalysis.consensus)
+	const statisticalResult = analysisPayload(integratedAnalysis.statistical)
+	const arimaResult = analysisPayload(integratedAnalysis.arima)
+	const lstmResult = analysisPayload(integratedAnalysis.lstm)
+	const backtestResult = analysisPayload(integratedAnalysis.backtest)
+	const consensusSignal = stringValue(consensusResult, ['signal'])
+	const elliottDirection = stringValue(elliottResult, [
+		'current_wave',
+		'direction',
+	])
+	const gannSupport = numberValue(gannResult, ['square_of_nine', 'support'])
+	const gannResistance = numberValue(gannResult, [
+		'square_of_nine',
+		'resistance',
+	])
+	const arimaForecast = numberValue(arimaResult, ['forecast', '0'])
+	const lstmForecast = numberValue(lstmResult, ['forecast', '0'])
 
 	return (
 		<main className="stock-detail-page" dir="rtl">
@@ -229,9 +362,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 						<div>
 							<span>السعر الحالي</span>
 							<strong>
-								{livePrice?.price?.toFixed(2) ??
-									stats.last?.close.toFixed(2) ??
-									'—'}
+								{formatEnglishNumber(livePrice?.price ?? stats.last?.close)}
 							</strong>
 							<span
 								className={`freshness-badge ${livePrice?.freshness ?? data.freshness ?? 'cached'}`}
@@ -255,19 +386,17 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 									: 'negative'
 							}
 						>
-							{stats.changePercent == null
-								? '—'
-								: `${stats.changePercent.toFixed(2)}%`}
+							{formatEnglishPercent(stats.changePercent)}
 						</div>
 					</section>
 					<section className="stock-stats-grid">
 						<div>
 							<span>أعلى فترة</span>
-							<b>{stats.high?.toFixed(2) ?? '—'}</b>
+							<b>{formatEnglishNumber(stats.high)}</b>
 						</div>
 						<div>
 							<span>أدنى فترة</span>
-							<b>{stats.low?.toFixed(2) ?? '—'}</b>
+							<b>{formatEnglishNumber(stats.low)}</b>
 						</div>
 						<div>
 							<span>عدد الشموع</span>
@@ -275,7 +404,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 						</div>
 						<div>
 							<span>آخر حجم</span>
-							<b>{stats.last?.volume?.toLocaleString() ?? '—'}</b>
+							<b>{formatEnglishNumber(stats.last?.volume, 0)}</b>
 						</div>
 					</section>
 					<section className="analysis-card stock-chart-card">
@@ -296,11 +425,117 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 							})}
 						</div>
 					</section>
+					<section className="analysis-card integrated-analysis-panel">
+						<div className="panel-title">
+							<div>
+								<h2>لوحة التحليل المدمج</h2>
+								<p className="muted">
+									نتائج مستقلة قابلة للمراجعة؛ لا تمثل توصية أو ضماناً.
+								</p>
+							</div>
+							<span className="eyebrow">Educational</span>
+						</div>
+						<div className="integrated-analysis-grid">
+							<div className="integrated-analysis-card is-primary">
+								<span>الإجماع</span>
+								<strong>
+									{formatEnglishNumber(
+										numberValue(consensusResult, ['score']),
+										0,
+									)}
+								</strong>
+								<small>
+									{consensusSignal ?? 'غير متاح'} · ثقة{' '}
+									{formatEnglishNumber(
+										numberValue(consensusResult, ['confidence']),
+										0,
+									)}
+									%
+								</small>
+							</div>
+							<div className="integrated-analysis-card">
+								<span>المؤشرات الفنية</span>
+								<strong>
+									RSI{' '}
+									{formatEnglishNumber(
+										numberValue(indicatorResult, ['rsi', 'value']),
+									)}
+								</strong>
+								<small>
+									MACD {stringValue(indicatorResult, ['macd', 'signal']) ?? '—'}{' '}
+									· SMA20{' '}
+									{formatEnglishNumber(numberValue(indicatorResult, ['sma20']))}
+								</small>
+							</div>
+							<div className="integrated-analysis-card">
+								<span>Elliott Wave</span>
+								<strong>{elliottDirection ?? 'غير متاح'}</strong>
+								<small>
+									الموجة{' '}
+									{stringValue(elliottResult, ['current_wave', 'wave']) ?? '—'}{' '}
+									· ثقة{' '}
+									{formatEnglishPercent(
+										(numberValue(elliottResult, ['confidence']) ?? 0) * 100,
+									)}
+								</small>
+							</div>
+							<div className="integrated-analysis-card">
+								<span>Gann</span>
+								<strong>دعم {formatEnglishNumber(gannSupport)}</strong>
+								<small>مقاومة {formatEnglishNumber(gannResistance)}</small>
+							</div>
+							<div className="integrated-analysis-card">
+								<span>الإحصاء والمخاطر</span>
+								<strong>
+									Volatility{' '}
+									{formatEnglishPercent(
+										(numberValue(statisticalResult, ['volatility']) ??
+											Number.NaN) * 100,
+									)}
+								</strong>
+								<small>
+									VaR 95%{' '}
+									{formatEnglishPercent(
+										(numberValue(statisticalResult, ['var_95']) ?? Number.NaN) *
+											100,
+									)}{' '}
+									· Sharpe{' '}
+									{formatEnglishNumber(
+										numberValue(statisticalResult, ['sharpe_ratio']),
+									)}
+								</small>
+							</div>
+							<div className="integrated-analysis-card">
+								<span>Forecast baselines</span>
+								<strong>ARIMA {formatEnglishNumber(arimaForecast)}</strong>
+								<small>LSTM {formatEnglishNumber(lstmForecast)} · تعليمي</small>
+							</div>
+							<div className="integrated-analysis-card">
+								<span>Backtest تعليمي</span>
+								<strong>
+									Win rate{' '}
+									{formatEnglishPercent(
+										(numberValue(backtestResult, ['win_rate']) ?? Number.NaN) *
+											100,
+									)}
+								</strong>
+								<small>
+									Max drawdown{' '}
+									{formatEnglishPercent(
+										(numberValue(backtestResult, ['max_drawdown']) ??
+											Number.NaN) * 100,
+									)}
+								</small>
+							</div>
+						</div>
+					</section>
 					<section className="analysis-card stock-ai-grid">
 						<div>
 							<span className="eyebrow">Ensemble Prediction</span>
-							<strong>{ai?.forecast?.[0]?.toFixed?.(2) ?? '—'}</strong>
-							<small>ثقة مجمعة: {ai?.confidence ?? '—'}%</small>
+							<strong>{formatEnglishNumber(ai?.forecast?.[0])}</strong>
+							<small>
+								ثقة مجمعة: {formatEnglishPercent(ai?.confidence ?? null)}
+							</small>
 						</div>
 						<div>
 							<span className="eyebrow">المزاج العام</span>
@@ -327,13 +562,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 								<div key={String(label)}>
 									<span>{label}</span>
 									<strong>
-										{value == null
-											? '—'
-											: typeof value === 'number'
-												? value.toLocaleString('en-US', {
-														maximumFractionDigits: 2,
-													})
-												: String(value)}
+										{value == null ? '—' : formatEnglishScalar(value)}
 									</strong>
 								</div>
 							))}
@@ -387,7 +616,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 									>
 										{item.transactionType === 'BUY' ? 'شراء' : 'بيع'}
 									</b>
-									<b>{item.shares.toLocaleString()}</b>
+									<b>{formatEnglishNumber(item.shares, 0)}</b>
 								</div>
 							))}
 						</div>
