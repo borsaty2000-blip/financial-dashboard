@@ -68,6 +68,7 @@ async function companies(): Promise<{ egx: unknown[]; tasi: unknown[] }> {
 	])
 	const egx = egxResult.map((company) => ({
 		symbol: company.symbol,
+		displaySymbol: company.displaySymbol,
 		name: company.name,
 		currency: company.currency,
 		exchange: company.exchange,
