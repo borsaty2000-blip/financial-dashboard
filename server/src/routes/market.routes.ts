@@ -13,6 +13,8 @@ import {
 	CandlesService,
 	type CandleMarket,
 } from '../services/market/candles.service.js'
+import { getEgyptCompanies } from '../services/market/twelve-data.adapter.js'
+import { live, unavailable } from '../services/market/market.types.js'
 
 export const marketRoutes = Router()
 
@@ -63,17 +65,17 @@ marketRoutes.get('/silver', async (_request, response) => {
 	response.json(await getEgxMetals('silver'))
 })
 
-marketRoutes.get('/egx/companies', (_request, response) => {
-	response.json({
-		data: [],
-		source: 'EGX MCP',
-		timestamp: new Date().toISOString(),
-		freshness: 'cached',
-		delay_minutes: 15,
-		available: false,
-		error:
-			'The official EGX repository exposes stock and metals tools, not a company-directory tool.',
-	})
+marketRoutes.get('/egx/companies', async (_request, response) => {
+	try {
+		response.json(live('Twelve Data', await getEgyptCompanies()))
+	} catch (error) {
+		response.json(
+			unavailable(
+				'Twelve Data',
+				error instanceof Error ? error.message : 'EGX directory unavailable',
+			),
+		)
+	}
 })
 
 marketRoutes.get('/egx/quote/:symbol', async (request, response) => {

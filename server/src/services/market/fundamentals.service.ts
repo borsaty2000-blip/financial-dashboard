@@ -131,7 +131,7 @@ export class FundamentalsService {
 			keyRatios: fundamentals ?? {},
 			dividendHistory: data?.dividends ?? [],
 			earningsHistory: data?.earnings ?? [],
-			source: 'SAHMK Pro',
+				source: 'SAHMK',
 			available: Boolean(fundamentals && Object.keys(fundamentals).length),
 		}
 	}
@@ -150,7 +150,7 @@ export class FundamentalsService {
 			keyRatios: stats?.valuations_metrics ?? stats?.statistics ?? {},
 			dividendHistory: stats?.dividends ?? [],
 			earningsHistory: stats?.earnings ?? [],
-			source: 'Twelve Data Pro',
+			source: 'Twelve Data',
 			available: Boolean(stats && Object.keys(stats).length),
 		}
 	}

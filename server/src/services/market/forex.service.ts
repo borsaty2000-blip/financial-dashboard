@@ -97,7 +97,7 @@ export class ForexService {
 				pair: `${from}/${to}`,
 				rate: Number.isFinite(rate) ? rate : null,
 				changePercent: Number(data?.percent_change) || null,
-				source: 'Twelve Data Pro',
+				source: 'Twelve Data',
 				updatedAt: data?.datetime ?? null,
 				available: Number.isFinite(rate),
 			}

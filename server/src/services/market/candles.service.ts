@@ -1,4 +1,5 @@
 import { prisma } from '../../lib/prisma.js'
+import { resolveEgyptSymbol } from './twelve-data.adapter.js'
 
 export type Candle = {
 	date: string
@@ -37,6 +38,13 @@ const freshnessFor = (
 ): { freshness: Freshness; delayedByMinutes: number | null } => {
 	if (source === 'database-cache')
 		return { freshness: 'cached', delayedByMinutes: null }
+	if (
+		source === 'Yahoo Finance' ||
+		source === 'Stooq' ||
+		source === 'SAHMK historical' ||
+		(source === 'Twelve Data' && process.env.TWELVE_DATA_REALTIME !== 'true')
+	)
+		return { freshness: 'delayed', delayedByMinutes: 15 }
 	const date = candles.at(-1)?.date
 	const age = date
 		? Math.max(0, Math.round((Date.now() - new Date(date).getTime()) / 60_000))
@@ -177,8 +185,10 @@ export class CandlesService {
 	) {
 		const apiKey = process.env.TWELVE_DATA_API_KEY
 		if (!apiKey) throw new Error('TWELVE_DATA_API_KEY is not configured')
+		const providerSymbol =
+			market === 'EGX' ? await resolveEgyptSymbol(symbol) : symbol
 		const params = new URLSearchParams({
-			symbol,
+			symbol: providerSymbol,
 			interval: interval === '1d' ? '1day' : interval,
 			outputsize: String(days),
 			apikey: apiKey,
@@ -202,7 +212,7 @@ export class CandlesService {
 			}))
 			.filter(validCandle)
 			.reverse()
-		return response(symbol, market, interval, candles, 'Twelve Data Pro')
+		return response(symbol, market, interval, candles, 'Twelve Data')
 	}
 
 	private static async fetchSahmk(
@@ -239,7 +249,7 @@ export class CandlesService {
 			}))
 			.filter(validCandle)
 		if (!candles.length) throw new Error('No SAHMK historical data')
-		return response(symbol, market, interval, candles, 'SAHMK Pro')
+		return response(symbol, market, interval, candles, 'SAHMK historical')
 	}
 
 	private static async fetchPolygon(
@@ -364,8 +374,8 @@ export class CandlesService {
 
 	static async getQuote(symbol: string, market: CandleMarket = 'EGX') {
 		const normalized = symbol.trim().toUpperCase()
-		try {
-			if (market === 'TASI' && process.env.SAHMK_API_KEY) {
+		if (market === 'TASI' && process.env.SAHMK_API_KEY) {
+			try {
 				const data = await requestJson(
 					`https://api.sahmk.sa/api/v1/quote/${encodeURIComponent(normalized)}/`,
 					{ headers: { 'X-API-Key': process.env.SAHMK_API_KEY } },
@@ -375,16 +385,25 @@ export class CandlesService {
 						symbol: normalized,
 						price: Number(data.price),
 						changePercent: Number(data.change_percent ?? 0),
-						source: 'SAHMK Pro',
+						source: 'SAHMK',
 						freshness: data.is_delayed
 							? ('delayed' as Freshness)
 							: ('live' as Freshness),
 						updatedAt: data.updated_at ?? new Date().toISOString(),
 					}
+			} catch (error) {
+				console.warn(
+					'SAHMK quote source failed:',
+					error instanceof Error ? error.message : error,
+				)
 			}
-			if (process.env.TWELVE_DATA_API_KEY) {
+		}
+		if (process.env.TWELVE_DATA_API_KEY) {
+			try {
+				const providerSymbol =
+					market === 'EGX' ? await resolveEgyptSymbol(normalized) : normalized
 				const params = new URLSearchParams({
-					symbol: normalized,
+					symbol: providerSymbol,
 					apikey: process.env.TWELVE_DATA_API_KEY,
 				})
 				const exchange =
@@ -398,12 +417,22 @@ export class CandlesService {
 						symbol: normalized,
 						price: Number(data.close),
 						changePercent: Number(data.percent_change ?? 0),
-						source: 'Twelve Data Pro',
-						freshness: 'live' as Freshness,
+						source: 'Twelve Data',
+						freshness:
+							process.env.TWELVE_DATA_REALTIME === 'true'
+								? ('live' as Freshness)
+								: ('delayed' as Freshness),
 						updatedAt: data.datetime ?? new Date().toISOString(),
 					}
+			} catch (error) {
+				console.warn(
+					'Twelve Data quote source failed:',
+					error instanceof Error ? error.message : error,
+				)
 			}
-			if (process.env.POLYGON_API_KEY) {
+		}
+		if (process.env.POLYGON_API_KEY) {
+			try {
 				const data = await requestJson(
 					`https://api.polygon.io/v2/last/trade/${encodeURIComponent(normalized)}?apiKey=${encodeURIComponent(process.env.POLYGON_API_KEY)}`,
 				)
@@ -417,7 +446,14 @@ export class CandlesService {
 						freshness: 'live' as Freshness,
 						updatedAt: new Date().toISOString(),
 					}
+			} catch (error) {
+				console.warn(
+					'Polygon quote source failed:',
+					error instanceof Error ? error.message : error,
+				)
 			}
+		}
+		try {
 			const candles = await this.getCandles(normalized, market, '1d', 2)
 			const last = candles.candles.at(-1)
 			const previous = candles.candles.at(-2)
@@ -434,7 +470,7 @@ export class CandlesService {
 				}
 		} catch (error) {
 			console.warn(
-				'Quote source failed:',
+				'Candle quote fallback failed:',
 				error instanceof Error ? error.message : error,
 			)
 		}

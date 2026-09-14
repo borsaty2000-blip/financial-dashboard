@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { io } from 'socket.io-client'
 
 export type LivePrice = {
 	symbol: string
@@ -9,21 +8,50 @@ export type LivePrice = {
 	source: string
 	updatedAt: string | null
 }
-export function useLivePrice(symbol: string, market = 'EGX') {
+
+type Market = 'EGX' | 'TASI' | 'GLOBAL'
+const QUOTE_POLL_INTERVAL_MS = 30_000
+
+const quoteUrl = (symbol: string, market: Market) => {
+	const base = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
+	return `${base}/api/market/quote/${encodeURIComponent(symbol)}?market=${market}`
+}
+
+export const useLivePrice = (symbol: string, market: Market = 'EGX') => {
 	const [quote, setQuote] = useState<LivePrice | null>(null)
+
 	useEffect(() => {
-		const socket = io(import.meta.env.VITE_API_URL || window.location.origin, {
-			transports: ['websocket', 'polling'],
-		})
-		const onUpdate = (value: LivePrice) => {
-			if (value.symbol === symbol.toUpperCase()) setQuote(value)
+		let active = true
+		const load = async () => {
+			if (document.visibilityState === 'hidden') return
+			const controller = new AbortController()
+			const timeout = window.setTimeout(() => controller.abort(), 12_000)
+			try {
+				const response = await fetch(quoteUrl(symbol, market), {
+					headers: { accept: 'application/json' },
+					signal: controller.signal,
+				})
+				if (!response.ok) return
+				const value = (await response.json()) as LivePrice
+				if (active && value.price != null) setQuote(value)
+			} catch {
+				/* keep the last verified quote; the historical-card fallback remains visible */
+			} finally {
+				window.clearTimeout(timeout)
+			}
 		}
-		socket.emit('price:subscribe', { symbols: [symbol], market })
-		socket.on('price:update', onUpdate)
+		const onVisibilityChange = () => {
+			if (document.visibilityState === 'visible') void load()
+		}
+		void load()
+		const timer = window.setInterval(() => void load(), QUOTE_POLL_INTERVAL_MS)
+		document.addEventListener('visibilitychange', onVisibilityChange)
 		return () => {
-			socket.off('price:update', onUpdate)
-			socket.close()
+			active = false
+			window.clearInterval(timer)
+			document.removeEventListener('visibilitychange', onVisibilityChange)
 		}
 	}, [symbol, market])
+
 	return quote
 }

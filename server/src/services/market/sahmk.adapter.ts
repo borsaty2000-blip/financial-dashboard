@@ -1,8 +1,19 @@
-import { live, unavailable, type MarketEnvelope } from './market.types.js'
+import {
+	delayed,
+	live,
+	unavailable,
+	type MarketEnvelope,
+} from './market.types.js'
+import { getYahooDelayedEnvelope } from './yahoo.adapter.js'
 
 const baseUrl = (
 	process.env.SAHMK_BASE_URL ?? 'https://api.sahmk.sa/api/v1'
 ).replace(/\/$/, '')
+
+const isDelayed = (value: unknown) =>
+	typeof value === 'object' &&
+	value !== null &&
+	(value as Record<string, unknown>).is_delayed === true
 
 async function request<T>(
 	path: string,
@@ -22,12 +33,17 @@ async function request<T>(
 
 export async function getTasiSummary(): Promise<MarketEnvelope<unknown>> {
 	try {
-		return live('SAHMK', await request('/market/summary/', { index: 'TASI' }))
+		const data = await request('/market/summary/', { index: 'TASI' })
+		return isDelayed(data) ? delayed('SAHMK', data) : live('SAHMK', data)
 	} catch (error) {
-		return unavailable(
-			'SAHMK',
-			error instanceof Error ? error.message : 'SAHMK unavailable',
-		)
+		try {
+			return await getYahooDelayedEnvelope('^TASI.SR')
+		} catch {
+			return unavailable(
+				'Yahoo Finance',
+				error instanceof Error ? error.message : 'TASI unavailable',
+			)
+		}
 	}
 }
 
@@ -35,12 +51,17 @@ export async function getTasiQuote(
 	symbol: string,
 ): Promise<MarketEnvelope<unknown>> {
 	try {
-		return live('SAHMK', await request(`/quote/${encodeURIComponent(symbol)}/`))
+		const data = await request(`/quote/${encodeURIComponent(symbol)}/`)
+		return isDelayed(data) ? delayed('SAHMK', data) : live('SAHMK', data)
 	} catch (error) {
-		return unavailable(
-			'SAHMK',
-			error instanceof Error ? error.message : 'SAHMK unavailable',
-		)
+		try {
+			return await getYahooDelayedEnvelope(`${symbol}.SR`)
+		} catch {
+			return unavailable(
+				'Yahoo Finance',
+				error instanceof Error ? error.message : 'SAHMK unavailable',
+			)
+		}
 	}
 }
 

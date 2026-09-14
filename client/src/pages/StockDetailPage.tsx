@@ -3,6 +3,7 @@ import { api } from '../lib/api'
 import { useLivePrice } from '../hooks/useLivePrice'
 
 type Candle = { date: string; close: number; volume: number }
+type Scalar = string | number | null | undefined
 type Candles = {
 	symbol: string
 	candles: Candle[]
@@ -10,14 +11,37 @@ type Candles = {
 	freshness?: 'live' | 'delayed' | 'cached'
 }
 type Watchlist = { id: string; items: { symbol: string }[] }
-type FeatureResponse = {
-	data?: any
+type FeaturePayload = {
 	forecast?: number[]
 	confidence?: number
 	articleCount?: number
 	distribution?: Record<string, number>
 	latest?: boolean
 	anomalyCount?: number
+}
+type FeatureResponse = FeaturePayload & { data?: FeaturePayload }
+type FinancialStatement = {
+	filingDate?: Scalar
+	period?: Scalar
+	revenue?: Scalar
+	totalRevenue?: Scalar
+	netIncome?: Scalar
+	netIncomeLoss?: Scalar
+}
+type Fundamentals = {
+	keyRatios?: Record<string, Scalar>
+	incomeStatement?: FinancialStatement[]
+	available?: boolean
+}
+type InsiderTrade = {
+	id: string
+	insiderName: string
+	insiderRole: string
+	transactionType: 'BUY' | 'SELL'
+	shares: number
+}
+type Ownership = {
+	shareholders?: Array<{ name: string; percentage: number | null }>
 }
 
 export function StockDetailPage({ symbol }: { symbol: string }) {
@@ -27,22 +51,26 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 		null,
 	)
 	const [anomalyData, setAnomalyData] = useState<FeatureResponse | null>(null)
-	const [fundamentals, setFundamentals] = useState<any>(null)
-	const [insiderTrades, setInsiderTrades] = useState<any[]>([])
-	const [ownership, setOwnership] = useState<any>(null)
+	const [fundamentals, setFundamentals] = useState<Fundamentals | null>(null)
+	const [insiderTrades, setInsiderTrades] = useState<InsiderTrade[]>([])
+	const [ownership, setOwnership] = useState<Ownership | null>(null)
 	const [message, setMessage] = useState('')
 	const [loading, setLoading] = useState(true)
 	const [isPlaying, setIsPlaying] = useState(false)
 	const normalized = symbol.toUpperCase()
-	const livePrice = useLivePrice(normalized)
+	const market = /^\d{4,5}$/u.test(normalized) ? 'TASI' : 'EGX'
+	const livePrice = useLivePrice(normalized, market)
 
 	useEffect(() => {
 		const controller = new AbortController()
 		const timeout = window.setTimeout(() => controller.abort(), 12_000)
 		let cancelled = false
-		void api<Candles>(`/api/market/candles/${normalized}?days=120`, {
-			signal: controller.signal,
-		})
+		void api<Candles>(
+			`/api/market/candles/${normalized}?market=${market}&days=120`,
+			{
+				signal: controller.signal,
+			},
+		)
 			.then((result) => {
 				if (!cancelled) setData(result)
 			})
@@ -62,13 +90,13 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 		void api<FeatureResponse>(`/api/analysis/${normalized}/anomalies`)
 			.then(setAnomalyData)
 			.catch(() => undefined)
-		void api<any>(`/api/fundamentals/${normalized}`)
+		void api<Fundamentals>(`/api/fundamentals/${normalized}`)
 			.then(setFundamentals)
 			.catch(() => undefined)
-		void api<{ data: any[] }>(`/api/insider-trades/${normalized}`)
+		void api<{ data: InsiderTrade[] }>(`/api/insider-trades/${normalized}`)
 			.then((result) => setInsiderTrades(result.data))
 			.catch(() => undefined)
-		void api<any>(`/api/ownership/${normalized}`)
+		void api<Ownership>(`/api/ownership/${normalized}`)
 			.then(setOwnership)
 			.catch(() => undefined)
 		return () => {
@@ -76,7 +104,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 			controller.abort()
 			window.clearTimeout(timeout)
 		}
-	}, [normalized])
+	}, [market, normalized])
 
 	const stats = useMemo(() => {
 		const candles = data?.candles ?? []
@@ -97,7 +125,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 		}
 	}, [data])
 
-	async function addToWatchlist() {
+	const addToWatchlist = async () => {
 		try {
 			const lists = await api<Watchlist[]>('/api/watchlists')
 			const list =
@@ -115,7 +143,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 			setMessage('سجّل الدخول لإضافة السهم إلى قائمتك')
 		}
 	}
-	async function listen() {
+	const listen = async () => {
 		const text = `السعر الحالي لسهم ${normalized} هو ${stats.last?.close?.toFixed(2) ?? 'غير متاح'}. التغير ${stats.changePercent?.toFixed(2) ?? 'غير متاح'} بالمئة.`
 		try {
 			const response = await fetch(
@@ -143,6 +171,14 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 	const ai = ensembleData?.data ?? ensembleData
 	const mood = sentimentData?.data ?? sentimentData
 	const anomalyResult = anomalyData?.data ?? anomalyData
+	const fundamentalMetrics: Array<[string, Scalar]> = [
+		['P/E', fundamentals?.keyRatios?.peRatio],
+		['EPS', fundamentals?.keyRatios?.eps],
+		['القيمة السوقية', fundamentals?.keyRatios?.marketCap],
+		['عائد التوزيعات', fundamentals?.keyRatios?.dividendYield],
+		['أعلى 52 أسبوعاً', fundamentals?.keyRatios?.fiftyTwoWeekHigh],
+		['أدنى 52 أسبوعاً', fundamentals?.keyRatios?.fiftyTwoWeekLow],
+	]
 
 	return (
 		<main className="stock-detail-page" dir="rtl">
@@ -287,14 +323,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 							<span className="eyebrow">مالية</span>
 						</div>
 						<div className="fundamentals-grid">
-							{[
-								['P/E', fundamentals?.keyRatios?.peRatio],
-								['EPS', fundamentals?.keyRatios?.eps],
-								['القيمة السوقية', fundamentals?.keyRatios?.marketCap],
-								['عائد التوزيعات', fundamentals?.keyRatios?.dividendYield],
-								['أعلى 52 أسبوعاً', fundamentals?.keyRatios?.fiftyTwoWeekHigh],
-								['أدنى 52 أسبوعاً', fundamentals?.keyRatios?.fiftyTwoWeekLow],
-							].map(([label, value]) => (
+							{fundamentalMetrics.map(([label, value]) => (
 								<div key={String(label)}>
 									<span>{label}</span>
 									<strong>
@@ -311,17 +340,15 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 						</div>
 						{fundamentals?.incomeStatement?.length ? (
 							<div className="fundamentals-table">
-								{fundamentals.incomeStatement
-									.slice(0, 5)
-									.map((item: any, index: number) => (
-										<div key={index}>
-											<span>
-												{item.filingDate ?? item.period ?? `سنة ${index + 1}`}
-											</span>
-											<b>{item.revenue ?? item.totalRevenue ?? '—'}</b>
-											<b>{item.netIncome ?? item.netIncomeLoss ?? '—'}</b>
-										</div>
-									))}
+								{fundamentals.incomeStatement.slice(0, 5).map((item, index) => (
+									<div key={index}>
+										<span>
+											{item.filingDate ?? item.period ?? `سنة ${index + 1}`}
+										</span>
+										<b>{item.revenue ?? item.totalRevenue ?? '—'}</b>
+										<b>{item.netIncome ?? item.netIncomeLoss ?? '—'}</b>
+									</div>
+								))}
 							</div>
 						) : (
 							<p className="muted">
@@ -340,7 +367,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 							<span className="eyebrow">Insider Trading</span>
 						</div>
 						<div className="ownership-list">
-							{(ownership?.shareholders ?? []).map((item: any) => (
+							{(ownership?.shareholders ?? []).map((item) => (
 								<div key={item.name}>
 									<span>{item.name}</span>
 									<b>{item.percentage == null ? '—' : `${item.percentage}%`}</b>

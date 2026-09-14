@@ -3,7 +3,7 @@ import { navigate } from '../router'
 
 type MarketEnvelope = {
 	available?: boolean
-	freshness?: 'live' | 'cached' | 'stale'
+	freshness?: 'live' | 'delayed' | 'cached' | 'stale'
 	data?: unknown
 }
 
@@ -61,6 +61,8 @@ const toStatus = (envelope: MarketEnvelope | null): MarketCard['status'] => {
 	if (!envelope?.available) return 'unavailable'
 	return envelope.freshness === 'live' ? 'live' : 'cached'
 }
+const quoteValue = (value: unknown) =>
+	numberFrom(value, ['value', 'price', 'close', 'indexValue', 'index_value'])
 
 const formatValue = (value?: number) =>
 	value == null
@@ -201,12 +203,20 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 			{
 				label: 'EGX',
 				caption: 'السوق المصري',
-				value: numberFrom(egxData, ['value', 'close', 'indexValue', 'egx30']),
-				change: numberFrom(egxData, [
-					'changePercent',
-					'change_percent',
-					'percentChange',
-				]),
+				value:
+					quoteValue(nested(egxData, 'egx30')) ??
+					numberFrom(egxData, ['value', 'close', 'indexValue', 'egx30']),
+				change:
+					numberFrom(nested(egxData, 'egx30'), [
+						'changePercent',
+						'change_percent',
+						'percentChange',
+					]) ??
+					numberFrom(egxData, [
+						'changePercent',
+						'change_percent',
+						'percentChange',
+					]),
 				status: toStatus(egx),
 			},
 			{

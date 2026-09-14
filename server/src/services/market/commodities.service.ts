@@ -30,7 +30,7 @@ async function quote(symbol: string) {
 				price,
 				changePercent: Number(data?.percent_change) || null,
 				updatedAt: data?.datetime ?? null,
-				source: 'Twelve Data Pro',
+				source: 'Twelve Data',
 			}
 		: null
 }
