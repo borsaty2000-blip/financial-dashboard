@@ -37,6 +37,7 @@ model User {
   analystProfile       AnalystProfile?
   analystSubscriptions AnalystSubscription[] @relation("Subscriber")
   analystSubscribers   AnalystSubscription[] @relation("Analyst")
+  savedScreeners       SavedScreener[]
 
   @@index([email])
   @@index([username])
@@ -279,4 +280,54 @@ model AnalystSubscription {
   @@unique([subscriberId, analystId])
   @@index([analystId])
   @@map("analyst_subscriptions")
+}
+
+model MarketCandle {
+  id        String   @id @default(uuid())
+  symbol    String
+  market    String
+  interval  String
+  date      DateTime
+  open      Float
+  high      Float
+  low       Float
+  close     Float
+  volume    Float    @default(0)
+  source    String
+  createdAt DateTime @default(now())
+
+  @@unique([symbol, market, interval, date])
+  @@index([symbol, market, date])
+  @@map("market_candles")
+}
+
+model EconomicEvent {
+  id         String   @id @default(uuid())
+  eventKey   String   @unique
+  date       DateTime
+  country    String
+  category   String
+  title      String
+  importance String
+  previous   String?
+  forecast   String?
+  actual     String?
+  source     String   @default("manual")
+  createdAt  DateTime @default(now())
+
+  @@index([date, country, importance])
+  @@map("economic_events")
+}
+
+model SavedScreener {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  filters   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("saved_screeners")
 }

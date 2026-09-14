@@ -588,3 +588,22 @@ Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
 التحقق النهائي: `npm run typecheck` ناجح، `npm run build` ناجح، و91 اختباراً ناجحة. `npx prisma validate` و`npx prisma generate` ناجحان عند إزالة متغير `DATABASE_URL` الموروث غير الصالح من جلسة التشغيل حتى يقرأ Prisma القيمة المحلية الصحيحة من `.env`. اختبارات HTTP أعادت Health 200، والتقارير والمطور وDeveloper API أعادت 401 بدون مصادقة كما هو متوقع، وGlobal Comparison أعاد 200 مع حالة توفر صريحة. لم يتم النشر الخارجي ولم يتم دفع commits إلى origin.
 
 عدد commits Parts 6–15: 10 commits، من `2e28908` حتى `557777d`، إضافة إلى commit نهائي مشترك للواجهة والتوثيق. القيود الخارجية: WhatsApp وTelegram وgTTS وموصل الأخبار تحتاج مفاتيح أو حزم اختيارية؛ Analyst subscriptions تحتاج تطبيق migration على قاعدة الإنتاج قبل الاستخدام.
+
+
+## ملحق pasted_content_30 — Reliable Data, Fundamentals, Calendar, News, Screener and Portfolio Analytics
+
+تم تنفيذ الأولويات الست بالترتيب المطلوب دون نشر خارجي. في طبقة البيانات أصبحت `CandlesService` تستخدم Twelve Data Pro ثم SAHMK Pro للسوق السعودي ثم Polygon.io ثم Yahoo/Stooq/Finnhub كبدائل، مع كاش 60 ثانية لكل رمز وفترة وسوق، وحفظ ناجح اختياري في جدول `market_candles`. أضيف `getQuote` وendpoint `GET /api/market/quote/:symbol` مع `freshness` و`delayedByMinutes`. أضيف `server/src/sockets/price-stream.ts` وبث `price:update` كل ثانية للأسهم التي اشتركت فعلياً، إضافة إلى hook الواجهة `useLivePrice` ومؤشر Live/Delayed/Cached في صفحة السهم.
+
+أضيف `FundamentalsService` مع مسارات `/api/fundamentals/:symbol` و`/ratios` و`/dividends`. يدعم Finnhub وSAHMK وTwelve Data مع إعادة `—` أو حالة `available:false` عند غياب القيمة، وأضيف قسم البيانات المالية في صفحة تفاصيل السهم مع مؤشرات P/E وEPS والقيمة السوقية والتوزيعات و52 أسبوعاً وقائمة مالية عند توفرها.
+
+أضيف نموذج `EconomicEvent` وmigration وخدمة تقويم يدوي تمتد ستة أشهر لمصر والسعودية والعالمي، مع فلاتر الدولة والأهمية والفئة، ومساري `/api/calendar/events` و`/api/calendar/notify` وصفحة `/calendar`. يوجد fallback يدوي واضح إذا لم تكن migration مطبقة بعد، ولا تُعرض الأحداث على أنها بيانات Trading Economics إلا عند ربط مصدر خارجي.
+
+أضيف `NewsService` بخمسة RSS قابلة للضبط: Mubasher وArgaam وEnterprise والبورصة المصرية وInvesting.com العربي، مع تصنيف اقتصاد/شركات/عام، ربط الرموز داخل العنوان والوصف، ملخص من جملتين، sentiment score وشارة المشاعر. عند تشغيل Python service يستخدم AraBERT/CAMeL model المحدد في `ARABIC_SENTIMENT_MODEL`، وإلا يستخدم fallback قاموسياً معلناً. الواجهة متاحة على `/news` ومسارات `/api/news` و`/api/news/:symbol`.
+
+أضيف `ScreenerService` و25 حقلاً قابلاً للتوسع تشمل P/E وP/B وEPS وROE وRSI وMACD وSMA والقيمة السوقية والحجم والتوزيعات وConsensus، مع `/api/screener/scan` و`/presets` و`/save` و`/alert` وصفحة `/screener`. الفلاتر التي لا تتوفر لها بيانات لا تخترع قيماً؛ تُعامل كقيم غير متاحة ولا تمنع العرض.
+
+أضيف `PortfolioAnalyticsService` وحساب Sharpe وSortino وMax Drawdown وBeta مقابل EGX30 وAlpha والعائد الكلي ومنحنى Equity، مع endpoint محمي `/api/portfolio/analytics` وصفحة `/portfolio/analytics`. عند عدم وجود صفقات مغلقة أو سلسلة EGX30 يعاد `null` بدلاً من رقم مصطنع.
+
+نتائج الاختبار: `npm run typecheck` ناجح، `npm run build` ناجح، و91 اختباراً ناجحة، `python3 -m py_compile` ناجح، و`prisma validate/generate` ناجحان عند إزالة `DATABASE_URL` الموروث غير الصالح من جلسة التشغيل. Health 200، Quote 200، Fundamentals 200 مع حالة توفر صريحة، Calendar 200، News 200، Presets 200، Screener scan 200، وPortfolio Analytics 401 بدون جلسة كما هو متوقع.
+
+القيود: المصدر الحي الحقيقي يتطلب مفاتيح `TWELVE_DATA_API_KEY` و`SAHMK_API_KEY` و`POLYGON_API_KEY`؛ البث كل ثانية لا يعني أن المزود نفسه يرسل tick جديداً كل ثانية، بل يعيد نشر أحدث quote متاح. الأخبار تعتمد على توفر RSS، وAraBERT يتطلب تشغيل خدمة Python وحزمة النموذج، كما يجب تطبيق migrations الثلاث الجديدة على قاعدة الإنتاج قبل الاعتماد على التخزين التاريخي والتقويم والماسح المحفوظ.

@@ -37,6 +37,10 @@ import { AnalystsPage } from './pages/AnalystsPage'
 import { AnalystApplyPage } from './pages/AnalystApplyPage'
 import { DeveloperDashboardPage } from './pages/DeveloperDashboardPage'
 import { DigitalTwinPage } from './pages/DigitalTwinPage'
+import { EconomicCalendarPage } from './pages/EconomicCalendarPage'
+import { NewsPage } from './pages/NewsPage'
+import { AdvancedScreenerPage } from './pages/AdvancedScreenerPage'
+import { PortfolioAnalyticsPage } from './pages/PortfolioAnalyticsPage'
 import NotificationLive from './components/NotificationLive'
 import { LiveAnalysisFeed } from './components/Analysis/LiveAnalysisFeed'
 
@@ -79,14 +83,14 @@ function RoutedApp() {
 		)
 	if (path === '/compare') return <ComparisonPage />
 	if (path === '/compare/global') return <GlobalComparisonPage />
-	if (path === '/analysts' || path.startsWith('/analysts/'))
-		return <AnalystsPage />
 	if (path === '/analysts/apply')
 		return (
 			<ProtectedRoute>
 				<AnalystApplyPage />
 			</ProtectedRoute>
 		)
+	if (path === '/analysts' || path.startsWith('/analysts/'))
+		return <AnalystsPage />
 	if (path === '/developer/dashboard')
 		return (
 			<ProtectedRoute>
@@ -97,6 +101,15 @@ function RoutedApp() {
 		return (
 			<ProtectedRoute>
 				<DigitalTwinPage />
+			</ProtectedRoute>
+		)
+	if (path === '/calendar') return <EconomicCalendarPage />
+	if (path === '/news') return <NewsPage />
+	if (path === '/screener') return <AdvancedScreenerPage />
+	if (path === '/portfolio/analytics')
+		return (
+			<ProtectedRoute>
+				<PortfolioAnalyticsPage />
 			</ProtectedRoute>
 		)
 	if (path === '/weekly-report' || path === '/reports/weekly')

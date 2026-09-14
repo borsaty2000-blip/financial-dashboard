@@ -31,6 +31,10 @@ import { audioRoutes } from './src/routes/audio.routes.js'
 import { whatsappRoutes } from './src/routes/whatsapp.routes.js'
 import { telegramRoutes } from './src/routes/telegram.routes.js'
 import { analystsRoutes } from './src/routes/analysts.routes.js'
+import { fundamentalsRoutes } from './src/routes/fundamentals.routes.js'
+import { calendarRoutes } from './src/routes/calendar.routes.js'
+import { newsRoutes } from './src/routes/news.routes.js'
+import { screenerRoutes } from './src/routes/screener.routes.js'
 
 const app = express()
 app.use(express.json())
@@ -98,6 +102,10 @@ app.get('/api/health', (_request, response) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/market', marketRoutes)
+app.use('/api/fundamentals', fundamentalsRoutes)
+app.use('/api/calendar', calendarRoutes)
+app.use('/api/news', newsRoutes)
+app.use('/api/screener', screenerRoutes)
 app.use('/api/analysis', analysisRoutes)
 app.use('/api/shariah', shariahRoutes)
 app.use('/api/tradingview/webhook', tradingViewRoutes)
