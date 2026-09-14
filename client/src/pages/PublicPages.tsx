@@ -864,6 +864,44 @@ function PublicFooter() {
 	)
 }
 
+function PublicPromoBanner() {
+	return (
+		<section
+			className="borsaty-promo-banner"
+			aria-label="رسالة بورصتي التعريفية"
+		>
+			<div className="borsaty-promo-banner__label">
+				<span aria-hidden="true">✦</span>
+				بورصتي · مركز التحليل العربي
+			</div>
+			<div className="borsaty-promo-banner__viewport">
+				<div className="borsaty-promo-banner__track">
+					<strong>
+						منصة عربية متقدمة تجمع متابعة الأسواق والتحليل التعليمي في مساحة
+						واحدة
+					</strong>
+					<span>مؤشرات فنية</span>
+					<span>Elliott Wave</span>
+					<span>Gann</span>
+					<span>Consensus</span>
+					<span>Backtesting</span>
+					<span>أخبار وتقويم اقتصادي</span>
+					<strong>
+						بيانات مصر والسعودية والذهب والفضة — دون وعود أو أرقام مختلقة
+					</strong>
+				</div>
+			</div>
+			<button
+				type="button"
+				className="borsaty-promo-banner__action"
+				onClick={() => navigate('/analysis/elliott')}
+			>
+				اكتشف مركز التحليل <span aria-hidden="true">←</span>
+			</button>
+		</section>
+	)
+}
+
 export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 	const [egx, setEgx] = useState<MarketEnvelope | null>(null)
 	const [tasi, setTasi] = useState<MarketEnvelope | null>(null)
@@ -1027,6 +1065,7 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 	return (
 		<div className="borsaty-public-page" dir="rtl">
 			<PublicHeader live={live} news={news} />
+			<PublicPromoBanner />
 			<main>
 				<section className="borsaty-hero">
 					<div className="borsaty-hero__copy">
