@@ -5,6 +5,7 @@ import type {
 	LoginInput,
 	RegisterInput,
 } from '../../validators/auth.validator.js'
+import { verifyTwoFactor } from './two-factor.service.js'
 
 const publicUser = {
 	id: true,
@@ -107,6 +108,24 @@ export async function login(
 		!(await bcrypt.compare(input.password, user.passwordHash))
 	)
 		throw genericAuthError
+	if (
+		user.twoFactorEnabled &&
+		(!input.twoFactorCode ||
+			!user.twoFactorSecret ||
+			!verifyTwoFactor(user.twoFactorSecret, input.twoFactorCode))
+	) {
+		throw new Error('رمز التحقق بخطوتين مطلوب أو غير صحيح')
+	}
+	await prisma.loginHistory
+		.create({
+			data: {
+				userId: user.id,
+				userAgent: meta?.userAgent,
+				ipAddress: meta?.ipAddress,
+				success: true,
+			},
+		})
+		.catch(() => undefined)
 	await prisma.user.update({
 		where: { id: user.id },
 		data: { lastLoginAt: new Date() },
