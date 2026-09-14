@@ -1,6 +1,6 @@
 {
 	"version": 2,
-	"buildCommand": "npx prisma generate && npm run build",
+	"buildCommand": "npx prisma generate && npx prisma migrate deploy && npm run build",
 	"installCommand": "npm install --include=dev && npm --prefix client install --include=dev",
 	"outputDirectory": "client/dist",
 	"functions": {

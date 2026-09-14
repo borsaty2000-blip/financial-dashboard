@@ -774,3 +774,11 @@ Commits المرحلة: `d06ee22` للتقويمات المتخصصة، `5736caa
 أظهر الفحص أن السعودية والمعادن تعيدان `available:false` عند غياب `SAHMK_API_KEY` أو جسر EGX الرسمي، من دون أرقام مختلقة. كما أن `/api/news` كان يعيد `available:true` مع قائمة فارغة؛ أضيف محلياً إصلاح يجعلها `available:false` مع رسالة واضحة عندما لا تُرجع أي feed أخباراً، واختُبر محلياً مع Gann والأخبار. هذا الإصلاح الأخير يحتاج commit ودفعاً منفصلاً قبل أن يظهر في الإنتاج.
 
 لم يُنفذ إنشاء حساب حقيقي: اختبار جسم التسجيل الفارغ عاد 400 validator، أما إنشاء مستخدم صالح فمتوقف على إصلاح `DATABASE_URL` في Vercel ويتطلب payload اختباراً صريحاً حتى لا يُنشأ حساب غير مقصود.
+
+## نتيجة تحديث DATABASE_URL واكتشاف schema drift
+
+بعد تحديث `DATABASE_URL` في Vercel أصبح `/api/health` بحالة 200، وأصبح طلب التسجيل يصل إلى Prisma بدلاً من الفشل في الاتصال. أعاد التسجيل الحالة 400 بسبب أن عمود `twoFactorEnabled` غير موجود في قاعدة الإنتاج، ما يثبت أن المشكلة الحالية هي **schema drift** وليست كلمة مرور أو DNS.
+
+يحتوي `prisma/schema.prisma` على `twoFactorSecret` و`twoFactorEnabled`، وتحتوي migration `20260914110000_add_push_security/migration.sql` على أوامر `ADD COLUMN IF NOT EXISTS` لهذه الأعمدة. أُضيف `npx prisma migrate deploy` إلى `vercel.json` قبل `npm run build`، بحيث تُطبّق migrations المتراكمة في مرحلة build قبل تشغيل Serverless. لم تُنفّذ migration مباشرة من البيئة المحلية ولم تُعرض أي قيمة سرية.
+
+نجحت بوابات التحقق المحلية بعد التعديل: Prisma validate، typecheck، typecheck:packages، اختبارات server، اختبارات auth، اختبارات الواجهة، build، وgit diff check. التغيير محفوظ محلياً فقط بانتظار موافقة نشر منفصلة لأن build سيجري migration على قاعدة الإنتاج.
