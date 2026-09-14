@@ -33,6 +33,7 @@ type LiveIndex = {
 
 type DirectoryCompany = {
 	symbol: string
+	displaySymbol?: string
 	name: string
 	currency?: string
 	exchange?: string
@@ -157,7 +158,9 @@ function MarketDirectory({
 		const normalized = query.trim().toLowerCase()
 		if (!normalized) return companies
 		return companies.filter((company) =>
-			`${company.symbol} ${company.name}`.toLowerCase().includes(normalized),
+			`${company.displaySymbol ?? ''} ${company.symbol} ${company.name}`
+				.toLowerCase()
+				.includes(normalized),
 		)
 	}, [companies, query])
 
@@ -199,6 +202,7 @@ function MarketDirectory({
 						<tbody>
 							{filtered.map((company) => {
 								const mover = prices.get(company.symbol)
+								const displaySymbol = company.displaySymbol ?? company.symbol
 								const price = mover?.price ?? company.price ?? undefined
 								const change =
 									mover?.changePercent ?? company.changePercent ?? undefined
@@ -219,7 +223,7 @@ function MarketDirectory({
 													className={`borsaty-status-dot is-${status}`}
 													aria-hidden="true"
 												/>
-												<b>{company.symbol}</b>
+												<b>{displaySymbol}</b>
 											</button>
 										</td>
 										<td>{company.name}</td>

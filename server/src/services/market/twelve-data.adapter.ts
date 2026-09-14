@@ -1,5 +1,6 @@
 export type TwelveCompany = {
 	symbol: string
+	displaySymbol?: string
 	name: string
 	currency: string
 	exchange: string
@@ -62,6 +63,13 @@ function normalizeCompany(
 	}
 }
 
+function displaySymbolFor(company: TwelveCompany): string | undefined {
+	const name = company.name.toLowerCase()
+	return Object.entries(egxAliases).find(([, aliases]) =>
+		aliases.some((alias) => name.includes(alias)),
+	)?.[0]
+}
+
 async function getCompaniesByExchange(
 	exchange: 'XCAI' | 'XSAU',
 ): Promise<TwelveCompany[]> {
@@ -78,6 +86,11 @@ async function getCompaniesByExchange(
 	const companies = (payload.data ?? [])
 		.map(normalizeCompany)
 		.filter((company): company is TwelveCompany => company !== null)
+		.map((company) => {
+			const displaySymbol =
+				exchange === 'XCAI' ? displaySymbolFor(company) : undefined
+			return displaySymbol ? { ...company, displaySymbol } : company
+		})
 	if (!companies.length)
 		throw new Error(`Twelve Data returned no ${exchange} companies`)
 	directoryCache.set(exchange, {

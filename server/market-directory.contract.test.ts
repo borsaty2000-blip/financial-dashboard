@@ -26,11 +26,25 @@ test('Saudi directory falls back to Twelve Data EOD without claiming live data',
 				}),
 				{ status: 200, headers: { 'content-type': 'application/json' } },
 			)
+		if (url.includes('exchange=XCAI'))
+			return new Response(
+				JSON.stringify({
+					data: [
+						{
+							symbol: 'EGS60121C018',
+							name: 'Commercial International Bank (Egypt) S.A.E.',
+							currency: 'EGP',
+							exchange: 'EGX',
+						},
+					],
+				}),
+				{ status: 200, headers: { 'content-type': 'application/json' } },
+			)
 		throw new Error(`unexpected URL in contract test: ${url}`)
 	}
 
 	try {
-		const { clearTwelveDirectoryCacheForTest } =
+		const { clearTwelveDirectoryCacheForTest, getEgyptCompanies } =
 			await import('./src/services/market/twelve-data.adapter.js')
 		const { getTasiCompanies } =
 			await import('./src/services/market/sahmk.adapter.js')
@@ -52,6 +66,10 @@ test('Saudi directory falls back to Twelve Data EOD without claiming live data',
 				figiCode: null,
 			},
 		])
+		clearTwelveDirectoryCacheForTest()
+		const egypt = await getEgyptCompanies()
+		assert.equal(egypt[0]?.symbol, 'EGS60121C018')
+		assert.equal(egypt[0]?.displaySymbol, 'COMI')
 	} finally {
 		globalThis.fetch = originalFetch
 	}
