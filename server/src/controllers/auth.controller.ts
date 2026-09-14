@@ -23,6 +23,20 @@ const meta = (req: Request) => ({
 })
 const sendError = (res: Response, error: unknown) => {
 	const message = error instanceof Error ? error.message : 'حدث خطأ في المصادقة'
+	if (
+		message.includes('Prisma') ||
+		message.includes("Can't reach database server") ||
+		message.includes('P1001') ||
+		message.includes('P1002') ||
+		message.includes('ECONN')
+	) {
+		res.status(503).json({ error: 'خدمة قاعدة البيانات غير متاحة حالياً' })
+		return
+	}
+	if (message.includes('Unique constraint') || message.includes('P2002')) {
+		res.status(409).json({ error: 'البريد أو اسم المستخدم مستخدم بالفعل' })
+		return
+	}
 	const status =
 		message.includes('خطأ في') || message.includes('Invalid token') ? 401 : 400
 	res.status(status).json({ error: message })

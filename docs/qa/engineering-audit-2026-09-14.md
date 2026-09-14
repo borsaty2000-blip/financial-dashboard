@@ -125,3 +125,7 @@ at ... server/src/routes/profile.routes.ts
 تم دفع `6896f5e` إلى `origin/main`، وأصبح `/api/health` على `borsatyai.com` بحالة 200 بعد أربع محاولات مراقبة. بعد النشر أصبحت المسارات التالية 200: health، market summary، EGX summary، TASI summary، gold، EGX companies، consensus، news، وOpenAPI. بقي Elliott وGann بحالة 502 برسالة `fetch failed` لأن `PYTHON_SERVICE_URL` غير موجودة في Vercel، كما ظهرت استجابات `available: false` للبيانات السوقية بسبب غياب `SAHMK_API_KEY` وغياب جسر EGX الرسمي في بيئة الإنتاج.
 
 أضيف بعد ذلك fallback حتمي داخل Node لمعادلات Elliott وGann التعليمية، مع `engine: deterministic-node-fallback` وإخلاء صريح. اختُبر محلياً مع خدمة Python معزولة، وأعاد المساران 200 بعقد fallback واضح. لم يُنشر هذا التعديل الثاني بعد عند كتابة هذه الفقرة.
+
+## فحص المصادقة بعد النشر
+
+اختبار `POST /api/auth/login` ببيانات غير صالحة لم ينشئ أي سجل، لكنه كشف أن Vercel لا يستطيع الوصول إلى Neon، وكانت الاستجابة القديمة تسرب hostname قاعدة البيانات داخل رسالة Prisma. فحص DNS أظهر أن المضيف يحل إلى `63.182.37.92` وأن TCP/5432 متاح من بيئة الفحص، لذلك يلزم التحقق من قيمة `DATABASE_URL` واسم المضيف/SSL في Vercel وNeon دون كشف السر. عُدّل auth controller محلياً لتحويل أخطاء Prisma/اتصال قاعدة البيانات إلى HTTP 503 برسالة عربية عامة، وتحويل تعارض uniqueness إلى 409، ومنع تسريب تفاصيل الاتصال.
