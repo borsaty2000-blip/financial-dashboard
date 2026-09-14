@@ -10,7 +10,7 @@ from services.forecasting import forecast_arima, forecast_lstm
 from services.backtesting import backtest_elliott, backtest_gann, backtest_indicators
 from services.candlestick import detect_candlestick_patterns
 from services.ensemble import ensemble_forecast
-from services.arabic_sentiment import get_stock_sentiment
+from services.arabic_sentiment import analyze_sentiment, get_stock_sentiment
 from services.anomaly import get_anomaly_score
 from utils.data_prep import prepare_dates, prepare_prices
 
@@ -60,6 +60,10 @@ class AnomalyData(BaseModel):
     symbol: str = "UNKNOWN"
     prices: List[float] = Field(min_length=20)
     volumes: List[float] | None = None
+
+
+class SentimentData(BaseModel):
+    text: str = Field(min_length=1, max_length=4000)
 
 
 @app.get("/health")
@@ -132,6 +136,11 @@ async def ensemble_endpoint(data: EnsembleData) -> dict:
 @app.get("/sentiment/{symbol}")
 async def sentiment_endpoint(symbol: str) -> dict:
     return {"status": "success", "data": get_stock_sentiment(symbol)}
+
+
+@app.post("/analyze/sentiment")
+async def sentiment_text_endpoint(data: SentimentData) -> dict:
+    return {"status": "success", "data": analyze_sentiment(data.text)}
 
 
 @app.post("/analyze/anomaly")
