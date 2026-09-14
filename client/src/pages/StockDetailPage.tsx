@@ -32,6 +32,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 	const [ownership, setOwnership] = useState<any>(null)
 	const [message, setMessage] = useState('')
 	const [loading, setLoading] = useState(true)
+	const [isPlaying, setIsPlaying] = useState(false)
 	const normalized = symbol.toUpperCase()
 	const livePrice = useLivePrice(normalized)
 
@@ -97,8 +98,25 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 			setMessage('سجّل الدخول لإضافة السهم إلى قائمتك')
 		}
 	}
-	function listen() {
+	async function listen() {
 		const text = `السعر الحالي لسهم ${normalized} هو ${stats.last?.close?.toFixed(2) ?? 'غير متاح'}. التغير ${stats.changePercent?.toFixed(2) ?? 'غير متاح'} بالمئة.`
+		try {
+			const response = await fetch(
+				`${import.meta.env.VITE_API_URL ?? ''}/api/analysis/${normalized}/audio`,
+			)
+			if (
+				response.ok &&
+				response.headers.get('content-type')?.includes('audio')
+			) {
+				const audio = new Audio(URL.createObjectURL(await response.blob()))
+				setIsPlaying(true)
+				audio.onended = () => setIsPlaying(false)
+				await audio.play()
+				return
+			}
+		} catch {
+			/* use browser speech fallback */
+		}
 		if ('speechSynthesis' in window) {
 			window.speechSynthesis.cancel()
 			window.speechSynthesis.speak(new SpeechSynthesisUtterance(text))
@@ -121,7 +139,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 				</div>
 				<div className="stock-header-actions">
 					<button className="secondary-button" onClick={listen}>
-						🎧 استمع للتحليل
+						{isPlaying ? '⏸ إيقاف الصوت' : '🎧 استمع للتحليل'}
 					</button>
 					<button className="primary-button" onClick={addToWatchlist}>
 						＋ أضف إلى قائمتي

@@ -1,6 +1,8 @@
 from typing import List
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
+import io
 from pydantic import BaseModel, Field
 
 from services.elliott_wave import analyze_elliott_wave
@@ -13,6 +15,7 @@ from services.ensemble import ensemble_forecast
 from services.arabic_sentiment import analyze_sentiment, get_stock_sentiment
 from services.anomaly import get_anomaly_score
 from utils.data_prep import prepare_dates, prepare_prices
+from services.tts_service import generate_analysis_audio
 
 app = FastAPI(title="Borsaty Analysis Service", version="1.0.0")
 
@@ -64,6 +67,11 @@ class AnomalyData(BaseModel):
 
 class SentimentData(BaseModel):
     text: str = Field(min_length=1, max_length=4000)
+
+
+class TTSData(BaseModel):
+    symbol: str
+    analysis: dict
 
 
 @app.get("/health")
@@ -181,3 +189,14 @@ async def candlestick_endpoint(data: CandlestickData) -> dict:
         return {"status": "success", "data": detect_candlestick_patterns(data.opens, data.highs, data.lows, data.closes, data.dates)}
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@app.post("/tts/analysis")
+async def tts_endpoint(data: TTSData):
+    try:
+        audio = generate_analysis_audio(data.symbol, data.analysis)
+        return StreamingResponse(io.BytesIO(audio), media_type="audio/mpeg")
+    except RuntimeError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    except Exception as error:
+        raise HTTPException(status_code=502, detail="تعذر توليد التحليل الصوتي") from error

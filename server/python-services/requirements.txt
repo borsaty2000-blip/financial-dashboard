@@ -10,3 +10,4 @@ arch
 statsmodels
 tensorflow
 databricks-sql-connector
+gTTS
