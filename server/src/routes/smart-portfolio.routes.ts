@@ -5,6 +5,7 @@ import {
 	getSmartPortfolio,
 	rebalancePlan,
 } from '../services/portfolio/smart-portfolio.service.js'
+import { getPortfolioAnalytics } from '../services/portfolio/portfolio-analytics.service.js'
 
 export const smartPortfolioRoutes = Router()
 smartPortfolioRoutes.use(requireAuth)
@@ -68,6 +69,19 @@ smartPortfolioRoutes.post('/smart/rebalance', async (request, response) => {
 			available: false,
 			error:
 				error instanceof Error ? error.message : 'Rebalance plan unavailable',
+		})
+	}
+})
+smartPortfolioRoutes.get('/analytics', async (request, response) => {
+	try {
+		return response.json(await getPortfolioAnalytics(request.userId!))
+	} catch (error) {
+		return response.status(502).json({
+			available: false,
+			error:
+				error instanceof Error
+					? error.message
+					: 'Portfolio analytics unavailable',
 		})
 	}
 })
