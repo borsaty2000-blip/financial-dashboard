@@ -39,6 +39,11 @@ model User {
   analystSubscriptions AnalystSubscription[] @relation("Subscriber")
   analystSubscribers   AnalystSubscription[] @relation("Analyst")
   savedScreeners       SavedScreener[]
+  pushSubscriptions    PushSubscription[]
+  pushNotifications    PushNotification[]
+  loginHistory         LoginHistory[]
+  twoFactorSecret      String?
+  twoFactorEnabled     Boolean               @default(false)
 
   @@index([email])
   @@index([username])
@@ -105,6 +110,54 @@ model Session {
 
   @@index([userId])
   @@map("sessions")
+}
+
+model LoginHistory {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ipAddress String?
+  userAgent String?
+  location  String?
+  success   Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@map("login_history")
+}
+
+model PushSubscription {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint   String
+  p256dh     String
+  auth       String
+  deviceType String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, endpoint])
+  @@index([userId, isActive])
+  @@map("push_subscriptions")
+}
+
+model PushNotification {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  icon      String?
+  link      String?
+  data      Json?
+  sent      Boolean   @default(false)
+  sentAt    DateTime?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, sent])
+  @@map("push_notifications")
 }
 
 model Follow {

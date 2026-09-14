@@ -1,0 +1,12 @@
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "twoFactorSecret" TEXT;
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "twoFactorEnabled" BOOLEAN NOT NULL DEFAULT false;
+CREATE TABLE IF NOT EXISTS "login_history" ("id" TEXT NOT NULL,"userId" TEXT NOT NULL,"ipAddress" TEXT,"userAgent" TEXT,"location" TEXT,"success" BOOLEAN NOT NULL DEFAULT true,"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "login_history_pkey" PRIMARY KEY ("id"));
+CREATE INDEX IF NOT EXISTS "login_history_userId_createdAt_idx" ON "login_history"("userId","createdAt");
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname='login_history_userId_fkey') THEN ALTER TABLE "login_history" ADD CONSTRAINT "login_history_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
+CREATE TABLE IF NOT EXISTS "push_subscriptions" ("id" TEXT NOT NULL,"userId" TEXT NOT NULL,"endpoint" TEXT NOT NULL,"p256dh" TEXT NOT NULL,"auth" TEXT NOT NULL,"deviceType" TEXT,"isActive" BOOLEAN NOT NULL DEFAULT true,"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "push_subscriptions_pkey" PRIMARY KEY ("id"));
+CREATE UNIQUE INDEX IF NOT EXISTS "push_subscriptions_userId_endpoint_key" ON "push_subscriptions"("userId","endpoint");
+CREATE INDEX IF NOT EXISTS "push_subscriptions_userId_isActive_idx" ON "push_subscriptions"("userId","isActive");
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname='push_subscriptions_userId_fkey') THEN ALTER TABLE "push_subscriptions" ADD CONSTRAINT "push_subscriptions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
+CREATE TABLE IF NOT EXISTS "push_notifications" ("id" TEXT NOT NULL,"userId" TEXT NOT NULL,"title" TEXT NOT NULL,"body" TEXT NOT NULL,"icon" TEXT,"link" TEXT,"data" JSONB,"sent" BOOLEAN NOT NULL DEFAULT false,"sentAt" TIMESTAMP(3),"readAt" TIMESTAMP(3),"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "push_notifications_pkey" PRIMARY KEY ("id"));
+CREATE INDEX IF NOT EXISTS "push_notifications_userId_sent_idx" ON "push_notifications"("userId","sent");
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname='push_notifications_userId_fkey') THEN ALTER TABLE "push_notifications" ADD CONSTRAINT "push_notifications_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;

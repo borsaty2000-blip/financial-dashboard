@@ -42,9 +42,14 @@ import {
 } from './src/routes/additional-markets.routes.js'
 import { comprehensiveComparisonRoutes } from './src/routes/comprehensive-comparison.routes.js'
 import { governanceRoutes } from './src/routes/governance.routes.js'
+import { pushRoutes } from './src/routes/push.routes.js'
+import { languageMiddleware } from './src/middleware/language.js'
+import { reportsRoutes } from './src/routes/reports.routes.js'
+import { securityRoutes } from './src/routes/security.routes.js'
 
 const app = express()
 app.use(express.json())
+app.use(languageMiddleware)
 app.use(publicRateLimit)
 const port = Number(process.env.PORT ?? 4000)
 
@@ -69,7 +74,7 @@ app.use((request, response, next) => {
 	)
 	response.setHeader(
 		'Access-Control-Allow-Headers',
-		'Content-Type,Authorization',
+		'Content-Type,Authorization,X-API-Key',
 	)
 	if (request.method === 'OPTIONS') {
 		response.sendStatus(204)
@@ -132,6 +137,9 @@ app.use('/api/developer', developerRoutes)
 app.use('/api/v1', developerApiRoutes)
 app.use('/api/analysis', audioRoutes)
 app.use('/api/alerts', whatsappRoutes)
+app.use('/api/push', pushRoutes)
+app.use('/api/reports', reportsRoutes)
+app.use('/api/security', securityRoutes)
 app.use('/api', telegramRoutes)
 app.use('/api/analysts', analystsRoutes)
 app.use(

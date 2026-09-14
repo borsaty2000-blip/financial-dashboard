@@ -1,6 +1,7 @@
 import { prisma } from '../../lib/prisma.js'
 import { CandlesService } from '../market/candles.service.js'
 import { getPortfolioValue } from '../trading.service.js'
+import { sendPush } from '../notifications/push.service.js'
 
 function weekStart() {
 	const date = new Date()
@@ -70,6 +71,11 @@ export async function buildWeeklyDigest(userId: string) {
 			},
 		})
 		.catch(() => undefined)
+	void sendPush(userId, {
+		title: 'تقرير بورصتي الأسبوعي جاهز',
+		body: 'افتح التقرير لمراجعة الأداء والفرص والمخاطر.',
+		link: '/reports/weekly',
+	})
 	return digest
 }
 

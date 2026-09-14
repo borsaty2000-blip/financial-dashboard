@@ -3,6 +3,7 @@ import { calculateRSI } from './analysis/indicators.service.js'
 import { CandlesService } from './market/candles.service.js'
 import { publishUserNotification } from './tradingview/signal-bus.js'
 import { sendWhatsAppForUser } from './notifications/whatsapp.service.js'
+import { sendPush } from './notifications/push.service.js'
 
 let timer: NodeJS.Timeout | undefined
 
@@ -61,6 +62,11 @@ async function checkAlerts() {
 					`تنبيه بورصتي: ${alert.symbol} وصل إلى ${latest}`,
 					'PRICE',
 				)
+				void sendPush(alert.userId, {
+					title: `تنبيه ${alert.symbol}`,
+					body: `وصل السعر إلى ${latest}`,
+					link: `/stock/${alert.symbol}`,
+				})
 			}
 		} catch (error) {
 			console.warn(
