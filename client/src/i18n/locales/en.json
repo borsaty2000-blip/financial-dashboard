@@ -1,0 +1,40 @@
+{
+	"navigation": {
+		"home": "Home",
+		"markets": "Markets",
+		"analysis": "Analysis",
+		"portfolio": "Portfolio",
+		"profile": "Profile"
+	},
+	"common": {
+		"language": "Language",
+		"save": "Save",
+		"cancel": "Cancel",
+		"loading": "Loading",
+		"unavailable": "Unavailable",
+		"educational": "Educational analysis, not investment advice"
+	},
+	"auth": { "login": "Log in", "logout": "Log out" },
+	"market": {
+		"egx": "Egyptian Exchange",
+		"tasi": "TASI",
+		"gold": "Gold",
+		"forex": "Forex"
+	},
+	"analysis": {
+		"elliott": "Elliott Waves",
+		"gann": "Gann",
+		"consensus": "Consensus"
+	},
+	"portfolio": {
+		"title": "My Portfolio",
+		"value": "Portfolio value",
+		"performance": "Performance"
+	},
+	"achievements": { "title": "Achievements" },
+	"errors": { "generic": "Something went wrong" },
+	"notifications": {
+		"enable": "Enable notifications",
+		"enabled": "Notifications enabled"
+	}
+}

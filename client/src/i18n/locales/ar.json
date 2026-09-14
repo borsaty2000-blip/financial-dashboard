@@ -1,0 +1,37 @@
+{
+	"navigation": {
+		"home": "الرئيسية",
+		"markets": "الأسواق",
+		"analysis": "التحليل",
+		"portfolio": "المحفظة",
+		"profile": "الملف الشخصي"
+	},
+	"common": {
+		"language": "اللغة",
+		"save": "حفظ",
+		"cancel": "إلغاء",
+		"loading": "جارٍ التحميل",
+		"unavailable": "غير متاح",
+		"educational": "تحليل تعليمي وليس توصية استثمارية"
+	},
+	"auth": { "login": "تسجيل الدخول", "logout": "تسجيل الخروج" },
+	"market": {
+		"egx": "البورصة المصرية",
+		"tasi": "تاسي",
+		"gold": "الذهب",
+		"forex": "الفوركس"
+	},
+	"analysis": {
+		"elliott": "موجات إليوت",
+		"gann": "جان",
+		"consensus": "الإجماع"
+	},
+	"portfolio": {
+		"title": "محفظتي",
+		"value": "قيمة المحفظة",
+		"performance": "الأداء"
+	},
+	"achievements": { "title": "الإنجازات" },
+	"errors": { "generic": "حدث خطأ غير متوقع" },
+	"notifications": { "enable": "تفعيل الإشعارات", "enabled": "الإشعارات مفعلة" }
+}

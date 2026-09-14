@@ -1,0 +1,40 @@
+{
+	"navigation": {
+		"home": "Accueil",
+		"markets": "Marchés",
+		"analysis": "Analyse",
+		"portfolio": "Portefeuille",
+		"profile": "Profil"
+	},
+	"common": {
+		"language": "Langue",
+		"save": "Enregistrer",
+		"cancel": "Annuler",
+		"loading": "Chargement",
+		"unavailable": "Indisponible",
+		"educational": "Analyse éducative, pas un conseil en investissement"
+	},
+	"auth": { "login": "Connexion", "logout": "Déconnexion" },
+	"market": {
+		"egx": "Bourse égyptienne",
+		"tasi": "TASI",
+		"gold": "Or",
+		"forex": "Forex"
+	},
+	"analysis": {
+		"elliott": "Ondes d’Elliott",
+		"gann": "Gann",
+		"consensus": "Consensus"
+	},
+	"portfolio": {
+		"title": "Mon portefeuille",
+		"value": "Valeur du portefeuille",
+		"performance": "Performance"
+	},
+	"achievements": { "title": "Réalisations" },
+	"errors": { "generic": "Une erreur est survenue" },
+	"notifications": {
+		"enable": "Activer les notifications",
+		"enabled": "Notifications activées"
+	}
+}

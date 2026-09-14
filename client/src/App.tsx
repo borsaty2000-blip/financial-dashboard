@@ -54,6 +54,9 @@ import {
 } from './pages/AnalystProgramPages'
 import NotificationLive from './components/NotificationLive'
 import { LiveAnalysisFeed } from './components/Analysis/LiveAnalysisFeed'
+import { LanguageSwitcher } from './components/LanguageSwitcher'
+import { NotificationSettingsPage } from './pages/NotificationSettingsPage'
+import { SecuritySettingsPage } from './pages/SecuritySettingsPage'
 
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
@@ -129,6 +132,18 @@ function RoutedApp() {
 		return (
 			<ProtectedRoute>
 				<TelegramSettingsPage />
+			</ProtectedRoute>
+		)
+	if (path === '/settings/notifications')
+		return (
+			<ProtectedRoute>
+				<NotificationSettingsPage />
+			</ProtectedRoute>
+		)
+	if (path === '/settings/security')
+		return (
+			<ProtectedRoute>
+				<SecuritySettingsPage />
 			</ProtectedRoute>
 		)
 	if (path === '/twin')
@@ -213,6 +228,7 @@ export function App() {
 					<MobileChrome />
 					<GlobalSearch />
 					<CurrencyConverter />
+					<LanguageSwitcher />
 					<a
 						className="telegram-quick-link"
 						href="/settings/telegram"

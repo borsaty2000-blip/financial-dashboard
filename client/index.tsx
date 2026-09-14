@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import { App } from '@client/App'
 import '@client/styles.css'
+import './src/i18n'
 
 declare global {
 	interface Window {
