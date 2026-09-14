@@ -36,3 +36,7 @@
 ## ما يجوز قوله للمستثمر
 
 يجوز تقديم المشروع كتجربة تقنية عربية تعليمية معمارياً متقدمة، مع الإفصاح أن بعض البيانات والمزودات غير مفعلة وأن التحليلات قد تكون fallback تعليمياً. لا يجوز ادعاء بيانات لحظية مضمونة، Python AI إنتاجي، traction، إيرادات، عوائد أو حقوق إعادة توزيع بيانات دون أدلة وعقود.
+
+## قياس الإنتاج الحالي قبل نشر الإصلاحات المحلية
+
+أُعيد تشغيل smoke test مؤرخ على `https://borsatyai.com` قبل دفع `5bab313`. النتائج: `/api/health` 200 خلال 3143ms؛ `/api/market/summary` 200 خلال 3184ms؛ `/api/market/egx/summary` 200 خلال 3236ms؛ `/api/market/tasi/summary` 200 خلال 3787ms لكنه `available:false` بسبب `SAHMK_API_KEY is not configured`؛ `/api/market/gold` 200 خلال 3234ms لكنه `available:false` بسبب `EGX_ADAPTER_SCRIPT is not configured`؛ `/api/news?limit=6` 200 خلال 3308ms مع قائمة فارغة و`available:false`؛ Elliott 200 خلال 3449ms وGann 200 خلال 4143ms بحالة `fallback`؛ Consensus 200 خلال 2989ms بحالة `success`؛ `/api/watchlists` 401 خلال 3117ms دون Token. هذه القياسات تخص الإصدار المنشور السابق، وليست دليلاً على نشر الإصلاحات المحلية الجديدة.
