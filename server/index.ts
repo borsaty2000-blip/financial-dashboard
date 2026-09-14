@@ -23,10 +23,14 @@ import { comparisonRoutes } from './src/routes/comparison.routes.js'
 import { simulatorRoutes } from './src/routes/simulator.routes.js'
 import { smartPortfolioRoutes } from './src/routes/smart-portfolio.routes.js'
 import { insightsRoutes } from './src/routes/insights.routes.js'
-import { developerRoutes } from './src/routes/developer.routes.js'
+import {
+	developerApiRoutes,
+	developerRoutes,
+} from './src/routes/developer.routes.js'
 import { audioRoutes } from './src/routes/audio.routes.js'
 import { whatsappRoutes } from './src/routes/whatsapp.routes.js'
 import { telegramRoutes } from './src/routes/telegram.routes.js'
+import { analystsRoutes } from './src/routes/analysts.routes.js'
 
 const app = express()
 app.use(express.json())
@@ -105,9 +109,11 @@ app.use('/api/simulator', simulatorRoutes)
 app.use('/api/portfolio', smartPortfolioRoutes)
 app.use('/api', insightsRoutes)
 app.use('/api/developer', developerRoutes)
+app.use('/api/v1', developerApiRoutes)
 app.use('/api/analysis', audioRoutes)
 app.use('/api/alerts', whatsappRoutes)
 app.use('/api', telegramRoutes)
+app.use('/api/analysts', analystsRoutes)
 app.use(
 	'/uploads',
 	express.static(path.join(process.cwd(), 'server', 'uploads')),

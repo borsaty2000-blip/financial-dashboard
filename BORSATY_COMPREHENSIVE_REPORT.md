@@ -571,3 +571,20 @@ Commit هذه الميزة: `acb8e0e`. لم يتم النشر.
 التحقق: `npm run typecheck` ناجح، `npm run build` ناجح، 91 اختبار واجهة ناجحة في 19 ملفاً، واختبارات Python السابقة ناجحة، واختبار HTTP لـEnsemble والمشاعر وكشف الشذوذ ناجح. اختبار Python أكد خمسة نماذج Ensemble، وEndpoint المشاعر أعاد حالة متاحة مع صفر أخبار عند غياب موصل الأخبار بدلاً من اختلاق أخبار. لم يتم النشر الخارجي.
 
 القيود المعروفة: Prophet وXGBoost وTransformers وgTTS اختيارية ولم تُثبّت في بيئة الإنتاج تلقائياً؛ عند غيابها تظهر حالة fallback صريحة. الشهادة الحالية JSON وليست PDF ثنائي؛ يمكن طباعتها إلى PDF من المتصفح، أو إضافة مولد PDF لاحقاً. المقارنة العالمية لا تعرض أرقاماً حتى يتم ربط مصدر موثوق لها. يجب تطبيق migration الجديد في بيئة قاعدة البيانات قبل استخدام Developer API في الإنتاج.
+
+
+## ملحق pasted_content_29 — Parts 6–15 Completion
+
+تمت مراجعة المتطلبات مقابل التنفيذ الموجود، ثم استكمال الفجوات بدلاً من إعادة بناء الملفات الموجودة. أصبح Part 6 يدعم اشتراكات Socket.io فعلية عبر `live:subscribe` و`live:unsubscribe`، ويشغل بثاً دورياً لتحليل Consensus لكل سهم مشترك، مع واجهة `LiveAnalysisFeed` وحالات خطأ واضحة.
+
+في Part 7 أضيفت ملفات المخاطر `CONSERVATIVE` و`BALANCED` و`AGGRESSIVE`، ومسارات إنشاء Smart Portfolio وجلبه وخطة إعادة التوازن. الخطة افتراضية وغير تنفيذية، وتعرض التوزيع المستهدف والأسهم المقترحة وقيمة المحفظة. أضيفت صفحة `/portfolio/smart`. في Part 8 أضيف Weekly Digest يتضمن أداء المحفظة، الفرص من قائمة المتابعة، المخاطر والتنبيهات، وسجل آخر التقارير، مع صفحة `/weekly-report` و`/reports/weekly` وزر طباعة إلى PDF.
+
+في Part 9 أصبح Digital Twin يحسب متوسط قيمة الشراء، فترة الاحتفاظ التقريبية، معدل النجاح، تحمل المخاطر، القطاعات المفضلة والتوصيات من سجل الأوامر والتفضيلات، مع صفحة `/twin`. في Part 10 أصبحت Global Comparison تجلب المؤشرات المتاحة للفترات 1M و3M و6M و1Y ولا تعرض أرقاماً مفقودة، مع صفحة `/compare/global`.
+
+في Part 11 أضيف `apiKeyAuth` فعلي يعتمد على hash للمفتاح، وحد 60 طلباً لكل دقيقة، وتحديث عداد الاستخدام، ونقطة `/api/v1/quote/:symbol`، ولوحة `/developer/dashboard`. في Part 12 أضيف Analyst Program وملف AnalystProfile واشتراكات المحللين ومسارات القائمة والاشتراك وطلب الاعتماد، مع migrations وصفحات `/analysts` و`/analysts/apply`.
+
+في Part 13 أضيف زر الاستماع للتحليل العربي باستخدام SpeechSynthesis المحلي مع endpoint صوتي آمن عند غياب gTTS. في Part 14 أضيف إرسال WhatsApp عبر Twilio فقط عند توفير المتغيرات المطلوبة، وزر من صفحة التنبيهات. في Part 15 أضيف Telegram webhook على `/api/telegram/webhook` وملف `telegram_bot.py` بالأوامر `/start` و`/analyze` و`/top` و`/alert` و`/portfolio`.
+
+التحقق النهائي: `npm run typecheck` ناجح، `npm run build` ناجح، و91 اختباراً ناجحة. `npx prisma validate` و`npx prisma generate` ناجحان عند إزالة متغير `DATABASE_URL` الموروث غير الصالح من جلسة التشغيل حتى يقرأ Prisma القيمة المحلية الصحيحة من `.env`. اختبارات HTTP أعادت Health 200، والتقارير والمطور وDeveloper API أعادت 401 بدون مصادقة كما هو متوقع، وGlobal Comparison أعاد 200 مع حالة توفر صريحة. لم يتم النشر الخارجي ولم يتم دفع commits إلى origin.
+
+عدد commits Parts 6–15: 10 commits، من `2e28908` حتى `557777d`، إضافة إلى commit نهائي مشترك للواجهة والتوثيق. القيود الخارجية: WhatsApp وTelegram وgTTS وموصل الأخبار تحتاج مفاتيح أو حزم اختيارية؛ Analyst subscriptions تحتاج تطبيق migration على قاعدة الإنتاج قبل الاستخدام.

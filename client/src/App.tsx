@@ -30,7 +30,15 @@ import MobileChrome from './components/MobileChrome'
 import { StockDetailPage } from './pages/StockDetailPage'
 import { SimulatorPage } from './pages/SimulatorPage'
 import { ShariahPage } from './pages/ShariahPage'
+import { SmartPortfolioPage } from './pages/SmartPortfolioPage'
+import { WeeklyReportPage } from './pages/WeeklyReportPage'
+import { GlobalComparisonPage } from './pages/GlobalComparisonPage'
+import { AnalystsPage } from './pages/AnalystsPage'
+import { AnalystApplyPage } from './pages/AnalystApplyPage'
+import { DeveloperDashboardPage } from './pages/DeveloperDashboardPage'
+import { DigitalTwinPage } from './pages/DigitalTwinPage'
 import NotificationLive from './components/NotificationLive'
+import { LiveAnalysisFeed } from './components/Analysis/LiveAnalysisFeed'
 
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
@@ -51,6 +59,12 @@ function RoutedApp() {
 	if (path === '/candlestick') return <CandlestickPage />
 	if (path === '/simulator') return <SimulatorPage />
 	if (path === '/shariah') return <ShariahPage />
+	if (path === '/portfolio/smart')
+		return (
+			<ProtectedRoute>
+				<SmartPortfolioPage />
+			</ProtectedRoute>
+		)
 	if (path === '/watchlists' || path === '/alerts')
 		return (
 			<ProtectedRoute>
@@ -64,6 +78,33 @@ function RoutedApp() {
 			</ProtectedRoute>
 		)
 	if (path === '/compare') return <ComparisonPage />
+	if (path === '/compare/global') return <GlobalComparisonPage />
+	if (path === '/analysts' || path.startsWith('/analysts/'))
+		return <AnalystsPage />
+	if (path === '/analysts/apply')
+		return (
+			<ProtectedRoute>
+				<AnalystApplyPage />
+			</ProtectedRoute>
+		)
+	if (path === '/developer/dashboard')
+		return (
+			<ProtectedRoute>
+				<DeveloperDashboardPage />
+			</ProtectedRoute>
+		)
+	if (path === '/twin')
+		return (
+			<ProtectedRoute>
+				<DigitalTwinPage />
+			</ProtectedRoute>
+		)
+	if (path === '/weekly-report' || path === '/reports/weekly')
+		return (
+			<ProtectedRoute>
+				<WeeklyReportPage />
+			</ProtectedRoute>
+		)
 	if (path.startsWith('/stock/'))
 		return <StockDetailPage symbol={path.slice('/stock/'.length)} />
 	if (
@@ -103,6 +144,7 @@ export function App() {
 					<GlobalSearch />
 					<InstallPrompt />
 					<NotificationLive />
+					<LiveAnalysisFeed />
 				</ToastProvider>
 			</AuthProvider>
 		</ErrorBoundary>

@@ -2380,3 +2380,21 @@ body.dark-mode {
 .equity-curve { position: relative; height: 220px; margin: 20px 0; border-radius: 12px; background: linear-gradient(180deg, rgba(0,166,81,.13), transparent); overflow: hidden; }
 .equity-curve span { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #00a651; transform: translate(-50%, 50%); }
 @media (max-width: 640px) { .stock-ai-grid, .metric-grid { grid-template-columns: 1fr; } .simulator-form { display: grid; } .simulator-form .primary-button, .simulator-form .secondary-button { width: 100%; } .live-analysis-notice { inset-inline: 12px; bottom: 74px; text-align: center; } }
+
+.live-feed { margin: 14px 0; }
+.live-dot { width: 8px; height: 8px; border-radius: 50%; background: #00a651; box-shadow: 0 0 0 4px #00a65122; }
+.feed-item { display: grid; grid-template-columns: 1fr auto auto auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.feed-item small { color: var(--muted); }
+.signal { padding: 4px 8px; border-radius: 6px; font-size: 11px; background: #eef2f6; }
+.signal.strong_buy, .signal.buy { color: #087d3c; background: #eaf8ef; }
+.signal.sell, .signal.strong_sell { color: #bd3030; background: #fff0f0; }
+.stock-header-actions { display: flex; gap: 8px; align-items: center; }
+.secondary-button { background: #eef4f8; color: #175b83; padding: 11px 16px; border-radius: 9px; font-weight: 700; font-size: 13px; }
+.allocation-ring { width: 180px; height: 180px; margin: 0 auto 20px; border-radius: 50%; display: grid; place-items: center; }
+.allocation-ring span { width: 112px; height: 112px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; font-weight: 800; }
+.comparison-bars { display: grid; gap: 14px; }
+.comparison-bar { display: grid; grid-template-columns: 150px 1fr; gap: 10px; align-items: center; }
+.comparison-bar b { display: block; min-width: 42px; color: white; padding: 7px 10px; border-radius: 6px; text-align: left; font-family: 'JetBrains Mono'; }
+.analyst-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.analyst-grid article { padding: 16px; border: 1px solid var(--border); border-radius: 10px; }
+@media (max-width: 640px) { .stock-header-actions { width: 100%; flex-direction: column; } .stock-header-actions button { width: 100%; } .feed-item { grid-template-columns: 1fr auto; } .feed-item small { grid-column: 2; } .comparison-bar { grid-template-columns: 100px 1fr; } .analyst-grid { grid-template-columns: 1fr; } }
