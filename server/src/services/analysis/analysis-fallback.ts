@@ -184,6 +184,58 @@ export function analyzeElliottFallback(prices: number[], order = 5) {
 	}
 }
 
+export function analyzeCandlesticksFallback(
+	opens: number[],
+	highs: number[],
+	lows: number[],
+	closes: number[],
+	dates: string[] = [],
+) {
+	const length = Math.min(
+		opens.length,
+		highs.length,
+		lows.length,
+		closes.length,
+	)
+	if (length < 2)
+		throw new Error('candlestick data must contain at least 2 candles')
+	const index = length - 1
+	const open = opens[index]
+	const high = highs[index]
+	const low = lows[index]
+	const close = closes[index]
+	const body = Math.abs(close - open)
+	const range = Math.max(high - low, 0.000001)
+	const upperShadow = high - Math.max(open, close)
+	const lowerShadow = Math.min(open, close) - low
+	let pattern = 'غير محدد'
+	let signal = 'neutral'
+	if (body / range < 0.1) pattern = 'دوجي'
+	else if (lowerShadow >= body * 2 && upperShadow <= body) {
+		pattern = 'مطرقة'
+		signal = close >= open ? 'bullish' : 'neutral'
+	} else if (upperShadow >= body * 2 && lowerShadow <= body) {
+		pattern = 'شهاب'
+		signal = close < open ? 'bearish' : 'neutral'
+	} else if (close > open) {
+		pattern = 'شمعة صاعدة'
+		signal = 'bullish'
+	} else if (close < open) {
+		pattern = 'شمعة هابطة'
+		signal = 'bearish'
+	}
+	return {
+		available: true,
+		latest: { date: dates[index] ?? null, open, high, low, close },
+		pattern,
+		signal,
+		body_percent: (body / range) * 100,
+		engine: 'deterministic-node-fallback',
+		disclaimer:
+			'تحليل شموع تعليمي احتياطي؛ لا يمثل توصية استثمارية ولا يضمن نتيجة مستقبلية.',
+	}
+}
+
 export function analyzeGannFallback(prices: number[], dates: string[]) {
 	if (!prices.length) throw new Error('prices must not be empty')
 	if (prices.length !== dates.length)

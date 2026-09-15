@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
 	analyzeElliottFallback,
+	analyzeCandlesticksFallback,
 	analyzeGannFallback,
 	anomalyFallback,
 	backtestFallback,
@@ -30,6 +31,20 @@ test('Gann fallback preserves dates and educational provenance', () => {
 	assert.equal(result.time_cycles.length, 8)
 	assert.equal(result.low_index, 0)
 	assert.equal(result.high_index, prices.length - 1)
+})
+
+test('candlestick fallback returns the latest price candle contract', () => {
+	const result = analyzeCandlesticksFallback(
+		[100, 101],
+		[103, 104],
+		[99, 100],
+		[102, 103],
+		dates.slice(0, 2),
+	)
+	assert.equal(result.available, true)
+	assert.equal(result.latest.close, 103)
+	assert.equal(result.signal, 'bullish')
+	assert.match(result.disclaimer, /تعليمي/)
 })
 
 test('statistical fallback returns finite educational metrics', () => {

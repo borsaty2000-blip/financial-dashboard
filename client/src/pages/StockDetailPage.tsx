@@ -40,6 +40,7 @@ type IntegratedAnalysis = {
 	indicators: AnalysisResponse | null
 	elliott: AnalysisResponse | null
 	gann: AnalysisResponse | null
+	candlestick: AnalysisResponse | null
 	consensus: AnalysisResponse | null
 	statistical: AnalysisResponse | null
 	arima: AnalysisResponse | null
@@ -135,6 +136,7 @@ export function StockDetailPage({
 			indicators: null,
 			elliott: null,
 			gann: null,
+			candlestick: null,
 			consensus: null,
 			statistical: null,
 			arima: null,
@@ -216,6 +218,7 @@ export function StockDetailPage({
 					indicators: result.data?.indicators ?? null,
 					elliott: result.data?.elliott ?? null,
 					gann: result.data?.gann ?? null,
+					candlestick: result.data?.candlestick ?? null,
 					consensus: result.data?.consensus ?? null,
 					statistical: result.data?.statistical ?? null,
 					arima: result.data?.arima ?? null,
@@ -345,6 +348,7 @@ export function StockDetailPage({
 	const indicatorResult = analysisPayload(integratedAnalysis.indicators)
 	const elliottResult = analysisPayload(integratedAnalysis.elliott)
 	const gannResult = analysisPayload(integratedAnalysis.gann)
+	const candlestickResult = analysisPayload(integratedAnalysis.candlestick)
 	const consensusResult = analysisPayload(integratedAnalysis.consensus)
 	const statisticalResult = analysisPayload(integratedAnalysis.statistical)
 	const arimaResult = analysisPayload(integratedAnalysis.arima)
@@ -550,12 +554,12 @@ export function StockDetailPage({
 							<div>
 								<h2>غرفة التحليل المتكاملة</h2>
 								<p className="muted">
-									يُبحث عن السهم أولاً، ثم تُقرأ البيانات و8 محركات مستقلة قبل
+									يُبحث عن السهم أولاً، ثم تُقرأ البيانات و9 محركات مستقلة قبل
 									بناء الخلاصة. لا تمثل النتائج توصية أو ضماناً.
 								</p>
 							</div>
 							<span className="eyebrow">
-								{completedEngines}/8 محركات
+								{completedEngines}/9 محركات
 								{fallbackEngines ? ` · ${fallbackEngines} تعليمية` : ''}
 							</span>
 						</div>
@@ -717,7 +721,30 @@ export function StockDetailPage({
 							<div className="integrated-analysis-card">
 								<span>Gann</span>
 								<strong>دعم {formatEnglishNumber(gannSupport)}</strong>
-								<small>مقاومة {formatEnglishNumber(gannResistance)}</small>
+								<small>
+									مقاومة {formatEnglishNumber(gannResistance)} · قمة{' '}
+									{stringValue(gannResult, [
+										'price_time_context',
+										'high_date',
+									]) ?? '—'}
+								</small>
+							</div>
+							<div className="integrated-analysis-card">
+								<span>الشموع اليابانية</span>
+								<strong>
+									{stringValue(candlestickResult, ['pattern']) ?? 'غير متاح'}
+								</strong>
+								<small>
+									{stringValue(candlestickResult, ['signal']) === 'bullish'
+										? 'إشارة صاعدة'
+										: stringValue(candlestickResult, ['signal']) === 'bearish'
+											? 'إشارة هابطة'
+											: 'قراءة محايدة'}{' '}
+									· إغلاق{' '}
+									{formatEnglishNumber(
+										numberValue(candlestickResult, ['latest', 'close']),
+									)}
+								</small>
 							</div>
 							<div className="integrated-analysis-card">
 								<span>الإحصاء والمخاطر</span>
@@ -774,7 +801,7 @@ export function StockDetailPage({
 								</p>
 							</div>
 							<span className="eyebrow">
-								{displayedEnginesAvailable}/8 محركات
+								{displayedEnginesAvailable}/9 محركات
 							</span>
 						</div>
 						<div className="analysis-reading-grid">

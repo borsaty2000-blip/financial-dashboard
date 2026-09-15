@@ -110,7 +110,8 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 		const stages = [
 			'تحميل الشموع والتحقق من كفاية البيانات',
 			'المؤشرات الفنية وقنوات كايتلر وفيبوناتشي',
-			'Elliott Wave وGann',
+			'Elliott Wave وGann التاريخي والسعري',
+			'تحليل نماذج الشموع والسلوك السعري',
 			'الإجماع والإحصاء والتوقعات',
 			'الاختبار التاريخي ومقارنة النتائج',
 		]
@@ -118,6 +119,13 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 			Promise.resolve(calculateIndicatorSnapshot(symbol, candles)),
 			analyzeElliott(series.prices),
 			analyzeGann(series.prices, dates),
+			analyzeCandlesticks(
+				series.candles.map((candle) => candle.open),
+				series.candles.map((candle) => candle.high),
+				series.candles.map((candle) => candle.low),
+				series.candles.map((candle) => candle.close),
+				dates,
+			),
 			ConsensusService.calculate(symbol, series.prices, dates),
 			analyze(series.prices),
 			forecastARIMA(series.prices, 7),
@@ -128,6 +136,7 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 			'indicators',
 			'elliott',
 			'gann',
+			'candlestick',
 			'consensus',
 			'statistical',
 			'arima',
@@ -151,7 +160,24 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 				return { name: engineNames[index], status: 'unavailable' as const }
 			return { name: engineNames[index], status: 'computed' as const }
 		})
-		const consensusResult = value<Record<string, unknown>>(3)
+		const gannResult = value<Record<string, unknown>>(2)
+		const gannData =
+			gannResult?.data && typeof gannResult.data === 'object'
+				? (gannResult.data as Record<string, unknown>)
+				: gannResult
+		if (gannData) {
+			gannData.price_time_context = {
+				first_date: dates[0] ?? null,
+				last_date: dates.at(-1) ?? null,
+				first_price: series.prices[0] ?? null,
+				last_price: series.prices.at(-1) ?? null,
+				high_date:
+					dates[series.prices.indexOf(Math.max(...series.prices))] ?? null,
+				low_date:
+					dates[series.prices.indexOf(Math.min(...series.prices))] ?? null,
+			}
+		}
+		const consensusResult = value<Record<string, unknown>>(4)
 		const indicatorResult = value<Record<string, unknown>>(0)
 		const indicatorData =
 			indicatorResult?.data && typeof indicatorResult.data === 'object'
@@ -200,12 +226,13 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 				marketMood,
 				indicators: value(0),
 				elliott: value(1),
-				gann: value(2),
-				consensus: value(3),
-				statistical: value(4),
-				arima: value(5),
-				lstm: value(6),
-				backtest: value(7),
+				gann: gannResult,
+				candlestick: value(3),
+				consensus: consensusResult,
+				statistical: value(5),
+				arima: value(6),
+				lstm: value(7),
+				backtest: value(8),
 			},
 		})
 	} catch (error) {

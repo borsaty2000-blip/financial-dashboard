@@ -31,6 +31,7 @@ const arabicCompanyNames: Record<string, string> = {
 	ETEL: 'المصرية للاتصالات',
 	SWDY: 'السويدي إليكتريك',
 	TMGH: 'مجموعة طلعت مصطفى',
+	IEEC: 'المشروعات الصناعية والهندسية',
 }
 
 marketRoutes.get('/company/:symbol', async (request, response) => {
