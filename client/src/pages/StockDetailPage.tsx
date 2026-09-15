@@ -497,6 +497,34 @@ export function StockDetailPage({
 	const validationExplanation = numberValue(backtestResult, ['win_rate'])
 		? 'الاختبار التاريخي يعرض سلوك الفرضية على بيانات سابقة، ولا يثبت نجاحها في المستقبل.'
 		: 'لم تتوفر نتيجة اختبار تاريخي مكتملة لهذا الرمز؛ لا يتم استبدالها بتقدير.'
+	const pricePosition =
+		stats.high != null &&
+		stats.low != null &&
+		stats.high !== stats.low &&
+		stats.last
+			? ((stats.last.close - stats.low) / (stats.high - stats.low)) * 100
+			: undefined
+	const consensusScore = numberValue(consensusResult, ['score'])
+	const consensusConfidence = numberValue(consensusResult, ['confidence'])
+	const decisionHeadline =
+		consensusSignalArabic !== 'غير متاح'
+			? `السهم يظهر ${consensusSignalArabic} وفق اتفاق المحركات المتاحة.`
+			: `قراءة ${trendDirectionArabic} مع حاجة إلى بيانات إضافية قبل بناء حكم مركب.`
+	const evidenceLine = [
+		`الاتجاه ${trendDirectionArabic}`,
+		`Elliott ${elliottDirectionArabic}`,
+		macdSignal ? `MACD ${macdSignal}` : 'MACD غير متاح',
+	].join(' · ')
+	const invalidationLine =
+		gannSupport != null
+			? `تتغير القراءة إذا كُسر الدعم المحسوب ${formatEnglishNumber(gannSupport)} بإغلاق واضح.`
+			: 'منطقة إبطال السيناريو غير متاحة حتى تكتمل بيانات الدعم والمقاومة.'
+	const dataQualityLabel =
+		analysisQuality?.status === 'high'
+			? 'جودة مرتفعة'
+			: analysisQuality?.status === 'medium'
+				? 'جودة متوسطة'
+				: 'تحتاج تحققاً'
 
 	return (
 		<main className="stock-detail-page" dir="rtl">
@@ -606,11 +634,61 @@ export function StockDetailPage({
 							<b>{formatEnglishNumber(stats.last?.volume, 0)}</b>
 						</div>
 					</section>
+					<section
+						className="stock-command-center"
+						aria-label="مذكرة السهم الموحدة"
+					>
+						<div className="stock-command-center__heading">
+							<div>
+								<span className="eyebrow">
+									BORSATY RESEARCH NOTE · {normalized}
+								</span>
+								<h2>مذكرة السهم الموحدة</h2>
+								<p>
+									قراءة واحدة تربط السعر، الاتجاه، المحركات، المخاطر وجودة
+									البيانات.
+								</p>
+							</div>
+							<strong>{dataQualityLabel}</strong>
+						</div>
+						<div className="stock-command-center__verdict">
+							<span>الخلاصة التنفيذية التعليمية</span>
+							<b>{decisionHeadline}</b>
+							<small>{evidenceLine}</small>
+						</div>
+						<div className="stock-command-center__grid">
+							<div>
+								<span>اتفاق المحركات</span>
+								<b>{formatEnglishNumber(consensusScore, 0)}</b>
+								<small>من 100</small>
+							</div>
+							<div>
+								<span>ثقة القراءة</span>
+								<b>{formatEnglishPercent(consensusConfidence)}</b>
+								<small>ليست احتمال نجاح</small>
+							</div>
+							<div>
+								<span>موقع السعر في النطاق</span>
+								<b>{formatEnglishNumber(pricePosition, 0)}%</b>
+								<small>بين أعلى وأدنى فترة</small>
+							</div>
+						</div>
+						<div className="stock-command-center__risk">
+							<span>شرط تغيّر السيناريو</span>
+							<b>{invalidationLine}</b>
+						</div>
+						<p className="stock-command-center__disclaimer">
+							هذه مذكرة تحليلية تعليمية وليست توصية شراء أو بيع. عند تعارض
+							المحركات نعرض التعارض بدلاً من إخفائه.
+						</p>
+					</section>
 					<section className="analysis-card stock-chart-card">
 						<div className="panel-title">
 							<div>
-								<span className="eyebrow">TradingView-style cockpit</span>
-								<h2>الرسم الاحترافي</h2>
+								<span className="eyebrow">
+									غرفة السعر والحجم · {normalized}
+								</span>
+								<h2>الرسم السعري الاحترافي</h2>
 							</div>
 							<span className="muted">شموع · حجم · مؤشرات قابلة للتفعيل</span>
 						</div>
@@ -622,7 +700,7 @@ export function StockDetailPage({
 					>
 						<div className="panel-title">
 							<div>
-								<span className="eyebrow">SMART SUMMARY · {normalized}</span>
+								<span className="eyebrow">موجز القرار · {normalized}</span>
 								<h2>الملخص الذكي المدعّم بالأدلة</h2>
 							</div>
 							<strong className="smart-summary-verdict">{smartVerdict}</strong>
@@ -870,21 +948,23 @@ export function StockDetailPage({
 								</small>
 							</div>
 							<div className="integrated-analysis-card">
-								<span>Forecast baselines</span>
+								<span>خطوط التنبؤ التعليمية</span>
 								<strong>ARIMA {formatEnglishNumber(arimaForecast)}</strong>
-								<small>LSTM {formatEnglishNumber(lstmForecast)} · تعليمي</small>
+								<small>
+									LSTM {formatEnglishNumber(lstmForecast)} · قراءة تعليمية
+								</small>
 							</div>
 							<div className="integrated-analysis-card">
-								<span>Backtest تعليمي</span>
+								<span>اختبار تاريخي تعليمي</span>
 								<strong>
-									Win rate{' '}
+									نسبة النجاح{' '}
 									{formatEnglishPercent(
 										(numberValue(backtestResult, ['win_rate']) ?? Number.NaN) *
 											100,
 									)}
 								</strong>
 								<small>
-									Max drawdown{' '}
+									أقصى تراجع{' '}
 									{formatEnglishPercent(
 										(numberValue(backtestResult, ['max_drawdown']) ??
 											Number.NaN) * 100,
