@@ -2,7 +2,10 @@ import { prisma } from '../../lib/prisma.js'
 export async function getInsiderTrades(symbol?: string) {
 	try {
 		const data = await prisma.insiderTrade.findMany({
-			where: symbol ? { symbol: symbol.toUpperCase() } : undefined,
+			where: {
+				...(symbol ? { symbol: symbol.toUpperCase() } : {}),
+				source: { not: 'manual-seed' },
+			},
 			orderBy: { transactionDate: 'desc' },
 			take: 50,
 		})
