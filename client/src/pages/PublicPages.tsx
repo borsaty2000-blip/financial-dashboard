@@ -311,7 +311,11 @@ function MarketDirectory({
 										<td>
 											<button
 												className="borsaty-directory-symbol"
-												onClick={() => navigate(`/stock/${company.symbol}`)}
+												onClick={() =>
+													navigate(
+														`/stock/${company.symbol}?name=${encodeURIComponent(arabicName)}`,
+													)
+												}
 											>
 												<i
 													className={`borsaty-status-dot is-${status}`}
@@ -346,7 +350,11 @@ function MarketDirectory({
 										<td>
 											<button
 												className="borsaty-row-analysis"
-												onClick={() => navigate(`/stock/${company.symbol}`)}
+												onClick={() =>
+													navigate(
+														`/stock/${company.symbol}?name=${encodeURIComponent(arabicName)}`,
+													)
+												}
 											>
 												تحليل السهم <span aria-hidden="true">←</span>
 											</button>

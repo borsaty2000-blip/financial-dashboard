@@ -6804,7 +6804,6 @@ body:has(.borsaty-public-page) .global-language-switcher {
 	}
 }
 
-
 .analysis-data-quality {
 	margin: 12px 0 4px;
 	padding: 10px 12px;
@@ -6826,4 +6825,14 @@ body:has(.borsaty-public-page) .global-language-switcher {
 	.analysis-data-quality strong {
 		color: #ffd66b;
 	}
+}
+
+.stock-detail-header h1 .stock-symbol-label {
+	display: inline-block;
+	margin-inline-start: 10px;
+	font-family: 'JetBrains Mono', monospace;
+	font-size: 0.62em;
+	font-weight: 700;
+	color: #1675a5;
+	direction: ltr;
 }

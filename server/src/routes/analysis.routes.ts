@@ -87,10 +87,12 @@ async function resolveSeries(request: Request) {
 analysisRoutes.get('/:symbol/full', async (request, response) => {
 	try {
 		const series = await resolveSeries(request)
-		if (series.prices.length < 3)
+		if (series.prices.length < 60)
 			return response.status(404).json({
 				status: 'unavailable',
-				message: 'لا توجد بيانات تاريخية كافية لبناء غرفة التحليل',
+				message:
+					'لا توجد بيانات تاريخية كافية لبناء تحليل موثوق؛ يلزم توفر 60 جلسة على الأقل',
+				candles_count: series.count,
 			})
 
 		const symbol = request.params.symbol.toUpperCase()
@@ -123,6 +125,16 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 			const result = settled[index]
 			return result?.status === 'fulfilled' ? (result.value as T) : null
 		}
+		const engineStatuses = settled.map((result, index) => {
+			if (result.status === 'rejected')
+				return { index, status: 'unavailable' as const }
+			const value = result.value as Record<string, unknown> | null
+			if (value?.status === 'fallback')
+				return { index, status: 'educational_fallback' as const }
+			if (value?.available === false)
+				return { index, status: 'unavailable' as const }
+			return { index, status: 'computed' as const }
+		})
 		return response.json({
 			status: 'success',
 			symbol,
@@ -137,8 +149,10 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 					'البيانات والتحليلات تعليمية؛ لا تُستخدم وحدها لاتخاذ قرار شراء أو بيع.',
 			},
 			stages,
-			completed_engines: settled.filter((item) => item.status === 'fulfilled')
-				.length,
+			completed_engines: engineStatuses.filter(
+				(item) => item.status !== 'unavailable',
+			).length,
+			engine_statuses: engineStatuses,
 			data: {
 				indicators: value(0),
 				elliott: value(1),
@@ -153,8 +167,7 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 	} catch (error) {
 		return response.status(502).json({
 			status: 'error',
-			message:
-				error instanceof Error ? error.message : 'Full analysis unavailable',
+			message: 'تعذر إكمال غرفة التحليل حالياً؛ أعد المحاولة لاحقاً',
 		})
 	}
 })

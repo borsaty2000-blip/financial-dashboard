@@ -49,6 +49,7 @@ type FullAnalysisResponse = {
 	}
 	stages?: string[]
 	completed_engines?: number
+	engine_statuses?: Array<{ index: number; status: string }>
 }
 type FinancialStatement = {
 	filingDate?: Scalar
@@ -107,7 +108,13 @@ const stringValue = (value: unknown, path: string[] = []) => {
 		: undefined
 }
 
-export function StockDetailPage({ symbol }: { symbol: string }) {
+export function StockDetailPage({
+	symbol,
+	companyName,
+}: {
+	symbol: string
+	companyName?: string
+}) {
 	const [data, setData] = useState<Candles | null>(null)
 	const [ensembleData, setEnsembleData] = useState<FeatureResponse | null>(null)
 	const [sentimentData, setSentimentData] = useState<FeatureResponse | null>(
@@ -129,6 +136,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 	const [analysisQuality, setAnalysisQuality] =
 		useState<FullAnalysisResponse['data_quality']>()
 	const [completedEngines, setCompletedEngines] = useState(0)
+	const [fallbackEngines, setFallbackEngines] = useState(0)
 	const [fundamentals, setFundamentals] = useState<Fundamentals | null>(null)
 	const [insiderTrades, setInsiderTrades] = useState<InsiderTrade[]>([])
 	const [ownership, setOwnership] = useState<Ownership | null>(null)
@@ -187,6 +195,11 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 				setAnalysisStages(result.stages ?? [])
 				setAnalysisQuality(result.data_quality)
 				setCompletedEngines(result.completed_engines ?? 0)
+				setFallbackEngines(
+					(result.engine_statuses ?? []).filter(
+						(item) => item.status === 'educational_fallback',
+					).length,
+				)
 			})
 			.catch(() => undefined)
 		void api<Fundamentals>(`/api/fundamentals/${normalized}`)
@@ -360,7 +373,10 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 				</button>
 				<div>
 					<p className="eyebrow">تفاصيل السهم</p>
-					<h1>{normalized}</h1>
+					<h1>
+						{companyName ?? normalized}
+						<small className="stock-symbol-label">{normalized}</small>
+					</h1>
 				</div>
 				<div className="stock-header-actions">
 					<button className="secondary-button" onClick={listen}>
@@ -473,12 +489,17 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 									بناء الخلاصة. لا تمثل النتائج توصية أو ضماناً.
 								</p>
 							</div>
-							<span className="eyebrow">{completedEngines}/8 محركات</span>
+							<span className="eyebrow">
+								{completedEngines}/8 محركات
+								{fallbackEngines ? ` · ${fallbackEngines} تعليمية` : ''}
+							</span>
 						</div>
 						<div className="analysis-data-quality" role="note">
 							<strong>حدود القراءة:</strong>{' '}
 							{analysisQuality?.message ??
 								'النتائج تعليمية ولا تمثل توصية استثمارية أو قراراً آلياً.'}
+							{fallbackEngines > 0 &&
+								` يوجد ${fallbackEngines} محرك احتياطي تعليمي؛ لا تخلطه بنتيجة مزود تحليلي متخصص.`}
 						</div>
 						{analysisStages.length > 0 && (
 							<div className="analysis-pipeline" aria-label="مراحل التحليل">

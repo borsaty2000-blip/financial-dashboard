@@ -328,8 +328,11 @@ function RoutedApp() {
 			</ProtectedRoute>
 		)
 	if (path === '/stock') return <NotFoundPage />
-	if (path.startsWith('/stock/'))
-		return <StockDetailPage symbol={path.slice('/stock/'.length)} />
+	if (path.startsWith('/stock/')) {
+		const [symbol, query = ''] = path.slice('/stock/'.length).split('?')
+		const name = new URLSearchParams(query).get('name') ?? undefined
+		return <StockDetailPage symbol={symbol} companyName={name} />
+	}
 	if (
 		path === '/dashboard' ||
 		path === '/achievements' ||
