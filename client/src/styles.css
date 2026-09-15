@@ -7128,16 +7128,21 @@ textarea {
 }
 
 .borsaty-public-page {
-	background:
-		radial-gradient(circle at 86% 8%, rgb(8 120 174 / 7%), transparent 28rem),
-		linear-gradient(180deg, #ffffff 0%, #f7fafb 52%, #edf3f6 100%);
-	color: var(--market-text);
+	background: #ffffff !important;
+	background-image: linear-gradient(
+		180deg,
+		#ffffff 0%,
+		#ffffff 58%,
+		#f3f6f8 100%
+	) !important;
+	color: #17232d !important;
+	font-family: var(--font-market) !important;
 }
 
 .borsaty-public-header,
 .topbar {
-	background: linear-gradient(180deg, #0d141a 0%, #111d25 100%);
-	border-bottom: 1px solid #263944;
+	background: #0b0d0f !important;
+	border-bottom: 1px solid #2b3338 !important;
 	box-shadow: 0 5px 22px rgb(7 18 26 / 18%);
 }
 
@@ -7190,9 +7195,10 @@ textarea {
 	padding-top: 62px;
 	background: linear-gradient(
 		180deg,
-		rgb(255 255 255 / 82%),
-		rgb(248 251 252 / 45%)
-	);
+		#ffffff 0%,
+		#ffffff 72%,
+		#f7f9fa 100%
+	) !important;
 }
 
 .borsaty-kicker,
@@ -7202,7 +7208,7 @@ textarea {
 }
 
 .borsaty-hero h1 {
-	color: #122a3a;
+	color: #111b22 !important;
 	font-family: var(--font-market);
 	letter-spacing: -0.045em;
 }
@@ -7230,7 +7236,7 @@ textarea {
 .borsaty-pulse-index,
 .stock-card {
 	border-color: var(--market-border);
-	background: linear-gradient(145deg, #ffffff 0%, #f8fafb 100%);
+	background: #ffffff !important;
 	box-shadow: 0 8px 24px rgb(27 59 75 / 6%);
 }
 
