@@ -6675,3 +6675,46 @@ body.dark-mode .analysis-orchestration-steps span {
 		stroke: currentColor;
 	}
 }
+
+.analysis-pipeline {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: 8px;
+	margin: 16px 0 18px;
+	padding: 12px;
+	border: 1px solid #dbe8ee;
+	border-radius: 14px;
+	background: linear-gradient(135deg, #f8fcff, #eef7fb);
+}
+.analysis-pipeline span {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	min-width: 0;
+	color: #365465;
+	font-size: 0.76rem;
+	line-height: 1.45;
+}
+.analysis-pipeline b {
+	display: inline-grid;
+	place-items: center;
+	flex: 0 0 24px;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: #0d6e91;
+	color: #ffffff;
+	font-size: 0.72rem;
+}
+@media (max-width: 760px) {
+	.analysis-pipeline {
+		grid-template-columns: 1fr;
+	}
+}
+body.dark-mode .analysis-pipeline {
+	border-color: #254858;
+	background: linear-gradient(135deg, #102a37, #123c4a);
+}
+body.dark-mode .analysis-pipeline span {
+	color: #e9f8ff;
+}

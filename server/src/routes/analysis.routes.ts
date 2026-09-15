@@ -22,6 +22,7 @@ import {
 	type CandleMarket,
 } from '../services/market/candles.service.js'
 import { analysisRateLimit } from '../middleware/rateLimit.js'
+import { runBacktest } from '../services/analysis/backtesting.python.js'
 
 export const analysisRoutes = Router()
 analysisRoutes.use(analysisRateLimit)
@@ -82,6 +83,74 @@ async function resolveSeries(request: Request) {
 		count: candles.count,
 	}
 }
+
+analysisRoutes.get('/:symbol/full', async (request, response) => {
+	try {
+		const series = await resolveSeries(request)
+		if (series.prices.length < 3)
+			return response.status(404).json({
+				status: 'unavailable',
+				message: 'لا توجد بيانات تاريخية كافية لبناء غرفة التحليل',
+			})
+
+		const symbol = request.params.symbol.toUpperCase()
+		const candles: Candle[] = series.candles.map((candle) => ({
+			open: candle.open,
+			high: candle.high,
+			low: candle.low,
+			close: candle.close,
+			volume: candle.volume,
+		}))
+		const dates = series.dates
+		const stages = [
+			'تحميل الشموع والتحقق من كفاية البيانات',
+			'المؤشرات الفنية وقنوات كايتلر وفيبوناتشي',
+			'Elliott Wave وGann',
+			'الإجماع والإحصاء والتوقعات',
+			'الاختبار التاريخي ومقارنة النتائج',
+		]
+		const settled = await Promise.allSettled([
+			Promise.resolve(calculateIndicatorSnapshot(symbol, candles)),
+			analyzeElliott(series.prices),
+			analyzeGann(series.prices, dates),
+			ConsensusService.calculate(symbol, series.prices, dates),
+			analyze(series.prices),
+			forecastARIMA(series.prices, 7),
+			forecastLSTM(series.prices, 7),
+			runBacktest('indicators', series.prices, 30, 7),
+		])
+		const value = <T>(index: number): T | null => {
+			const result = settled[index]
+			return result?.status === 'fulfilled' ? (result.value as T) : null
+		}
+		return response.json({
+			status: 'success',
+			symbol,
+			market: queryMarket(request.query.market),
+			source: series.source,
+			candles_count: series.count,
+			stages,
+			completed_engines: settled.filter((item) => item.status === 'fulfilled')
+				.length,
+			data: {
+				indicators: value(0),
+				elliott: value(1),
+				gann: value(2),
+				consensus: value(3),
+				statistical: value(4),
+				arima: value(5),
+				lstm: value(6),
+				backtest: value(7),
+			},
+		})
+	} catch (error) {
+		return response.status(502).json({
+			status: 'error',
+			message:
+				error instanceof Error ? error.message : 'Full analysis unavailable',
+		})
+	}
+})
 
 analysisRoutes.get('/:symbol/candlestick', async (request, response) => {
 	try {

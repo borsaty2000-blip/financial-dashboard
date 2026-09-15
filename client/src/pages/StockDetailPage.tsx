@@ -39,6 +39,11 @@ type IntegratedAnalysis = {
 	lstm: AnalysisResponse | null
 	backtest: AnalysisResponse | null
 }
+type FullAnalysisResponse = {
+	data?: Partial<IntegratedAnalysis>
+	stages?: string[]
+	completed_engines?: number
+}
 type FinancialStatement = {
 	filingDate?: Scalar
 	period?: Scalar
@@ -113,6 +118,8 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 			lstm: null,
 			backtest: null,
 		})
+	const [analysisStages, setAnalysisStages] = useState<string[]>([])
+	const [completedEngines, setCompletedEngines] = useState(0)
 	const [fundamentals, setFundamentals] = useState<Fundamentals | null>(null)
 	const [insiderTrades, setInsiderTrades] = useState<InsiderTrade[]>([])
 	const [ownership, setOwnership] = useState<Ownership | null>(null)
@@ -152,57 +159,26 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 		void api<FeatureResponse>(`/api/analysis/${normalized}/anomalies`)
 			.then(setAnomalyData)
 			.catch(() => undefined)
-		const optionalAnalysis = <T,>(path: string) =>
-			api<T>(path, { suppressToast: true }).catch(() => null)
-		void Promise.all([
-			optionalAnalysis<AnalysisResponse>(
-				`/api/analysis/${normalized}/indicators?market=${market}`,
-			),
-			optionalAnalysis<AnalysisResponse>(
-				`/api/analysis/${normalized}/elliott?market=${market}`,
-			),
-			optionalAnalysis<AnalysisResponse>(
-				`/api/analysis/${normalized}/gann?market=${market}`,
-			),
-			optionalAnalysis<AnalysisResponse>(
-				`/api/analysis/${normalized}/consensus?market=${market}`,
-			),
-			optionalAnalysis<AnalysisResponse>(
-				`/api/analysis/${normalized}/statistical?market=${market}`,
-			),
-			optionalAnalysis<AnalysisResponse>(
-				`/api/analysis/${normalized}/forecast/arima?market=${market}&steps=7`,
-			),
-			optionalAnalysis<AnalysisResponse>(
-				`/api/analysis/${normalized}/forecast/lstm?market=${market}&steps=7`,
-			),
-			optionalAnalysis<AnalysisResponse>(
-				`/api/backtest/${normalized}/indicators?market=${market}&lookback=30&horizon=7`,
-			),
-		]).then(
-			([
-				indicators,
-				elliott,
-				gann,
-				consensus,
-				statistical,
-				arima,
-				lstm,
-				backtest,
-			]) => {
-				if (!cancelled)
-					setIntegratedAnalysis({
-						indicators,
-						elliott,
-						gann,
-						consensus,
-						statistical,
-						arima,
-						lstm,
-						backtest,
-					})
-			},
+		void api<FullAnalysisResponse>(
+			`/api/analysis/${normalized}/full?market=${market}`,
+			{ suppressToast: true },
 		)
+			.then((result) => {
+				if (cancelled) return
+				setIntegratedAnalysis({
+					indicators: result.data?.indicators ?? null,
+					elliott: result.data?.elliott ?? null,
+					gann: result.data?.gann ?? null,
+					consensus: result.data?.consensus ?? null,
+					statistical: result.data?.statistical ?? null,
+					arima: result.data?.arima ?? null,
+					lstm: result.data?.lstm ?? null,
+					backtest: result.data?.backtest ?? null,
+				})
+				setAnalysisStages(result.stages ?? [])
+				setCompletedEngines(result.completed_engines ?? 0)
+			})
+			.catch(() => undefined)
 		void api<Fundamentals>(`/api/fundamentals/${normalized}`)
 			.then(setFundamentals)
 			.catch(() => undefined)
@@ -473,13 +449,24 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 					<section className="analysis-card integrated-analysis-panel">
 						<div className="panel-title">
 							<div>
-								<h2>لوحة التحليل المدمج</h2>
+								<h2>غرفة التحليل المتكاملة</h2>
 								<p className="muted">
-									نتائج مستقلة قابلة للمراجعة؛ لا تمثل توصية أو ضماناً.
+									يُبحث عن السهم أولاً، ثم تُقرأ البيانات و8 محركات مستقلة قبل
+									بناء الخلاصة. لا تمثل النتائج توصية أو ضماناً.
 								</p>
 							</div>
-							<span className="eyebrow">Educational</span>
+							<span className="eyebrow">{completedEngines}/8 محركات</span>
 						</div>
+						{analysisStages.length > 0 && (
+							<div className="analysis-pipeline" aria-label="مراحل التحليل">
+								{analysisStages.map((stage, index) => (
+									<span key={stage}>
+										<b>{index + 1}</b>
+										{stage}
+									</span>
+								))}
+							</div>
+						)}
 						<div className="integrated-analysis-grid">
 							<div className="integrated-analysis-card is-primary">
 								<span>الإجماع</span>
