@@ -463,6 +463,19 @@ model MarketCandle {
   @@map("market_candles")
 }
 
+model EgxCompany {
+  id         String   @id @default(uuid())
+  sourceCode String   @unique
+  symbol     String   @unique
+  nameAr     String
+  market     String   @default("EGX")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([market, symbol])
+  @@map("egx_companies")
+}
+
 model EconomicEvent {
   id         String   @id @default(uuid())
   eventKey   String   @unique

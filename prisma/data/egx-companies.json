@@ -1,0 +1,877 @@
+{
+  "sourceFile": "أسهم_البورصة_المصرية_مدققة.xlsx",
+  "sourceSha256": "68e2a18c8af666dabed6bac877d520705aa6ee2eefafa19becc93e242e735bb7",
+  "codeColumnNote": "Excel contains trading code in column A; no column C was present. symbol is derived by removing .CA.",
+  "items": [
+    {
+      "sourceCode": "ABUK.CA",
+      "symbol": "ABUK",
+      "nameAr": "ابوقير للاسمدة والصناعات الكيماوية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ACGC.CA",
+      "symbol": "ACGC",
+      "nameAr": "العربية لحليج الأقطان",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ACTF.CA",
+      "symbol": "ACTF",
+      "nameAr": "اكت فاينانشال للاستشارات",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ADIB.CA",
+      "symbol": "ADIB",
+      "nameAr": "مصرف أبو ظبي الأسلامي- مصر",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "AFMC.CA",
+      "symbol": "AFMC",
+      "nameAr": "الإسكندرية للمطاحن و المخابز",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "AIDC.CA",
+      "symbol": "AIDC",
+      "nameAr": "ارابيا للاستثمار والتنمية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "AIFI.CA",
+      "symbol": "AIFI",
+      "nameAr": "اطلس للاستثمار والصناعات الغذائية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "AIHC.CA",
+      "symbol": "AIHC",
+      "nameAr": "ارابيا انفستمنتس هولدنج",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "AJWA.CA",
+      "symbol": "AJWA",
+      "nameAr": "اجواء للصناعات الغذائية - مصر",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ALCN.CA",
+      "symbol": "ALCN",
+      "nameAr": "الاسكندرية لتداول الحاويات والبضائع",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "AMER.CA",
+      "symbol": "AMER",
+      "nameAr": "(مجموعة عامر القابضة (عامر جروب",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "AMIA.CA",
+      "symbol": "AMIA",
+      "nameAr": "الملتقي العربي للاستثمارات",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "AMOC.CA",
+      "symbol": "AMOC",
+      "nameAr": "الاسكندرية للزيوت المعدنية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "AMPI.CA",
+      "symbol": "AMPI",
+      "nameAr": "نوفيدا للإستثمار والتكنولوجيا",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ARAB.CA",
+      "symbol": "ARAB",
+      "nameAr": "المطورون العرب القابضة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ARCC.CA",
+      "symbol": "ARCC",
+      "nameAr": "العربية للاسمنت",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "AREH.CA",
+      "symbol": "AREH",
+      "nameAr": "المجموعه المصريه العقاريه",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ASCM.CA",
+      "symbol": "ASCM",
+      "nameAr": "اسيك للتعدين - اسكوم",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ASPI.CA",
+      "symbol": "ASPI",
+      "nameAr": "اسباير كابيتال القابضة للاستثمارات المالية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ATLC.CA",
+      "symbol": "ATLC",
+      "nameAr": "التوفيق للتأجير التمويلي -أية.تي.ليس",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ATQA.CA",
+      "symbol": "ATQA",
+      "nameAr": "مصر الوطنية للصلب - عتاقة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "BINV.CA",
+      "symbol": "BINV",
+      "nameAr": "بي إنفستمنتس القابضة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "BONY.CA",
+      "symbol": "BONY",
+      "nameAr": "بنيان للتنمية والتجارة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "BTFH.CA",
+      "symbol": "BTFH",
+      "nameAr": "بلتون القابضة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "CCAP.CA",
+      "symbol": "CCAP",
+      "nameAr": "القلعة للاستثمارات المالية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "CIEB.CA",
+      "symbol": "CIEB",
+      "nameAr": "بنك كريدي اجريكول مصر",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "CLHO.CA",
+      "symbol": "CLHO",
+      "nameAr": "شركة مستشفي كليوباترا",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "COMI.CA",
+      "symbol": "COMI",
+      "nameAr": "البنك التجاري الدولي -مصر (سى اى بى )",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "COPR.CA",
+      "symbol": "COPR",
+      "nameAr": "كوبر للاستثمار التجاري والتطوير العقاري",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "COSG.CA",
+      "symbol": "COSG",
+      "nameAr": "القاهرة للزيوت والصابون",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "CSAG.CA",
+      "symbol": "CSAG",
+      "nameAr": "القناة للتوكيلات الملاحية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "DAPH.CA",
+      "symbol": "DAPH",
+      "nameAr": "التعمير والاستشارات الهندسية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "DIFC.CA",
+      "symbol": "DIFC",
+      "nameAr": "الدولية للثلج الجاف - ديفكو 2",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "DOMT.CA",
+      "symbol": "DOMT",
+      "nameAr": "العربية للصناعات الغذائية دومتي",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "DSCW.CA",
+      "symbol": "DSCW",
+      "nameAr": "دايس للملابس الجاهزة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EAC.CA",
+      "symbol": "EAC",
+      "nameAr": "المصرية العربية (ثمار) لتداول الاوراق المالية والسندات",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EAST.CA",
+      "symbol": "EAST",
+      "nameAr": "الشرقية - ايسترن كومباني",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EDFM.CA",
+      "symbol": "EDFM",
+      "nameAr": "مطاحن شرق الدلتا",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EFIC.CA",
+      "symbol": "EFIC",
+      "nameAr": "المالية والصناعية المصرية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EFID.CA",
+      "symbol": "EFID",
+      "nameAr": "ايديتا للصناعات الغذائية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EFIH.CA",
+      "symbol": "EFIH",
+      "nameAr": "اي فاينانس للاستثمارات المالية والرقمية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EGAL.CA",
+      "symbol": "EGAL",
+      "nameAr": "مصر للالومنيوم",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EGAS.CA",
+      "symbol": "EGAS",
+      "nameAr": "غاز مصر",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EGCH.CA",
+      "symbol": "EGCH",
+      "nameAr": "الصناعات الكيماوية المصرية - كيما",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EGTS.CA",
+      "symbol": "EGTS",
+      "nameAr": "المصرية للمنتجعات السياحية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EHDR.CA",
+      "symbol": "EHDR",
+      "nameAr": "المصريين للاسكان والتنمية والتعمير",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EKHO.CA",
+      "symbol": "EKHO",
+      "nameAr": "القابضة المصرية الكويتية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EKHOA.CA",
+      "symbol": "EKHOA",
+      "nameAr": "القابضة المصرية الكويتية بالجنية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ELEC.CA",
+      "symbol": "ELEC",
+      "nameAr": "الكابلات الكهربائية المصرية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ELKA.CA",
+      "symbol": "ELKA",
+      "nameAr": "القاهرة للاسكان والتعمير",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ELNA.CA",
+      "symbol": "ELNA",
+      "nameAr": "النصر للحاصلات الزراعية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ELSH.CA",
+      "symbol": "ELSH",
+      "nameAr": "الشمس للاسكان والتعمير",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EMFD.CA",
+      "symbol": "EMFD",
+      "nameAr": "إعمار مصر للتنمية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ENGC.CA",
+      "symbol": "ENGC",
+      "nameAr": "الصناعات الهندسية المعمارية للانشاء والتعمير - ايكون",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EPCO.CA",
+      "symbol": "EPCO",
+      "nameAr": "المصرية للدواجن",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ETEL.CA",
+      "symbol": "ETEL",
+      "nameAr": "المصرية للاتصالات",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ETRS.CA",
+      "symbol": "ETRS",
+      "nameAr": "المصرية لخدمات النقل والتجارة ايجيترانس نوسكو",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "EXPA.CA",
+      "symbol": "EXPA",
+      "nameAr": "البنك المصري لتنمية الصادرات",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "FAIT.CA",
+      "symbol": "FAIT",
+      "nameAr": "بنك فيصل الاسلامي المصرية بالجنية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "FAITA.CA",
+      "symbol": "FAITA",
+      "nameAr": "بنك فيصل الاسلامي المصري - بالدولار",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "FCMD.CA",
+      "symbol": "FCMD",
+      "nameAr": "المناجم والمحاجر وتصنيع المواد البترولية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "FIRE.CA",
+      "symbol": "FIRE",
+      "nameAr": "الاولى للاستثمار والتنمية العقارية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "FNAR.CA",
+      "symbol": "FNAR",
+      "nameAr": "الفنار للمقاولات العمومية والإنشاءات والتجارة والاستيراد والتصدير",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "FWRY.CA",
+      "symbol": "FWRY",
+      "nameAr": "فوري لتكنولوجيا البنوك والمدفوعات الالكترونية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "GBCO.CA",
+      "symbol": "GBCO",
+      "nameAr": "جى بى كوربوريشن",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "GDWA.CA",
+      "symbol": "GDWA",
+      "nameAr": "جدوى للتنمية الصناعية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "GETO.CA",
+      "symbol": "GETO",
+      "nameAr": "جينيال تورز",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "GOUR.CA",
+      "symbol": "GOUR",
+      "nameAr": "جورميه ايجيبت دوت كوم للاغذية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "GPIM.CA",
+      "symbol": "GPIM",
+      "nameAr": "جى بى اى للنمو العمرانى",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "GROV.CA",
+      "symbol": "GROV",
+      "nameAr": "جروفا ذات غرض الاستحواذ",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "GSSC.CA",
+      "symbol": "GSSC",
+      "nameAr": "العامة للصوامع والتخزين",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "HDBK.CA",
+      "symbol": "HDBK",
+      "nameAr": "بنك التعمير والاسكان",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "HELI.CA",
+      "symbol": "HELI",
+      "nameAr": "مصر الجديدة للاسكان والتعمير",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "HRHO.CA",
+      "symbol": "HRHO",
+      "nameAr": "مجموعة اي اف جي القابضة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ICFC.CA",
+      "symbol": "ICFC",
+      "nameAr": "الدولية للأسمدة والكيماويات",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "IDRE.CA",
+      "symbol": "IDRE",
+      "nameAr": "الاسماعيلية الجديدة للتطوير والتنمية العمرانية-شركة منقسمة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "IEEC.CA",
+      "symbol": "IEEC",
+      "nameAr": "المشروعات الصناعية والهندسية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "IFAP.CA",
+      "symbol": "IFAP",
+      "nameAr": "الدوليه للمحاصيل الزراعيه",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "INFI.CA",
+      "symbol": "INFI",
+      "nameAr": "الاسماعيلية الوطنية للصناعات الغذائية (فوديكو)",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ISMA.CA",
+      "symbol": "ISMA",
+      "nameAr": "الاسماعيلية مصر للدواجن",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ISMQ.CA",
+      "symbol": "ISMQ",
+      "nameAr": "الحديد والصلب للمناجم والمحاجر",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ISPH.CA",
+      "symbol": "ISPH",
+      "nameAr": "ابن سينا فارما",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "JUFO.CA",
+      "symbol": "JUFO",
+      "nameAr": "جهينة للصناعات الغذائية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "KABO.CA",
+      "symbol": "KABO",
+      "nameAr": "النصر للملابس والمنسوجات - كابو",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "LCSW.CA",
+      "symbol": "LCSW",
+      "nameAr": "ليسيكو مصر",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MASR.CA",
+      "symbol": "MASR",
+      "nameAr": "مدينة مصر للاسكان والتعمير",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MBSC.CA",
+      "symbol": "MBSC",
+      "nameAr": "مصر بنى سويف للاسمنت",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MCQE.CA",
+      "symbol": "MCQE",
+      "nameAr": "مصر للاسمنت - قنا",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MCRO.CA",
+      "symbol": "MCRO",
+      "nameAr": "ماكرو جروب للمستحضرات الطبية (ماكرو كابيتال)",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MEPA.CA",
+      "symbol": "MEPA",
+      "nameAr": "العبوات الطبية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MFPC.CA",
+      "symbol": "MFPC",
+      "nameAr": "مصر لإنتاج الأسمدة - موبكو",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MILS.CA",
+      "symbol": "MILS",
+      "nameAr": "مطاحن ومخابز شمال القاهرة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MOED.CA",
+      "symbol": "MOED",
+      "nameAr": "المصرية لنظم التعليم الحديثة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MOSC.CA",
+      "symbol": "MOSC",
+      "nameAr": "مصر للزيوت والصابون",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MPCI.CA",
+      "symbol": "MPCI",
+      "nameAr": "ممفيس للادوية والصناعات الكيماوية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MPCO.CA",
+      "symbol": "MPCO",
+      "nameAr": "المنصورة للدواجن",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MPRC.CA",
+      "symbol": "MPRC",
+      "nameAr": "المصريه لمدينة الانتاج الاعلامى",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "MTIE.CA",
+      "symbol": "MTIE",
+      "nameAr": "ام.ام جروب للصناعة والتجارة العالمية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "NAMI.CA",
+      "symbol": "NAMI",
+      "nameAr": "الشركة القومية لإدارة الأصول والاستثمار",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "NAPR.CA",
+      "symbol": "NAPR",
+      "nameAr": "الوطنية للطباعة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "NCCW.CA",
+      "symbol": "NCCW",
+      "nameAr": "شركة النصر للأعمال المدنية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "NDRL.CA",
+      "symbol": "NDRL",
+      "nameAr": "الحفر الوطنية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "NEDA.CA",
+      "symbol": "NEDA",
+      "nameAr": "شمال الصعيد للتنمية والإنتاج الزراعي (نيوداب)",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "NIPH.CA",
+      "symbol": "NIPH",
+      "nameAr": "النيل للادوية والصناعات الكيماوية - النيل",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "OBRI.CA",
+      "symbol": "OBRI",
+      "nameAr": "العبور للاستثمار العقارى",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "OCDI.CA",
+      "symbol": "OCDI",
+      "nameAr": "السادس من اكتوبر للتنميه والاستثمار- سوديك",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "OFH.CA",
+      "symbol": "OFH",
+      "nameAr": "او بي المالية القابضة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "OIH.CA",
+      "symbol": "OIH",
+      "nameAr": "اوراسكوم للاستثمار القابضه",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "OLFI.CA",
+      "symbol": "OLFI",
+      "nameAr": "عبور لاند للصناعات الغذائية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ORAS.CA",
+      "symbol": "ORAS",
+      "nameAr": "اوراسكوم كونستراكشون بي ال سي",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ORHD.CA",
+      "symbol": "ORHD",
+      "nameAr": "اوراسكوم للتنمية مصر",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ORWE.CA",
+      "symbol": "ORWE",
+      "nameAr": "النساجون الشرقيون للسجاد",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "PHAR.CA",
+      "symbol": "PHAR",
+      "nameAr": "المصرية الدولية للصناعات الدوائية - ايبيكو",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "PHDC.CA",
+      "symbol": "PHDC",
+      "nameAr": "بالم هيلز للتعمير",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "POUL.CA",
+      "symbol": "POUL",
+      "nameAr": "القاهرة للدواجن",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "PRCL.CA",
+      "symbol": "PRCL",
+      "nameAr": "العامة لمنتجات الخزف والصيني",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "PRDC.CA",
+      "symbol": "PRDC",
+      "nameAr": "بايونيرز بروبرتيز للتنمية العمرانية بي ار اي جروب",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "RACC.CA",
+      "symbol": "RACC",
+      "nameAr": "راية لخدمات مراكز الاتصالات",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "RAYA.CA",
+      "symbol": "RAYA",
+      "nameAr": "راية القابضة للأستثمارات المالية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "RMDA.CA",
+      "symbol": "RMDA",
+      "nameAr": "العاشر من رمضان للصناعات الدوائية والمستحضرات تشخيصية-راميدا",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "SAUD.CA",
+      "symbol": "SAUD",
+      "nameAr": "بنك البركة مصر",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "SCEM.CA",
+      "symbol": "SCEM",
+      "nameAr": "اسمنت سيناء",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "SCFM.CA",
+      "symbol": "SCFM",
+      "nameAr": "مطاحن ومخابز جنوب القاهرة والجيزة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "SIPC.CA",
+      "symbol": "SIPC",
+      "nameAr": "سبأ الدولية للأدوية والصناعات الكيماوية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "SKPC.CA",
+      "symbol": "SKPC",
+      "nameAr": "سيدى كرير للبتروكيماويات - سيدبك",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "SNFC.CA",
+      "symbol": "SNFC",
+      "nameAr": "الشرقية الوطنية للامن الغذائي",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "SUGR.CA",
+      "symbol": "SUGR",
+      "nameAr": "الدلتا للسكر",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "SVCE.CA",
+      "symbol": "SVCE",
+      "nameAr": "جنوب الوادى للاسمنت",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "SWDY.CA",
+      "symbol": "SWDY",
+      "nameAr": "السويدى اليكتريك",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "TALM.CA",
+      "symbol": "TALM",
+      "nameAr": "تعليم لخدمات الإدارة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "TANM.CA",
+      "symbol": "TANM",
+      "nameAr": "تنمية للاستثمار العقاري",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "TAQA.CA",
+      "symbol": "TAQA",
+      "nameAr": "طاقة عربية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "TMGH.CA",
+      "symbol": "TMGH",
+      "nameAr": "مجموعة طلعت مصطفى القابضة",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "TWSA.CA",
+      "symbol": "TWSA",
+      "nameAr": "توسع للتخصيم",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "TYCN.CA",
+      "symbol": "TYCN",
+      "nameAr": "تايكون القابضة للاستثمارات المالية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "UEFM.CA",
+      "symbol": "UEFM",
+      "nameAr": "مطاحن مصر العليا",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "UEGC.CA",
+      "symbol": "UEGC",
+      "nameAr": "الصعيد العامة للمقاولات والاستثمار العقاري",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "UNIP.CA",
+      "symbol": "UNIP",
+      "nameAr": "يونيفرسال لصناعة مواد التعبئة و التغليف و الورق - يونيباك",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "UTOP.CA",
+      "symbol": "UTOP",
+      "nameAr": "يوتوبيا للاستثمار العقارى والسياحى",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "VALU.CA",
+      "symbol": "VALU",
+      "nameAr": "يو للتمويل الاستهلاكى",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "VLMR.CA",
+      "symbol": "VLMR",
+      "nameAr": "فالمور القابضة للاستثمار",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "VLMRA.CA",
+      "symbol": "VLMRA",
+      "nameAr": "فالمور القابضة للاستثماربالجنية",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "WCDF.CA",
+      "symbol": "WCDF",
+      "nameAr": "مطاحن ومخابز وسط وغرب الدلتا",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ZEOT.CA",
+      "symbol": "ZEOT",
+      "nameAr": "الزيوت المستخلصة ومنتجاتها",
+      "market": "EGX"
+    },
+    {
+      "sourceCode": "ZMID.CA",
+      "symbol": "ZMID",
+      "nameAr": "زهراء المعادي للاستثمار والتعمير",
+      "market": "EGX"
+    }
+  ]
+}

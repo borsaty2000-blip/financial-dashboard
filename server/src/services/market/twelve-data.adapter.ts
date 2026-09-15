@@ -1,3 +1,5 @@
+import { prisma } from '../../lib/prisma.js'
+
 export type TwelveCompany = {
 	symbol: string
 	displaySymbol?: string
@@ -101,6 +103,26 @@ async function getCompaniesByExchange(
 }
 
 export function getEgyptCompanies(): Promise<TwelveCompany[]> {
+	return getEgyptCompaniesFromCatalog()
+}
+
+async function getEgyptCompaniesFromCatalog(): Promise<TwelveCompany[]> {
+	const catalog = await prisma.egxCompany
+		.findMany({ where: { market: 'EGX' }, orderBy: { symbol: 'asc' } })
+		.catch(() => [])
+	if (catalog.length) {
+		return catalog.map((company) => ({
+			symbol: company.symbol,
+			displaySymbol: company.symbol,
+			name: company.nameAr,
+			currency: 'EGP',
+			exchange: 'EGX',
+			micCode: 'XCAI',
+			country: 'Egypt',
+			type: 'Common Stock',
+			figiCode: null,
+		}))
+	}
 	return getCompaniesByExchange('XCAI')
 }
 
