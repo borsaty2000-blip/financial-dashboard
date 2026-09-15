@@ -144,6 +144,10 @@ export function StockDetailPage({
 	const [loading, setLoading] = useState(true)
 	const [isPlaying, setIsPlaying] = useState(false)
 	const normalized = symbol.toUpperCase()
+	const displayCompanyName =
+		companyName && companyName.toUpperCase() !== normalized
+			? companyName
+			: undefined
 	const market = /^\d{4,5}$/u.test(normalized) ? 'TASI' : 'EGX'
 	const livePrice = useLivePrice(normalized, market)
 
@@ -389,7 +393,7 @@ export function StockDetailPage({
 				<div>
 					<p className="eyebrow">تفاصيل السهم</p>
 					<h1>
-						{companyName ?? normalized}
+						{displayCompanyName ?? normalized}
 						<small className="stock-symbol-label">{normalized}</small>
 					</h1>
 				</div>
