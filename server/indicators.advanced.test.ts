@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
+	calculateAdvancedFibonacci,
 	calculateKeltnerChannels,
 	calculateTrendAngle,
 	type Candle,
@@ -39,4 +40,23 @@ test('classifies a rising trend angle with an explicit window', () => {
 
 test('returns unavailable trend angle when history is too short', () => {
 	assert.equal(calculateTrendAngle(risingCandles(10), 20), null)
+})
+
+test('calculates advanced Fibonacci levels and ATR dynamic zones', () => {
+	const result = calculateAdvancedFibonacci(risingCandles(80))
+	assert.ok(result)
+	assert.equal(result.direction, 'up')
+	assert.ok(result.retracement['0.618'] < result.swingHigh)
+	assert.ok(result.extensions['1.618'] > result.swingHigh)
+	assert.ok(result.dynamicSupport.lower < result.dynamicSupport.level)
+	assert.ok(result.dynamicResistance.upper > result.dynamicResistance.level)
+})
+
+test('returns unavailable Fibonacci analysis for incomplete OHLC history', () => {
+	assert.equal(
+		calculateAdvancedFibonacci(
+			Array.from({ length: 40 }, (_, index) => ({ close: 100 + index })),
+		),
+		null,
+	)
 })

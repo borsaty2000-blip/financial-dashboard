@@ -325,6 +325,16 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 				: trendDirection === 'flat'
 					? 'جانبي'
 					: 'غير متاح'
+	const fibonacciDirection = stringValue(indicatorResult, [
+		'fibonacci',
+		'direction',
+	])
+	const fibonacciDirectionArabic =
+		fibonacciDirection === 'up'
+			? 'اتجاه صاعد'
+			: fibonacciDirection === 'down'
+				? 'اتجاه هابط'
+				: 'غير متاح'
 	const analysisEnginesAvailable = [
 		indicatorResult,
 		elliottResult,
@@ -542,6 +552,52 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 										]),
 									)}
 									% لكل شمعة
+								</small>
+							</div>
+							<div className="integrated-analysis-card">
+								<span>فيبوناتشي المتقدم</span>
+								<strong>{fibonacciDirectionArabic}</strong>
+								<small>
+									23.6%{' '}
+									{formatEnglishNumber(
+										numberValue(indicatorResult, [
+											'fibonacci',
+											'retracement',
+											'0.236',
+										]),
+									)}{' '}
+									· 61.8%{' '}
+									{formatEnglishNumber(
+										numberValue(indicatorResult, [
+											'fibonacci',
+											'retracement',
+											'0.618',
+										]),
+									)}
+								</small>
+							</div>
+							<div className="integrated-analysis-card">
+								<span>المناطق الديناميكية</span>
+								<strong>
+									دعم{' '}
+									{formatEnglishNumber(
+										numberValue(indicatorResult, [
+											'fibonacci',
+											'dynamicSupport',
+											'level',
+										]),
+									)}
+								</strong>
+								<small>
+									مقاومة{' '}
+									{formatEnglishNumber(
+										numberValue(indicatorResult, [
+											'fibonacci',
+											'dynamicResistance',
+											'level',
+										]),
+									)}{' '}
+									· نطاق ATR
 								</small>
 							</div>
 							<div className="integrated-analysis-card">

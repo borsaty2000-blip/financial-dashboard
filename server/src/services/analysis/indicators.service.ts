@@ -148,6 +148,79 @@ export function calculateTrendAngle(candles: Candle[], period = 20) {
 	}
 }
 
+/**
+ * Fibonacci swing map with ATR-sized dynamic zones. The latest completed
+ * lookback window is used, and the impulse direction follows the order of
+ * the detected swing low/high rather than a guessed market direction.
+ */
+export function calculateAdvancedFibonacci(
+	candles: Candle[],
+	lookback = 120,
+	atrPeriod = 14,
+) {
+	const window = candles.slice(-lookback)
+	if (
+		window.length < 30 ||
+		window.some((candle) => candle.high == null || candle.low == null)
+	)
+		return null
+	let highIndex = 0
+	let lowIndex = 0
+	for (let index = 1; index < window.length; index += 1) {
+		if (window[index].high! > window[highIndex].high!) highIndex = index
+		if (window[index].low! < window[lowIndex].low!) lowIndex = index
+	}
+	const swingHigh = window[highIndex].high!
+	const swingLow = window[lowIndex].low!
+	const range = swingHigh - swingLow
+	if (!Number.isFinite(range) || range <= 0) return null
+	const direction = lowIndex < highIndex ? 'up' : 'down'
+	const ratios = [0.236, 0.382, 0.5, 0.618, 0.786]
+	const retracement = Object.fromEntries(
+		ratios.map((ratio) => [
+			String(ratio),
+			direction === 'up' ? swingHigh - range * ratio : swingLow + range * ratio,
+		]),
+	)
+	const extensions = {
+		'1.272':
+			direction === 'up' ? swingHigh + range * 0.272 : swingLow - range * 0.272,
+		'1.618':
+			direction === 'up' ? swingHigh + range * 0.618 : swingLow - range * 0.618,
+	}
+	const close = window.at(-1)!.close
+	const atr = calculateATR(window, atrPeriod)
+	if (atr == null || !Number.isFinite(atr) || atr <= 0) return null
+	const levels = Object.values(retracement).filter((level) =>
+		Number.isFinite(level),
+	)
+	const supports = levels.filter((level) => level <= close)
+	const resistances = levels.filter((level) => level >= close)
+	const support = supports.length ? Math.max(...supports) : swingLow
+	const resistance = resistances.length ? Math.min(...resistances) : swingHigh
+	const zoneWidth = atr * 0.5
+	return {
+		lookback: window.length,
+		atr,
+		direction,
+		swingHigh,
+		swingLow,
+		range,
+		retracement,
+		extensions,
+		dynamicSupport: {
+			level: support,
+			lower: support - zoneWidth,
+			upper: support + zoneWidth,
+		},
+		dynamicResistance: {
+			level: resistance,
+			lower: resistance - zoneWidth,
+			upper: resistance + zoneWidth,
+		},
+	}
+}
+
 export function calculateIndicatorSnapshot(symbol: string, candles: Candle[]) {
 	const closes = candles.map((candle) => candle.close)
 	const rsi = calculateRSI(candles)
@@ -158,6 +231,7 @@ export function calculateIndicatorSnapshot(symbol: string, candles: Candle[]) {
 	const atr = calculateATR(candles)
 	const keltner = calculateKeltnerChannels(candles)
 	const trendAngle = calculateTrendAngle(candles)
+	const fibonacci = calculateAdvancedFibonacci(candles)
 	const recommendation =
 		rsi == null || macd == null
 			? 'HOLD'
@@ -195,6 +269,7 @@ export function calculateIndicatorSnapshot(symbol: string, candles: Candle[]) {
 		atr,
 		keltner,
 		trendAngle,
+		fibonacci,
 		risk:
 			closes.length > 1
 				? {
