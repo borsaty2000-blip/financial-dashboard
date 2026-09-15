@@ -35,6 +35,7 @@ import { analystsRoutes } from './src/routes/analysts.routes.js'
 import { fundamentalsRoutes } from './src/routes/fundamentals.routes.js'
 import { calendarRoutes } from './src/routes/calendar.routes.js'
 import { newsRoutes } from './src/routes/news.routes.js'
+import { stockRoutes } from './src/routes/stock.routes.js'
 import { screenerRoutes } from './src/routes/screener.routes.js'
 import { specializedCalendarRoutes } from './src/routes/specialized-calendar.routes.js'
 import {
@@ -163,6 +164,7 @@ app.use('/api/tools', currencyRoutes)
 app.use('/api/comparison', comprehensiveComparisonRoutes)
 app.use('/api', governanceRoutes)
 app.use('/api/news', newsRoutes)
+app.use('/api/stock', stockRoutes)
 app.use('/api/screener', screenerRoutes)
 app.use('/api/analysis', analysisRoutes)
 app.use('/api/shariah', shariahRoutes)

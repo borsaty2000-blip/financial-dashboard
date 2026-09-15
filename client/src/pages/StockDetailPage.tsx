@@ -1,13 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../lib/api'
 import { useLivePrice } from '../hooks/useLivePrice'
+import GannElliottChart from '../components/GannElliottChart'
 import {
 	formatEnglishNumber,
 	formatEnglishPercent,
 	formatEnglishScalar,
 } from '../lib/format'
 
-type Candle = { date: string; close: number; volume: number }
+type Candle = {
+	date: string
+	open: number
+	high: number
+	low: number
+	close: number
+	volume: number
+}
 type Scalar = string | number | null | undefined
 type Candles = {
 	symbol: string
@@ -83,6 +91,21 @@ type Ownership = {
 	shareholders?: Array<{ name: string; percentage: number | null }>
 	available?: boolean
 }
+type NewsItem = {
+	id: string
+	title: string
+	description?: string
+	summary?: string
+	source: string
+	publishedAt: string
+	url: string
+}
+type RelatedStock = {
+	symbol: string
+	nameAr: string
+	market: string
+	changePercent?: number | null
+}
 
 const analysisPayload = (response: AnalysisResponse | null) => {
 	if (response?.data && typeof response.data === 'object') return response.data
@@ -157,6 +180,8 @@ export function StockDetailPage({
 	const [insiderTrades, setInsiderTrades] = useState<InsiderTrade[]>([])
 	const [ownership, setOwnership] = useState<Ownership | null>(null)
 	const [resolvedCompanyName, setResolvedCompanyName] = useState<string>()
+	const [stockNews, setStockNews] = useState<NewsItem[]>([])
+	const [relatedStocks, setRelatedStocks] = useState<RelatedStock[]>([])
 	const [message, setMessage] = useState('')
 	const [loading, setLoading] = useState(true)
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -265,6 +290,16 @@ export function StockDetailPage({
 		})
 			.then(setOwnership)
 			.catch(() => undefined)
+		void api<{ data?: NewsItem[] }>(`/api/news/${normalized}`, {
+			suppressToast: true,
+		})
+			.then((result) => setStockNews(result.data ?? []))
+			.catch(() => undefined)
+		void api<{ data?: RelatedStock[] }>(`/api/stock/${normalized}/related`, {
+			suppressToast: true,
+		})
+			.then((result) => setRelatedStocks(result.data ?? []))
+			.catch(() => undefined)
 		return () => {
 			cancelled = true
 			controller.abort()
@@ -331,6 +366,15 @@ export function StockDetailPage({
 		if ('speechSynthesis' in window) {
 			window.speechSynthesis.cancel()
 			window.speechSynthesis.speak(new SpeechSynthesisUtterance(text))
+		}
+	}
+	const shareStock = async () => {
+		const url = `${window.location.origin}/stock/${normalized}`
+		try {
+			await navigator.clipboard.writeText(url)
+			setMessage('تم نسخ رابط السهم')
+		} catch {
+			setMessage(url)
 		}
 	}
 
@@ -411,6 +455,7 @@ export function StockDetailPage({
 		indicatorResult,
 		elliottResult,
 		gannResult,
+		candlestickResult,
 		consensusResult,
 		statisticalResult,
 		arimaResult,
@@ -453,6 +498,9 @@ export function StockDetailPage({
 					</button>
 					<button className="primary-button" onClick={addToWatchlist}>
 						＋ أضف إلى قائمتي
+					</button>
+					<button className="secondary-button" onClick={shareStock}>
+						🔗 مشاركة
 					</button>
 					<a
 						className="secondary-button"
@@ -533,6 +581,15 @@ export function StockDetailPage({
 					</section>
 					<section className="analysis-card stock-chart-card">
 						<h2>الأداء التاريخي</h2>
+						<GannElliottChart
+							candles={data.candles.map((candle) => ({
+								time: candle.date,
+								open: candle.open,
+								high: candle.high,
+								low: candle.low,
+								close: candle.close,
+							}))}
+						/>
 						<div className="stock-sparkline">
 							{data.candles.slice(-60).map((candle, index, values) => {
 								const min = Math.min(...values.map((item) => item.close))
@@ -936,6 +993,60 @@ export function StockDetailPage({
 						<small>
 							الأرقام غير المتاحة تظهر كشرطة ولا تمثل توصية استثمارية.
 						</small>
+					</section>
+					<section className="analysis-card stock-news-panel">
+						<div className="panel-title">
+							<h2>أخبار {displayCompanyName ?? normalized}</h2>
+							<span className="eyebrow">أخبار السهم</span>
+						</div>
+						{stockNews.length ? (
+							<div className="news-list">
+								{stockNews.slice(0, 6).map((item) => (
+									<a
+										className="news-item"
+										href={item.url}
+										target="_blank"
+										rel="noreferrer"
+										key={item.id}
+									>
+										<strong>{item.title}</strong>
+										<small>
+											{item.source} ·{' '}
+											{new Date(item.publishedAt).toLocaleDateString('ar-EG')}
+										</small>
+										<p>
+											{item.summary ?? item.description ?? 'لا يوجد ملخص متاح.'}
+										</p>
+									</a>
+								))}
+							</div>
+						) : (
+							<p className="muted">
+								لا توجد أخبار موثوقة مرتبطة بهذا الرمز حالياً.
+							</p>
+						)}
+					</section>
+					<section className="analysis-card related-stocks-panel">
+						<div className="panel-title">
+							<h2>أسهم مرتبطة</h2>
+							<span className="eyebrow">EGX / TASI</span>
+						</div>
+						{relatedStocks.length ? (
+							<div className="related-stocks-grid">
+								{relatedStocks.map((item) => (
+									<a
+										className="related-stock-card"
+										href={`/stock/${item.symbol}`}
+										key={item.symbol}
+									>
+										<strong>{item.symbol}</strong>
+										<span>{item.nameAr}</span>
+									</a>
+								))}
+							</div>
+						) : (
+							<p className="muted">لا تتوفر قائمة مرتبطة حالياً.</p>
+						)}
 					</section>
 				</>
 			)}
