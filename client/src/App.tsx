@@ -297,6 +297,8 @@ function RoutedApp() {
 		return <SpecializedCalendarsPage kind="earnings" />
 	if (path === '/calendar/splits')
 		return <SpecializedCalendarsPage kind="splits" />
+	if (path === '/markets/egx') return <PublicHomePage focus="EGX" />
+	if (path === '/markets/tasi') return <PublicHomePage focus="TASI" />
 	if (path === '/markets/forex') return <AdditionalMarketsPage kind="forex" />
 	if (path === '/markets/commodities')
 		return <AdditionalMarketsPage kind="commodities" />
