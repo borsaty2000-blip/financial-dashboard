@@ -15,9 +15,9 @@
 	],
 	"icons": [
 		{
-			"src": "/favicon.svg",
-			"sizes": "64x64",
-			"type": "image/svg+xml",
+			"src": "/branding/borsatyai-mark.png",
+			"sizes": "462x512",
+			"type": "image/png",
 			"purpose": "any maskable"
 		}
 	]
