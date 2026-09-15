@@ -7230,6 +7230,71 @@ textarea {
 	box-shadow: 0 24px 52px rgb(12 43 61 / 24%);
 }
 
+/* The public landing surface stays white; dark is reserved for the top chrome only. */
+.borsaty-terminal-card {
+	border: 1px solid #d9e2e7 !important;
+	background: #ffffff !important;
+	box-shadow: 0 10px 28px rgb(24 54 69 / 9%) !important;
+	color: #17232d !important;
+	transform: none !important;
+}
+
+.borsaty-terminal-card__head {
+	border-bottom: 1px solid #e7edf0 !important;
+	color: #697b84 !important;
+}
+
+.borsaty-terminal-card__grid strong {
+	border-bottom-color: #e7edf0 !important;
+	color: #0878ae !important;
+}
+
+.borsaty-terminal-card__grid span {
+	border-bottom-color: #e7edf0 !important;
+	color: #263d49 !important;
+}
+
+.borsaty-terminal-card__disclaimer {
+	color: #84929a !important;
+}
+
+.borsaty-promo-banner {
+	min-height: 46px !important;
+	border-bottom: 1px solid #e1e8ec !important;
+	background: #ffffff !important;
+	box-shadow: 0 2px 9px rgb(16 40 53 / 5%) !important;
+	color: #263d49 !important;
+}
+
+.borsaty-promo-banner__label {
+	color: #4c6470 !important;
+}
+
+.borsaty-promo-banner__label span,
+.borsaty-promo-banner__track span::before {
+	color: #0878ae !important;
+}
+
+.borsaty-promo-banner__track {
+	color: #627680 !important;
+}
+
+.borsaty-promo-banner__track strong {
+	color: #182b35 !important;
+}
+
+.borsaty-promo-banner__action {
+	border: 1px solid #1684b0 !important;
+	background: #ffffff !important;
+	color: #08658e !important;
+}
+
+.borsaty-promo-banner__action:hover,
+.borsaty-promo-banner__action:focus-visible {
+	background: #edf8fc !important;
+	color: #064b6b !important;
+}
+
 .panel,
 .analysis-card,
 .borsaty-pulse-table-card,
