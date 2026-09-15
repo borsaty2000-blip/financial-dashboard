@@ -52,3 +52,23 @@ test('AI assistant returns an educational response for a generic question', asyn
 		assert.equal(body.available, false)
 	})
 })
+
+test('AI assistant answers general questions without requiring a stock symbol', async () => {
+	await withServer(async (baseUrl) => {
+		const response = await fetch(`${baseUrl}/api/ai/chat`, {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({
+				message: 'ما الفرق بين الاستثمار والتداول؟',
+				history: [{ role: 'user', content: 'مرحبا' }],
+			}),
+		})
+		assert.equal(response.status, 200)
+		const body = (await response.json()) as {
+			message: string
+			available: boolean
+		}
+		assert.match(body.message, /إدارة المخاطر|الاستثمار|التداول/)
+		assert.equal(body.available, false)
+	})
+})

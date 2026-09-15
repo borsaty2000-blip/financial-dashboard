@@ -20,6 +20,16 @@ aiRoutes.post('/chat', async (request, response) => {
 				? body.market
 				: undefined,
 		symbol: typeof body.symbol === 'string' ? body.symbol : undefined,
+		history: Array.isArray(body.history)
+			? body.history
+					.filter(
+						(item) =>
+							item &&
+							(item.role === 'user' || item.role === 'assistant') &&
+							typeof item.content === 'string',
+					)
+					.slice(-12)
+			: undefined,
 	})
 	return response.json(result)
 })

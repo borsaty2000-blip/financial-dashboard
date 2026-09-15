@@ -33,7 +33,12 @@ export default function AIAssistantWidget() {
 		try {
 			const data = await api<AssistantResponse>('/api/ai/chat', {
 				method: 'POST',
-				body: JSON.stringify({ message: value }),
+				body: JSON.stringify({
+					message: value,
+					history: messages
+						.slice(-12)
+						.map(({ role, content }) => ({ role, content })),
+				}),
 			})
 			setMessages((items) => [
 				...items,
@@ -66,7 +71,7 @@ export default function AIAssistantWidget() {
 					<header>
 						<div>
 							<strong>مساعد borsatyai</strong>
-							<small>تحليل تعليمي بلا تنفيذ صفقات</small>
+							<small>شات ذكي عام · تحليل تعليمي بلا تنفيذ صفقات</small>
 						</div>
 						<button aria-label="إغلاق" onClick={() => setOpen(false)}>
 							×
@@ -75,13 +80,24 @@ export default function AIAssistantWidget() {
 					<div className="ai-assistant-messages">
 						{messages.length === 0 && (
 							<div className="ai-assistant-welcome">
-								<p>اسألني عن COMI أو اكتب: أفضل الأسهم.</p>
+								<p>
+									اسألني بحرية: شرح، أخبار، تقنية، استخدام المنصة، أو تحليل سهم.
+								</p>
 								<div>
-									<button onClick={() => void send('ما وضع COMI؟')}>
-										تحليل COMI
+									<button onClick={() => void send('اشرح لي RSI بطريقة بسيطة')}>
+										اشرح مؤشراً
 									</button>
-									<button onClick={() => void send('أفضل الأسهم اليوم')}>
-										أفضل الأسهم
+									<button
+										onClick={() => void send('كيف أستخدم منصة borsatyai؟')}
+									>
+										مساعدة في المنصة
+									</button>
+									<button
+										onClick={() =>
+											void send('ما الفرق بين الاستثمار والتداول؟')
+										}
+									>
+										سؤال عام
 									</button>
 								</div>
 							</div>
@@ -111,9 +127,7 @@ export default function AIAssistantWidget() {
 							</div>
 						))}
 						{loading && (
-							<div className="ai-message assistant">
-								جاري تحليل البيانات المتاحة...
-							</div>
+							<div className="ai-message assistant">جاري تجهيز الإجابة...</div>
 						)}
 					</div>
 					<form
