@@ -3,11 +3,14 @@ import type { ReactNode } from 'react'
 import {
 	BarChart3,
 	ChartNoAxesCombined,
+	Bell,
 	GraduationCap,
 	Home,
 	Newspaper,
+	Search,
 	Wrench,
 } from 'lucide-react'
+import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { navigate } from '../router'
 import { formatEnglishNumber, formatEnglishPercent } from '../lib/format'
 import { PublicMarketPulse } from '../components/PublicMarketPulse'
@@ -517,6 +520,44 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 				<span className="sr-only">borsatyai</span>
 			</button>
 			<nav className="borsaty-public-nav" aria-label="التنقل الرئيسي">
+				<button
+					className="public-quick-nav is-home"
+					onClick={() => go('/')}
+					aria-label="الصفحة الرئيسية"
+					title="الصفحة الرئيسية"
+				>
+					<Home size={17} strokeWidth={2.5} aria-hidden="true" />
+					<span>الرئيسية</span>
+				</button>
+				<button
+					className="public-quick-nav"
+					onClick={() => go('/analysis/elliott')}
+					aria-label="مركز التحليل المتقدم"
+					title="مركز التحليل المتقدم"
+				>
+					<BarChart3 size={17} strokeWidth={2.4} aria-hidden="true" />
+					<span>مركز التحليل</span>
+				</button>
+				<button
+					className="public-quick-nav"
+					onClick={() => go('/news')}
+					aria-label="أخبار السوق"
+					title="أخبار السوق"
+				>
+					<Newspaper size={17} strokeWidth={2.4} aria-hidden="true" />
+					<span>الأخبار</span>
+				</button>
+				<button
+					className="public-quick-nav"
+					onClick={() =>
+						window.dispatchEvent(new CustomEvent('borsaty-open-search'))
+					}
+					aria-label="البحث عن سهم"
+					title="البحث عن سهم"
+				>
+					<Search size={17} strokeWidth={2.4} aria-hidden="true" />
+					<span>بحث</span>
+				</button>
 				<HeaderMenu
 					id="markets"
 					label="الأسواق"
@@ -789,9 +830,14 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 				</HeaderMenu>
 			</nav>
 			<div className="borsaty-public-actions">
-				<button className="borsaty-home-button" onClick={() => go('/')}>
-					<Home size={16} strokeWidth={2.4} aria-hidden="true" />
-					<span>الرئيسية</span>
+				<LanguageSwitcher className="public-header-language" />
+				<button
+					className="public-header-icon-action"
+					onClick={() => go('/alerts')}
+					aria-label="التنبيهات"
+					title="التنبيهات"
+				>
+					<Bell size={17} strokeWidth={2.4} aria-hidden="true" />
 				</button>
 				<button className="borsaty-text-button" onClick={() => go('/login')}>
 					دخول

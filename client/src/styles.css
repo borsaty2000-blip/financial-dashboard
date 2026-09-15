@@ -6718,3 +6718,88 @@ body.dark-mode .analysis-pipeline {
 body.dark-mode .analysis-pipeline span {
 	color: #e9f8ff;
 }
+
+/* Desktop terminal navigation: home and core shortcuts sit beside the primary icons. */
+.borsaty-public-nav .public-quick-nav {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	min-height: 38px;
+	padding: 8px 10px;
+	border: 1px solid transparent;
+	border-radius: 10px;
+	background: transparent;
+	color: #ffffff;
+	font-size: 12px;
+	font-weight: 800;
+	white-space: nowrap;
+}
+.borsaty-public-nav .public-quick-nav:hover,
+.borsaty-public-nav .public-quick-nav:focus-visible,
+.borsaty-public-nav .public-quick-nav.is-home {
+	border-color: rgb(255 255 255 / 26%);
+	background: rgb(255 255 255 / 12%);
+	color: #ffffff;
+	outline: none;
+}
+.borsaty-public-nav .public-quick-nav.is-home {
+	background: linear-gradient(135deg, #138bc5, #075c8c);
+	box-shadow: 0 6px 14px rgb(0 73 112 / 22%);
+}
+.public-header-icon-action {
+	display: inline-grid;
+	place-items: center;
+	width: 38px;
+	height: 38px;
+	border: 1px solid rgb(255 255 255 / 24%);
+	border-radius: 10px;
+	background: rgb(255 255 255 / 8%);
+	color: #ffffff;
+	cursor: pointer;
+}
+.public-header-icon-action:hover,
+.public-header-icon-action:focus-visible {
+	background: #ffffff;
+	color: #0b3850;
+	outline: none;
+}
+.public-header-language {
+	position: relative;
+	top: auto;
+	inset-inline: auto;
+	display: inline-flex;
+	width: auto;
+	min-height: 36px;
+	padding: 0 8px;
+	border: 1px solid rgb(255 255 255 / 24%);
+	border-radius: 10px;
+	background: rgb(255 255 255 / 9%);
+	color: #ffffff;
+}
+.public-header-language span {
+	color: #ffffff;
+}
+.public-header-language select {
+	max-width: 92px;
+	background: transparent;
+	color: #ffffff;
+	font-size: 11px;
+}
+.public-header-language option {
+	background: #ffffff;
+	color: #163b4b;
+}
+body:has(.borsaty-public-page) .global-language-switcher {
+	display: none;
+}
+@media (max-width: 800px) {
+	.borsaty-public-nav .public-quick-nav {
+		display: none;
+	}
+	.public-header-language {
+		display: none;
+	}
+	body:has(.borsaty-public-page) .global-language-switcher {
+		display: none;
+	}
+}
