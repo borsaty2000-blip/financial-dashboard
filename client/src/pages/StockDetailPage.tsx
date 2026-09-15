@@ -29,6 +29,13 @@ type AnalysisResponse = {
 	data?: Record<string, unknown>
 	[key: string]: unknown
 }
+type MarketMood = {
+	available?: boolean
+	score?: number
+	label?: string
+	positive?: number
+	negative?: number
+}
 type IntegratedAnalysis = {
 	indicators: AnalysisResponse | null
 	elliott: AnalysisResponse | null
@@ -40,7 +47,7 @@ type IntegratedAnalysis = {
 	backtest: AnalysisResponse | null
 }
 type FullAnalysisResponse = {
-	data?: Partial<IntegratedAnalysis>
+	data?: Partial<IntegratedAnalysis> & { marketMood?: MarketMood }
 	data_quality?: {
 		status?: string
 		price_freshness?: string
@@ -142,6 +149,7 @@ export function StockDetailPage({
 		FullAnalysisResponse['engine_statuses']
 	>([])
 	const [analysisError, setAnalysisError] = useState('')
+	const [marketMood, setMarketMood] = useState<MarketMood | undefined>()
 	const [fallbackEngines, setFallbackEngines] = useState(0)
 	const [fundamentals, setFundamentals] = useState<Fundamentals | null>(null)
 	const [insiderTrades, setInsiderTrades] = useState<InsiderTrade[]>([])
@@ -216,6 +224,7 @@ export function StockDetailPage({
 				setAnalysisQuality(result.data_quality)
 				setCompletedEngines(result.completed_engines ?? 0)
 				setAnalysisEngineStatuses(result.engine_statuses ?? [])
+				setMarketMood(result.data?.marketMood)
 				setFallbackEngines(
 					(result.engine_statuses ?? []).filter(
 						(item) => item.status === 'educational_fallback',
@@ -776,9 +785,18 @@ export function StockDetailPage({
 							</small>
 						</div>
 						<div>
-							<span className="eyebrow">المزاج العام</span>
-							<strong>{mood?.articleCount ?? 0} خبر</strong>
-							<small>إيجابي {mood?.distribution?.positive ?? 0}%</small>
+							<span className="eyebrow">مزاج السوق</span>
+							<strong>
+								{marketMood?.available
+									? `${marketMood.label ?? 'محايد'} ${formatEnglishNumber(marketMood.score)}`
+									: 'غير متاح'}
+							</strong>
+							<small>
+								{marketMood?.available
+									? `إيجابي ${formatEnglishPercent(marketMood.positive)} · سلبي ${formatEnglishPercent(marketMood.negative)}`
+									: 'لا تتوفر مدخلات كافية'}
+							</small>
+							<small>مشاعر الأخبار: {mood?.articleCount ?? 0} خبر موثوق</small>
 						</div>
 						<div>
 							<span className="eyebrow">رصد الشذوذ</span>

@@ -23,6 +23,7 @@ import {
 } from '../services/market/candles.service.js'
 import { analysisRateLimit } from '../middleware/rateLimit.js'
 import { runBacktest } from '../services/analysis/backtesting.python.js'
+import { SentimentService } from '../services/analysis/sentiment.service.js'
 
 export const analysisRoutes = Router()
 analysisRoutes.use(analysisRateLimit)
@@ -150,6 +151,33 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 				return { name: engineNames[index], status: 'unavailable' as const }
 			return { name: engineNames[index], status: 'computed' as const }
 		})
+		const consensusResult = value<Record<string, unknown>>(3)
+		const indicatorResult = value<Record<string, unknown>>(0)
+		const indicatorData =
+			indicatorResult?.data && typeof indicatorResult.data === 'object'
+				? (indicatorResult.data as Record<string, unknown>)
+				: indicatorResult
+		const rsiValue =
+			indicatorData?.rsi && typeof indicatorData.rsi === 'object'
+				? Number((indicatorData.rsi as Record<string, unknown>).value)
+				: null
+		const macdSignal =
+			indicatorData?.macd && typeof indicatorData.macd === 'object'
+				? String((indicatorData.macd as Record<string, unknown>).signal ?? '')
+				: null
+		const latest = series.prices.at(-1)
+		const previous = series.prices.at(-2)
+		const priceChange =
+			Number.isFinite(latest) && Number.isFinite(previous) && previous
+				? ((latest! - previous!) / previous!) * 100
+				: null
+		const marketMood = SentimentService.calculateMarketMood(symbol, {
+			consensus: Number(consensusResult?.score),
+			rsi: Number.isFinite(rsiValue) ? rsiValue : null,
+			macd: macdSignal,
+			volume: series.candles.at(-1)?.volume ?? null,
+			priceChange,
+		})
 		return response.json({
 			status: 'success',
 			symbol,
@@ -169,6 +197,7 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 			).length,
 			engine_statuses: engineStatuses,
 			data: {
+				marketMood,
 				indicators: value(0),
 				elliott: value(1),
 				gann: value(2),
