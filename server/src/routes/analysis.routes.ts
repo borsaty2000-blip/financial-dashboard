@@ -24,6 +24,7 @@ import {
 import { analysisRateLimit } from '../middleware/rateLimit.js'
 import { runBacktest } from '../services/analysis/backtesting.python.js'
 import { SentimentService } from '../services/analysis/sentiment.service.js'
+import { buildSmartSummary } from '../services/analysis/smartSummary.service.js'
 
 export const analysisRoutes = Router()
 analysisRoutes.use(analysisRateLimit)
@@ -240,6 +241,100 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 			status: 'error',
 			message: 'تعذر إكمال غرفة التحليل حالياً؛ أعد المحاولة لاحقاً',
 		})
+	}
+})
+
+analysisRoutes.get('/:symbol/brilliant-summary', async (request, response) => {
+	try {
+		const series = await resolveSeries(request)
+		if (series.prices.length < 60)
+			return response.status(404).json({
+				status: 'unavailable',
+				message: 'لا توجد بيانات تاريخية كافية لبناء ملخص موثوق',
+			})
+		const candles: Candle[] = series.candles.map((candle) => ({
+			open: candle.open,
+			high: candle.high,
+			low: candle.low,
+			close: candle.close,
+			volume: candle.volume,
+		}))
+		const results = await Promise.allSettled([
+			Promise.resolve(calculateIndicatorSnapshot(series.symbol, candles)),
+			analyzeElliott(series.prices),
+			analyzeGann(series.prices, series.dates),
+			analyze(series.prices),
+		])
+		const resultAt = (index: number) => {
+			const result = results[index]
+			return result?.status === 'fulfilled' &&
+				result.value &&
+				typeof result.value === 'object'
+				? (result.value as Record<string, unknown>)
+				: null
+		}
+		const unwrap = (value: Record<string, unknown> | null) =>
+			value?.data && typeof value.data === 'object'
+				? (value.data as Record<string, unknown>)
+				: value
+		const indicators = unwrap(resultAt(0))
+		const elliott = unwrap(resultAt(1))
+		const gann = unwrap(resultAt(2))
+		const statistical = unwrap(resultAt(3))
+		const rsi =
+			indicators?.rsi && typeof indicators.rsi === 'object'
+				? Number((indicators.rsi as Record<string, unknown>).value)
+				: null
+		const macd =
+			indicators?.macd && typeof indicators.macd === 'object'
+				? String((indicators.macd as Record<string, unknown>).signal ?? '')
+				: null
+		const currentWave =
+			elliott?.current_wave && typeof elliott.current_wave === 'object'
+				? (elliott.current_wave as Record<string, unknown>)
+				: null
+		const gannSquare =
+			gann?.square_of_nine && typeof gann.square_of_nine === 'object'
+				? (gann.square_of_nine as Record<string, unknown>)
+				: null
+		const first = series.prices[0] ?? null
+		const last = series.prices.at(-1) ?? null
+		const summary = buildSmartSummary({
+			symbol: series.symbol,
+			price: Number.isFinite(last) ? last : null,
+			updatedAt: new Date().toISOString(),
+			rsi: Number.isFinite(rsi) ? rsi : null,
+			macd,
+			wave: currentWave?.wave ? String(currentWave.wave) : null,
+			waveDirection: currentWave?.direction
+				? String(currentWave.direction)
+				: null,
+			gannDirection:
+				first != null &&
+				last != null &&
+				Number.isFinite(first) &&
+				Number.isFinite(last)
+					? last >= first
+						? 'up'
+						: 'down'
+					: null,
+			gannSupport: Number(gannSquare?.support) || null,
+			gannResistance: Number(gannSquare?.resistance) || null,
+			volatility: Number(statistical?.volatility) || null,
+		})
+		return response.json({
+			status: 'success',
+			data: summary,
+			data_quality: {
+				source: series.source,
+				candles_count: series.count,
+				decision: 'NO_TRADE_DECISION',
+			},
+		})
+	} catch {
+		return response
+			.status(502)
+			.json({ status: 'error', message: 'تعذر بناء الملخص التحليلي حالياً' })
 	}
 })
 

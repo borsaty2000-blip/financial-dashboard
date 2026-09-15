@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { api } from '../lib/api'
 import { useLivePrice } from '../hooks/useLivePrice'
 import ProfessionalStockChart from '../components/ProfessionalStockChart'
+import { BrilliantSummary } from '../components/Analysis/BrilliantSummary'
 import {
 	formatEnglishNumber,
 	formatEnglishPercent,
@@ -682,6 +683,7 @@ export function StockDetailPage({
 							المحركات نعرض التعارض بدلاً من إخفائه.
 						</p>
 					</section>
+					<BrilliantSummary symbol={normalized} market={market} />
 					<section className="analysis-card stock-chart-card">
 						<div className="panel-title">
 							<div>
