@@ -16,6 +16,7 @@ const sections: ActivitySection[] = [
 		links: [
 			{ label: 'EGX', path: '/markets/egx' },
 			{ label: 'TASI', path: '/markets/tasi' },
+			{ label: 'خريطة السوق', path: '/heatmap' },
 			{ label: 'فاحص الأسهم', path: '/screener' },
 			{ label: 'الذهب والفضة', path: '/markets/commodities' },
 		],

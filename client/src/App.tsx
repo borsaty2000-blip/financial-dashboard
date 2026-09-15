@@ -78,6 +78,7 @@ import {
 	VideoLibraryPage,
 } from './pages/MarketLeadershipPages'
 import { AnalysisOverviewPage, PublicHomePage } from './pages/PublicPages'
+import { HeatmapPage } from './pages/HeatmapPage'
 
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
@@ -300,6 +301,7 @@ function RoutedApp() {
 	if (path === '/markets/egx') return <PublicHomePage focus="EGX" />
 	if (path === '/markets/tasi') return <PublicHomePage focus="TASI" />
 	if (path === '/markets/forex') return <AdditionalMarketsPage kind="forex" />
+	if (path === '/heatmap') return <HeatmapPage />
 	if (path === '/markets/commodities')
 		return <AdditionalMarketsPage kind="commodities" />
 	if (path === '/markets/crypto') return <AdditionalMarketsPage kind="crypto" />

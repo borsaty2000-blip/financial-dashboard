@@ -667,6 +667,12 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 								onSelect={go}
 							/>
 							<MenuLink
+								path="/heatmap"
+								label="خريطة السوق"
+								description="قراءة بصرية للأسعار المتاحة"
+								onSelect={go}
+							/>
+							<MenuLink
 								path="/markets/forex"
 								label="الفوركس"
 								description="أسواق إضافية"

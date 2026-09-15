@@ -59,7 +59,10 @@ function indexCard(
 	}
 }
 
-async function companies(): Promise<{ egx: unknown[]; tasi: unknown[] }> {
+export async function companies(): Promise<{
+	egx: unknown[]
+	tasi: unknown[]
+}> {
 	if (directoryCache && directoryCache.expiresAt > Date.now())
 		return directoryCache.value
 	const [egxResult, tasiResult] = await Promise.all([
@@ -104,7 +107,7 @@ async function companies(): Promise<{ egx: unknown[]; tasi: unknown[] }> {
 	return value
 }
 
-async function quotes(symbols: string[], market: 'EGX' | 'TASI') {
+export async function quotes(symbols: string[], market: 'EGX' | 'TASI') {
 	const result = await Promise.all(
 		symbols.slice(0, 12).map(async (symbol) => {
 			try {

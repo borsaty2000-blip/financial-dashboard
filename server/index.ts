@@ -67,6 +67,7 @@ import {
 import { openApiRoutes } from './src/routes/openapi.routes.js'
 import { liveMarketRoutes } from './src/routes/live-market.routes.js'
 import { aiRoutes } from './src/routes/ai.routes.js'
+import { heatmapRoutes } from './src/routes/heatmap.routes.js'
 
 initializeOptionalSentry()
 const app = express()
@@ -149,6 +150,7 @@ app.get('/api/health', (_request, response) =>
 )
 app.use('/api', openApiRoutes)
 app.use('/api/v1/market', liveMarketRoutes)
+app.use('/api/v1/market', heatmapRoutes)
 app.use('/api/ai', aiRoutes)
 app.use('/', seoRoutes)
 app.use('/api/auth', authRoutes)
