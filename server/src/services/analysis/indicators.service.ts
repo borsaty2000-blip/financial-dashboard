@@ -61,6 +61,93 @@ export function calculateATR(candles: Candle[], period = 14) {
 	return result
 }
 
+/**
+ * Keltner Channels: EMA of close ± multiplier × ATR using true range.
+ * The calculation is intentionally unavailable when OHLC data is incomplete;
+ * close-only series must not be presented as a fully calculated channel.
+ */
+export function calculateKeltnerChannels(
+	candles: Candle[],
+	period = 20,
+	atrPeriod = 10,
+	multiplier = 2,
+) {
+	if (
+		candles.length < period + atrPeriod ||
+		candles.some((candle) => candle.high == null || candle.low == null)
+	)
+		return null
+	const ema = calculateEMA(candles, period)
+	const ranges: number[] = []
+	for (let index = 0; index < candles.length; index += 1) {
+		const candle = candles[index]
+		const previousClose = candles[index - 1]?.close ?? candle.close
+		ranges.push(
+			Math.max(
+				candle.high! - candle.low!,
+				Math.abs(candle.high! - previousClose),
+				Math.abs(candle.low! - previousClose),
+			),
+		)
+	}
+	const atr =
+		ranges.slice(-atrPeriod).reduce((sum, value) => sum + value, 0) / atrPeriod
+	if (ema == null || !Number.isFinite(atr)) return null
+	return {
+		middle: ema,
+		upper: ema + multiplier * atr,
+		lower: ema - multiplier * atr,
+		atr,
+		period,
+		multiplier,
+		position:
+			candles.at(-1)!.close > ema + multiplier * atr
+				? 'above'
+				: candles.at(-1)!.close < ema - multiplier * atr
+					? 'below'
+					: 'inside',
+	}
+}
+
+/**
+ * Trend angle is the least-squares slope over normalized price, expressed in
+ * degrees per candle. Normalizing by mean price makes the angle comparable
+ * across instruments with different price scales; it is not a chart-screen
+ * angle and must be interpreted with the selected window.
+ */
+export function calculateTrendAngle(candles: Candle[], period = 20) {
+	if (candles.length < period) return null
+	const closes = candles.slice(-period).map((candle) => candle.close)
+	const mean = closes.reduce((sum, value) => sum + value, 0) / period
+	if (!Number.isFinite(mean) || mean <= 0) return null
+	const xMean = (period - 1) / 2
+	const numerator = closes.reduce(
+		(sum, value, index) => sum + (index - xMean) * (value - mean),
+		0,
+	)
+	const denominator = closes.reduce(
+		(sum, _, index) => sum + (index - xMean) ** 2,
+		0,
+	)
+	const slope = numerator / denominator
+	const percentPerCandle = (slope / mean) * 100
+	const angleDegrees = (Math.atan(percentPerCandle / 100) * 180) / Math.PI
+	return {
+		period,
+		slope,
+		percentPerCandle,
+		angleDegrees,
+		direction:
+			angleDegrees > 0.25 ? 'up' : angleDegrees < -0.25 ? 'down' : 'flat',
+		strength:
+			Math.abs(angleDegrees) >= 2
+				? 'strong'
+				: Math.abs(angleDegrees) >= 0.25
+					? 'moderate'
+					: 'weak',
+	}
+}
+
 export function calculateIndicatorSnapshot(symbol: string, candles: Candle[]) {
 	const closes = candles.map((candle) => candle.close)
 	const rsi = calculateRSI(candles)
@@ -69,6 +156,8 @@ export function calculateIndicatorSnapshot(symbol: string, candles: Candle[]) {
 	const sma50 = calculateSMA(candles, 50)
 	const bollinger = calculateBollinger(candles)
 	const atr = calculateATR(candles)
+	const keltner = calculateKeltnerChannels(candles)
+	const trendAngle = calculateTrendAngle(candles)
 	const recommendation =
 		rsi == null || macd == null
 			? 'HOLD'
@@ -104,6 +193,8 @@ export function calculateIndicatorSnapshot(symbol: string, candles: Candle[]) {
 		sma50,
 		bollinger,
 		atr,
+		keltner,
+		trendAngle,
 		risk:
 			closes.length > 1
 				? {

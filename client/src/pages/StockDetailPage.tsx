@@ -312,6 +312,19 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 	])
 	const arimaForecast = numberValue(arimaResult, ['forecast', '0'])
 	const lstmForecast = numberValue(lstmResult, ['forecast', '0'])
+	const keltnerPosition = stringValue(indicatorResult, ['keltner', 'position'])
+	const trendDirection = stringValue(indicatorResult, [
+		'trendAngle',
+		'direction',
+	])
+	const trendDirectionArabic =
+		trendDirection === 'up'
+			? 'صاعد'
+			: trendDirection === 'down'
+				? 'هابط'
+				: trendDirection === 'flat'
+					? 'جانبي'
+					: 'غير متاح'
 	const analysisEnginesAvailable = [
 		indicatorResult,
 		elliottResult,
@@ -487,6 +500,48 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 									MACD {stringValue(indicatorResult, ['macd', 'signal']) ?? '—'}{' '}
 									· SMA20{' '}
 									{formatEnglishNumber(numberValue(indicatorResult, ['sma20']))}
+								</small>
+							</div>
+							<div className="integrated-analysis-card">
+								<span>قنوات كايتلر</span>
+								<strong>
+									{keltnerPosition === 'above'
+										? 'فوق القناة'
+										: keltnerPosition === 'below'
+											? 'تحت القناة'
+											: keltnerPosition === 'inside'
+												? 'داخل القناة'
+												: 'غير متاح'}
+								</strong>
+								<small>
+									علوي{' '}
+									{formatEnglishNumber(
+										numberValue(indicatorResult, ['keltner', 'upper']),
+									)}{' '}
+									· سفلي{' '}
+									{formatEnglishNumber(
+										numberValue(indicatorResult, ['keltner', 'lower']),
+									)}
+								</small>
+							</div>
+							<div className="integrated-analysis-card">
+								<span>زاوية الاتجاه</span>
+								<strong>{trendDirectionArabic}</strong>
+								<small>
+									{formatEnglishNumber(
+										numberValue(indicatorResult, [
+											'trendAngle',
+											'angleDegrees',
+										]),
+									)}
+									° ·{' '}
+									{formatEnglishNumber(
+										numberValue(indicatorResult, [
+											'trendAngle',
+											'percentPerCandle',
+										]),
+									)}
+									% لكل شمعة
 								</small>
 							</div>
 							<div className="integrated-analysis-card">
