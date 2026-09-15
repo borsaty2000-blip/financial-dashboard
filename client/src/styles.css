@@ -6565,3 +6565,38 @@ body.dark-mode .analysis-orchestration-steps span {
 		min-width: 45px;
 	}
 }
+
+/* Mobile chrome owns the language control; it no longer floats over search or hero content. */
+@media (max-width: 720px) {
+	.global-language-switcher {
+		display: none;
+	}
+	.mobile-topbar .mobile-language-switcher {
+		position: static;
+		inset: auto;
+		z-index: auto;
+		flex: 0 0 auto;
+		width: 58px;
+		min-width: 58px;
+		height: 28px;
+		margin-inline-start: 2px;
+		padding: 2px 4px;
+		border-radius: 7px;
+		box-shadow: none;
+		font-size: 10px;
+	}
+	.mobile-topbar .mobile-language-switcher > span {
+		display: none;
+	}
+	.mobile-topbar .mobile-language-switcher select {
+		width: 48px;
+		min-width: 48px;
+		font-size: 10px;
+	}
+}
+
+.auth-visual .logo-mark img {
+	width: 48px;
+	height: 48px;
+	object-fit: contain;
+}

@@ -69,7 +69,7 @@ const sections: ActivitySection[] = [
 	},
 	{
 		key: 'general',
-		label: 'مركز بورصتي',
+		label: 'مركز borsatyai',
 		description: 'انتقل بسرعة بين الأسواق والتحليل والأخبار والتعلم.',
 		links: [
 			{ label: 'الأسواق', path: '/markets/egx' },
@@ -123,7 +123,9 @@ export function SectionActivityBar({ path }: { path: string }) {
 	return (
 		<section className="section-activity-bar" aria-label={section.label}>
 			<div className="section-activity-copy">
-				<span className="section-activity-kicker">بورصتي · {section.key}</span>
+				<span className="section-activity-kicker">
+					borsatyai · {section.key}
+				</span>
 				<strong>{section.label}</strong>
 				<p>{section.description}</p>
 			</div>

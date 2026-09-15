@@ -78,7 +78,7 @@ export function CommunityPage({
 		<main className="analysis-page leadership-page" dir="rtl">
 			<header className="page-heading">
 				<p className="eyebrow">Borsaty Community</p>
-				<h1>مجتمع بورصتي</h1>
+				<h1>مجتمع borsatyai</h1>
 				<p>
 					ناقش الأسواق وتبادل المعرفة باحترام، دون تحويل النقاش إلى توصيات
 					شخصية.
@@ -239,8 +239,8 @@ export function ReferralPage() {
 		typeof navigator !== 'undefined' && navigator.share
 			? () =>
 					void navigator.share({
-						title: 'بورصتي',
-						text: 'انضم إلى بورصتي',
+						title: 'borsatyai',
+						text: 'انضم إلى borsatyai',
 						url: `${location.origin}/register?ref=${data?.code?.code ?? ''}`,
 					})
 			: undefined

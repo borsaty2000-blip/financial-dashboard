@@ -192,7 +192,7 @@ export function AlertsPage() {
 			method: 'POST',
 			body: JSON.stringify({
 				to: phone,
-				message: `تنبيه بورصتي: ${symbol} ${condition} ${target}`,
+				message: `تنبيه borsatyai: ${symbol} ${condition} ${target}`,
 			}),
 		})
 	}

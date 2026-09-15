@@ -58,7 +58,7 @@ export function VoiceAssistantWidget() {
 			{open && (
 				<section className="voice-panel" dir="rtl">
 					<header>
-						<strong>مساعد بورصتي</strong>
+						<strong>مساعد borsatyai</strong>
 						<button onClick={() => setOpen(false)}>×</button>
 					</header>
 					<p>اسأل عن سهم أو الأخبار أو أنشئ مسودة تنبيه.</p>

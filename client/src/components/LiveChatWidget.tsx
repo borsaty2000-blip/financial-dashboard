@@ -33,7 +33,7 @@ export function LiveChatWidget() {
 			{open && (
 				<div className="chat-panel">
 					<header>
-						<b>دعم بورصتي</b>
+						<b>دعم borsatyai</b>
 						<button onClick={() => setOpen(false)}>×</button>
 					</header>
 					<div className="chat-messages">

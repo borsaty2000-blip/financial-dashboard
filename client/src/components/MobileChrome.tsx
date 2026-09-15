@@ -10,6 +10,7 @@ import {
 	X,
 } from 'lucide-react'
 import { useLocation, navigate } from '../router'
+import { LanguageSwitcher } from './LanguageSwitcher'
 
 const links = [
 	['الرئيسية', '/', Home],
@@ -179,6 +180,7 @@ export default function MobileChrome() {
 						<Bell size={20} />
 					</button>
 				</div>
+				<LanguageSwitcher className="mobile-language-switcher" />
 			</header>
 			<MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 			<nav className="bottom-nav" aria-label="التنقل الرئيسي">

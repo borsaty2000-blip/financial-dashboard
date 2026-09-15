@@ -503,7 +503,7 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 		<header ref={headerRef} className="borsaty-public-header">
 			<button className="borsaty-public-brand" onClick={() => go('/')}>
 				<img src="/branding/borsatyai-logo.png" alt="BorsatyAI" />
-				<span className="sr-only">بورصتي</span>
+				<span className="sr-only">borsatyai</span>
 			</button>
 			<nav className="borsaty-public-nav" aria-label="التنقل الرئيسي">
 				<HeaderMenu
@@ -727,7 +727,7 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 				>
 					<div className="public-menu-grid public-menu-learning-grid">
 						<div className="public-menu-intro">
-							<span className="public-menu-eyebrow">أكاديمية بورصتي</span>
+							<span className="public-menu-eyebrow">أكاديمية borsatyai</span>
 							<strong>تعلّم بإيقاعك</strong>
 							<p>محتوى عربي لفهم السوق وإدارة الفرضيات والمخاطر.</p>
 							<button
@@ -814,15 +814,15 @@ function PublicFooter() {
 			links: [
 				['أخبار السوق', '/news'],
 				['المدونة', '/blog'],
-				['أكاديمية بورصتي', '/education'],
+				['أكاديمية borsatyai', '/education'],
 				['مكتبة الفيديو', '/videos'],
-				['مجتمع بورصتي', '/community'],
+				['مجتمع borsatyai', '/community'],
 			],
 		},
 		{
 			title: 'عن المنصة',
 			links: [
-				['عن بورصتي', '/about'],
+				['عن borsatyai', '/about'],
 				['المساعدة', '/help'],
 				['الدعم', '/support'],
 				['إمكانية الوصول', '/accessibility'],
@@ -869,11 +869,11 @@ function PublicPromoBanner() {
 	return (
 		<section
 			className="borsaty-promo-banner"
-			aria-label="رسالة بورصتي التعريفية"
+			aria-label="رسالة borsatyai التعريفية"
 		>
 			<div className="borsaty-promo-banner__label">
 				<span aria-hidden="true">✦</span>
-				بورصتي · مركز التحليل العربي
+				borsatyai · مركز التحليل العربي
 			</div>
 			<div className="borsaty-promo-banner__viewport">
 				<div className="borsaty-promo-banner__track">
@@ -1096,7 +1096,10 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 							<span>اختبار تاريخي تعليمي</span>
 						</div>
 					</div>
-					<div className="borsaty-terminal-card" aria-label="ملخص أدوات بورصتي">
+					<div
+						className="borsaty-terminal-card"
+						aria-label="ملخص أدوات borsatyai"
+					>
 						<div className="borsaty-terminal-card__head">
 							<span>مركز التحليل</span>
 							<i />
@@ -1235,7 +1238,7 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 
 				<section className="borsaty-why">
 					<div>
-						<span className="borsaty-kicker">لماذا بورصتي؟</span>
+						<span className="borsaty-kicker">لماذا borsatyai؟</span>
 						<h2>هندسة مالية عربية، بلا أرقام مختلقة</h2>
 					</div>
 					<div className="borsaty-why__grid">

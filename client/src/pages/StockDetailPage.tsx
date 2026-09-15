@@ -358,7 +358,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 	return (
 		<main className="stock-detail-page" dir="rtl">
 			<header className="stock-detail-header">
-				<a className="stock-brand" href="/" aria-label="العودة إلى بورصتي">
+				<a className="stock-brand" href="/" aria-label="العودة إلى borsatyai">
 					<img src="/branding/borsatyai-logo.png" alt="BorsatyAI" />
 				</a>
 				<button className="link-button" onClick={() => window.history.back()}>

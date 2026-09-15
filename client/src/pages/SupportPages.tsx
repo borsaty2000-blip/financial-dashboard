@@ -22,7 +22,7 @@ function Shell({ title, children }: { title: string; children: ReactNode }) {
 		<main className="page-container support-page">
 			<div className="page-heading">
 				<div>
-					<span className="eyebrow">بورصتي Support</span>
+					<span className="eyebrow">borsatyai Support</span>
 					<h1>{title}</h1>
 				</div>
 				<a className="ghost-button light" href="/help">

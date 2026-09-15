@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { supportedLanguages } from '../i18n'
 import { api } from '../lib/api'
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ className = '' }: { className?: string }) {
 	const { i18n, t } = useTranslation()
 	const current = supportedLanguages.some((item) => item.code === i18n.language)
 		? i18n.language
@@ -15,7 +15,10 @@ export function LanguageSwitcher() {
 			}).catch(() => undefined)
 	}
 	return (
-		<label className="language-switcher" title={t('common.language')}>
+		<label
+			className={`language-switcher ${className}`.trim()}
+			title={t('common.language')}
+		>
 			<span aria-hidden="true">🌐</span>
 			<select
 				aria-label={t('common.language')}

@@ -10,7 +10,7 @@ export function DeveloperDocsPage() {
 		<main className="analysis-page developer-docs-page" dir="rtl">
 			<header className="page-heading">
 				<p className="eyebrow">Developer API v1</p>
-				<h1>توثيق واجهة بورصتي</h1>
+				<h1>توثيق واجهة borsatyai</h1>
 				<p>مفتاح القراءة فقط مطلوب في ترويسة X-API-Key.</p>
 			</header>
 			<section className="analysis-card">

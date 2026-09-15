@@ -216,7 +216,9 @@ export function EducationPage({
 				<section className="education-grid">
 					{data.map((item) => (
 						<article className="analysis-card" key={item.id}>
-							<h3>{item.course?.title ?? item.courseId ?? 'شهادة بورصتي'}</h3>
+							<h3>
+								{item.course?.title ?? item.courseId ?? 'شهادة borsatyai'}
+							</h3>
 							<p>
 								{item.progress != null
 									? `التقدم ${item.progress}%`
@@ -231,7 +233,7 @@ export function EducationPage({
 		<main className="education-page analysis-page" dir="rtl">
 			<header className="page-heading">
 				<p className="eyebrow">Borsaty Academy</p>
-				<h1>أكاديمية بورصتي</h1>
+				<h1>أكاديمية borsatyai</h1>
 				<p>
 					تعلم التحليل المالي خطوة بخطوة، مع محتوى تعليمي واضح وليس توصية
 					استثمارية.

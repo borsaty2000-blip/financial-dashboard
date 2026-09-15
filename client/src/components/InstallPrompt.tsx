@@ -23,10 +23,10 @@ export default function InstallPrompt() {
 			className="install-prompt"
 			dir="rtl"
 			role="dialog"
-			aria-label="تثبيت بورصتي"
+			aria-label="تثبيت borsatyai"
 		>
 			<div>
-				<strong>ثبّت بورصتي</strong>
+				<strong>ثبّت borsatyai</strong>
 				<small>وصول أسرع من شاشة جهازك</small>
 			</div>
 			<button onClick={() => void installEvent.prompt()}>تثبيت</button>

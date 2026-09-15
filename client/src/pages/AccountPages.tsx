@@ -167,7 +167,9 @@ export function LoginPage() {
 	return (
 		<div className="auth-page" dir="rtl">
 			<section className="auth-visual">
-				<div className="logo-mark">ب</div>
+				<div className="logo-mark">
+					<img src="/branding/borsatyai-logo.png" alt="borsatyai" />
+				</div>
 				<h1>
 					بياناتك. قراراتك. <em>ببصيرة.</em>
 				</h1>
@@ -182,7 +184,7 @@ export function LoginPage() {
 			<form className="auth-card" onSubmit={submit}>
 				<span className="eyebrow">مرحباً بعودتك</span>
 				<h2>تسجيل الدخول</h2>
-				<p className="muted">ادخل إلى لوحة بورصتي الشخصية</p>
+				<p className="muted">ادخل إلى لوحة borsatyai الشخصية</p>
 				<Field
 					label="البريد الإلكتروني أو اسم المستخدم"
 					value={identifier}
@@ -300,9 +302,11 @@ export function RegisterPage() {
 	return (
 		<div className="auth-page" dir="rtl">
 			<section className="auth-visual">
-				<div className="logo-mark">ب</div>
+				<div className="logo-mark">
+					<img src="/branding/borsatyai-logo.png" alt="borsatyai" />
+				</div>
 				<h1>
-					بورصتك.. ببصيرة <em>الذكاء.</em>
+					borsatyai · ببصيرة <em>الذكاء.</em>
 				</h1>
 				<p>ابدأ رحلتك في فهم الأسواق المصرية والسعودية والمعادن.</p>
 				<div className="benefit-list">
@@ -946,7 +950,7 @@ export function AchievementsPage() {
 		<Shell>
 			<div className="achievement-hero">
 				<div>
-					<span className="eyebrow">رحلتك في بورصتي</span>
+					<span className="eyebrow">رحلتك في borsatyai</span>
 					<h1>🏆 إنجازاتك</h1>
 					<p>كل خطوة تعلم تقرّبك من مستوى أعلى.</p>
 				</div>

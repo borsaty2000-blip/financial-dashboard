@@ -56,16 +56,16 @@ export default function AIAssistantWidget() {
 		<div className="ai-assistant-widget" dir="rtl">
 			<button
 				className="ai-assistant-fab"
-				aria-label="فتح مساعد بورصتي"
+				aria-label="فتح مساعد borsatyai"
 				onClick={() => setOpen((value) => !value)}
 			>
-				🤖 مساعد بورصتي
+				🤖 مساعد borsatyai
 			</button>
 			{open && (
-				<section className="ai-assistant-panel" aria-label="مساعد بورصتي">
+				<section className="ai-assistant-panel" aria-label="مساعد borsatyai">
 					<header>
 						<div>
-							<strong>مساعد بورصتي</strong>
+							<strong>مساعد borsatyai</strong>
 							<small>تحليل تعليمي بلا تنفيذ صفقات</small>
 						</div>
 						<button aria-label="إغلاق" onClick={() => setOpen(false)}>

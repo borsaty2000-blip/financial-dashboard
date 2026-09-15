@@ -370,7 +370,7 @@ export function App() {
 					<MobileChrome />
 					<GlobalSearch />
 					<CurrencyConverter />
-					<LanguageSwitcher />
+					<LanguageSwitcher className="global-language-switcher" />
 					<a
 						className="telegram-quick-link"
 						href="/settings/telegram"
