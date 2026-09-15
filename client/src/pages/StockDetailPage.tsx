@@ -25,6 +25,23 @@ type Watchlist = { id: string; items: { symbol: string }[] }
 
 type CompanyResponse = { nameAr?: string }
 
+type ElliottFrame = {
+	timeframe_ar: string
+	current_wave: string
+	wave_personality: string
+	direction: string
+	confidence: number
+	alternate_count?: { wave?: string }
+	targets?: { target_1?: number }
+	invalidation_level?: { level?: number }
+}
+
+type ElliottMtfData = {
+	by_timeframe?: Record<string, ElliottFrame>
+	consensus?: { direction?: string; confidence?: number }
+	disclaimer?: string
+}
+
 export function StockDetailPage({
 	symbol,
 	companyName,
@@ -42,6 +59,10 @@ export function StockDetailPage({
 	const [message, setMessage] = useState('')
 	const [loading, setLoading] = useState(true)
 	const [isPlaying, setIsPlaying] = useState(false)
+	const [activeTab, setActiveTab] = useState<'technical' | 'decision'>(
+		'technical',
+	)
+	const [elliottMtf, setElliottMtf] = useState<ElliottMtfData>()
 	const livePrice = useLivePrice(normalized, market)
 
 	useEffect(() => {
@@ -72,6 +93,14 @@ export function StockDetailPage({
 					result.nameAr.toUpperCase() !== normalized
 				)
 					setResolvedCompanyName(result.nameAr)
+			})
+			.catch(() => undefined)
+		void api<{ data?: ElliottMtfData }>(
+			`/api/analysis/${normalized}/elliott-mtf?market=${market}`,
+			{ suppressToast: true },
+		)
+			.then((result) => {
+				if (!cancelled) setElliottMtf(result.data)
 			})
 			.catch(() => undefined)
 		return () => {
@@ -228,20 +257,102 @@ export function StockDetailPage({
 			)}
 			{data && !loading && (
 				<div className="stock-analysis-single-page">
-					<BrilliantSummary symbol={normalized} market={market} />
-					<section
-						className="analysis-card stock-chart-card"
-						aria-label="الرسم والمؤشرات الفنية"
-					>
-						<div className="panel-title">
-							<div>
-								<span className="eyebrow">السعر والحجم · {normalized}</span>
-								<h2>الرسم السعري الاحترافي</h2>
+					<nav className="analysis-tabs" aria-label="أقسام تحليل السهم">
+						<button
+							className={activeTab === 'technical' ? 'is-active' : ''}
+							onClick={() => setActiveTab('technical')}
+						>
+							التحليل الفني المتقدم
+						</button>
+						<button
+							className={activeTab === 'decision' ? 'is-active' : ''}
+							onClick={() => setActiveTab('decision')}
+						>
+							القرار والتوصية
+						</button>
+					</nav>
+					{activeTab === 'technical' ? (
+						<>
+							<section
+								className="analysis-card stock-chart-card"
+								aria-label="الرسم والمؤشرات الفنية"
+							>
+								<div className="panel-title">
+									<div>
+										<span className="eyebrow">السعر والحجم · {normalized}</span>
+										<h2>الرسم السعري الاحترافي</h2>
+									</div>
+									<span className="muted">شموع · حجم · RSI · MACD</span>
+								</div>
+								<ProfessionalStockChart candles={data.candles} />
+							</section>
+							<section
+								className="analysis-card elliott-mtf-panel"
+								aria-label="تحليل Elliott متعدد الأطر"
+							>
+								<div className="panel-title">
+									<div>
+										<span className="eyebrow">هيكل الموجات · {normalized}</span>
+										<h2>Elliott Wave متعدد الأطر الزمنية</h2>
+									</div>
+									<strong>
+										{elliottMtf?.consensus?.direction === 'up'
+											? 'ميل صاعد'
+											: elliottMtf?.consensus?.direction === 'down'
+												? 'ميل هابط'
+												: 'توافق غير حاسم'}
+									</strong>
+								</div>
+								<div className="elliott-mtf-grid">
+									{Object.entries(elliottMtf?.by_timeframe ?? {}).map(
+										([key, frame]) => (
+											<article key={key} className="elliott-mtf-card">
+												<span>{frame.timeframe_ar}</span>
+												<strong>
+													الموجة {frame.current_wave} ·{' '}
+													{frame.direction === 'up'
+														? 'صاعد'
+														: frame.direction === 'down'
+															? 'هابط'
+															: 'جانبي'}
+												</strong>
+												<small>{frame.wave_personality}</small>
+												<small>
+													الثقة {formatEnglishPercent(frame.confidence)} ·
+													البديل {frame.alternate_count?.wave ?? '—'}
+												</small>
+												<small>
+													هدف 1: {formatEnglishNumber(frame.targets?.target_1)}{' '}
+													· إبطال:{' '}
+													{formatEnglishNumber(frame.invalidation_level?.level)}
+												</small>
+											</article>
+										),
+									)}
+								</div>
+								<p className="analysis-disclaimer">
+									{elliottMtf?.disclaimer ??
+										'التحليل متعدد الأطر احتمالي وتعليمي، وليس توصية شراء أو بيع.'}
+								</p>
+							</section>
+						</>
+					) : (
+						<section className="decision-tab-content">
+							<BrilliantSummary symbol={normalized} market={market} />
+							<div className="analysis-card decision-boundary-card">
+								<h2>حدود القرار</h2>
+								<p>
+									هذا القسم يحول الأدلة الفنية إلى سيناريوهات مشروطة ومناطق
+									مراقبة فقط. لا ينفذ صفقات ولا يقدم توصية استثمارية شخصية.
+								</p>
+								<div className="decision-boundary-grid">
+									<strong>التأكيد: إغلاق مؤكد خارج المنطقة المهمة</strong>
+									<strong>الإبطال: لا تعتمد على اختراق لحظي</strong>
+									<strong>المخاطر: حدد الخسارة قبل أي قرار مستقل</strong>
+								</div>
 							</div>
-							<span className="muted">شموع · حجم · RSI · MACD</span>
-						</div>
-						<ProfessionalStockChart candles={data.candles} />
-					</section>
+						</section>
+					)}
 				</div>
 			)}
 		</main>

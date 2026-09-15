@@ -25,9 +25,43 @@ import { analysisRateLimit } from '../middleware/rateLimit.js'
 import { runBacktest } from '../services/analysis/backtesting.python.js'
 import { SentimentService } from '../services/analysis/sentiment.service.js'
 import { buildSmartSummary } from '../services/analysis/smartSummary.service.js'
+import { analyzeElliottMTF } from '../services/analysis/elliott-mtf.python.js'
 
 export const analysisRoutes = Router()
 analysisRoutes.use(analysisRateLimit)
+
+analysisRoutes.get('/:symbol/elliott-mtf', async (request, response) => {
+	try {
+		const series = await resolveSeries(request)
+		if (series.candles.length < 60)
+			return response.status(404).json({
+				status: 'unavailable',
+				message: 'يلزم توفر 60 شمعة على الأقل لبناء تحليل متعدد الأطر',
+			})
+		const result = await analyzeElliottMTF(
+			series.candles.map((candle) => ({
+				open: candle.open,
+				high: candle.high,
+				low: candle.low,
+				close: candle.close,
+				volume: candle.volume,
+			})),
+		)
+		return response.json({
+			...result,
+			symbol: series.symbol,
+			market: queryMarket(request.query.market),
+			source: series.source,
+			candles_count: series.count,
+			decision: 'NO_TRADE_DECISION',
+		})
+	} catch {
+		return response.status(502).json({
+			status: 'error',
+			message: 'تعذر إكمال Elliott متعدد الأطر حالياً',
+		})
+	}
+})
 
 function queryPrices(value: unknown) {
 	if (typeof value !== 'string') return []

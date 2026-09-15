@@ -8278,3 +8278,76 @@ select:focus-visible {
 		height: 52px !important;
 	}
 }
+
+/* Deep two-page equity analysis experience */
+.analysis-tabs {
+	display: flex;
+	gap: 8px;
+	padding: 8px;
+	margin: 18px auto;
+	max-width: 1240px;
+	background: #f4f5f6;
+	border: 1px solid #dfe2e5;
+	border-radius: 12px;
+}
+.analysis-tabs button {
+	flex: 1;
+	padding: 13px 18px;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	color: #34383d;
+	font-weight: 700;
+	cursor: pointer;
+}
+.analysis-tabs button.is-active {
+	background: #171b20;
+	color: #fff;
+	box-shadow: 0 3px 12px rgba(23, 27, 32, 0.18);
+}
+.elliott-mtf-panel,
+.decision-boundary-card {
+	max-width: 1240px;
+	margin: 18px auto;
+}
+.elliott-mtf-grid,
+.decision-boundary-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
+}
+.elliott-mtf-card,
+.decision-boundary-grid strong {
+	display: grid;
+	gap: 8px;
+	padding: 16px;
+	border: 1px solid #e1e4e7;
+	border-radius: 10px;
+	background: #fff;
+}
+.elliott-mtf-card > span,
+.elliott-mtf-card > small {
+	color: #697078;
+}
+.elliott-mtf-card > strong {
+	color: #171b20;
+}
+.analysis-disclaimer {
+	margin: 16px 0 0;
+	color: #697078;
+	font-size: 0.86rem;
+}
+.decision-boundary-grid strong {
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+@media (max-width: 760px) {
+	.analysis-tabs,
+	.elliott-mtf-grid,
+	.decision-boundary-grid {
+		grid-template-columns: 1fr;
+	}
+	.analysis-tabs {
+		display: grid;
+	}
+}

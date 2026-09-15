@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict, Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
@@ -6,6 +6,7 @@ import io
 from pydantic import BaseModel, Field
 
 from services.elliott_wave import analyze_elliott_wave
+from services.elliott_mtf import analyze_elliott_mtf
 from services.gann import analyze_gann
 from services.statistical import calculate_statistics
 from services.forecasting import forecast_arima, forecast_lstm
@@ -17,12 +18,16 @@ from services.anomaly import get_anomaly_score
 from utils.data_prep import prepare_dates, prepare_prices
 from services.tts_service import generate_analysis_audio
 
-app = FastAPI(title="Borsaty Analysis Service", version="1.0.0")
+app = FastAPI(title="Borsaty Analysis Service", version="1.1.0")
 
 
 class PriceData(BaseModel):
     prices: List[float] = Field(min_length=3)
     order: int = Field(default=5, ge=1, le=50)
+
+
+class ElliottMTFData(BaseModel):
+    candles_by_tf: Dict[str, List[Dict[str, Any]]]
 
 
 class GannData(BaseModel):
@@ -87,6 +92,21 @@ async def elliott_endpoint(data: PriceData) -> dict:
         raise HTTPException(status_code=422, detail=str(error)) from error
     except Exception as error:
         raise HTTPException(status_code=500, detail="Elliott analysis failed") from error
+
+
+@app.post("/analyze/elliott/mtf")
+async def elliott_mtf_endpoint(data: ElliottMTFData) -> dict:
+    try:
+        clean = {
+            timeframe: candles
+            for timeframe, candles in data.candles_by_tf.items()
+            if isinstance(candles, list)
+        }
+        return {"status": "success", "data": analyze_elliott_mtf(clean)}
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    except Exception as error:
+        raise HTTPException(status_code=500, detail="Elliott MTF analysis failed") from error
 
 
 @app.post("/analyze/gann")
