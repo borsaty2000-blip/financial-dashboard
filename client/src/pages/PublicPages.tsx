@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import {
+	BarChart3,
+	ChartNoAxesCombined,
+	GraduationCap,
+	Home,
+	Newspaper,
+	Wrench,
+} from 'lucide-react'
 import { navigate } from '../router'
 import { formatEnglishNumber, formatEnglishPercent } from '../lib/format'
 import { PublicMarketPulse } from '../components/PublicMarketPulse'
@@ -397,12 +405,14 @@ type PublicHeaderProps = {
 function HeaderMenu({
 	id,
 	label,
+	icon: Icon,
 	openMenu,
 	onToggle,
 	children,
 }: {
 	id: string
 	label: string
+	icon: typeof Home
 	openMenu: string | null
 	onToggle: (id: string) => void
 	children: ReactNode
@@ -420,7 +430,8 @@ function HeaderMenu({
 				aria-haspopup="menu"
 				aria-controls={`public-menu-${id}`}
 			>
-				{label}{' '}
+				<Icon size={16} strokeWidth={2.2} aria-hidden="true" />
+				<span>{label}</span>{' '}
 				<span className="public-nav-chevron" aria-hidden="true">
 					⌄
 				</span>
@@ -509,6 +520,7 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 				<HeaderMenu
 					id="markets"
 					label="الأسواق"
+					icon={ChartNoAxesCombined}
 					openMenu={openMenu}
 					onToggle={toggle}
 				>
@@ -577,6 +589,7 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 				<HeaderMenu
 					id="analysis"
 					label="التحليل"
+					icon={BarChart3}
 					openMenu={openMenu}
 					onToggle={toggle}
 				>
@@ -638,6 +651,7 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 				<HeaderMenu
 					id="news"
 					label="الأخبار"
+					icon={Newspaper}
 					openMenu={openMenu}
 					onToggle={toggle}
 				>
@@ -676,6 +690,7 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 				<HeaderMenu
 					id="tools"
 					label="الأدوات"
+					icon={Wrench}
 					openMenu={openMenu}
 					onToggle={toggle}
 				>
@@ -722,6 +737,7 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 				<HeaderMenu
 					id="learn"
 					label="التعلم"
+					icon={GraduationCap}
 					openMenu={openMenu}
 					onToggle={toggle}
 				>
@@ -773,6 +789,10 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 				</HeaderMenu>
 			</nav>
 			<div className="borsaty-public-actions">
+				<button className="borsaty-home-button" onClick={() => go('/')}>
+					<Home size={16} strokeWidth={2.4} aria-hidden="true" />
+					<span>الرئيسية</span>
+				</button>
 				<button className="borsaty-text-button" onClick={() => go('/login')}>
 					دخول
 				</button>

@@ -6600,3 +6600,78 @@ body.dark-mode .analysis-orchestration-steps span {
 	height: 48px;
 	object-fit: contain;
 }
+
+/* Global navigation polish: bright white icons and an always-available home shortcut. */
+.borsaty-public-header .borsaty-public-nav > button,
+.borsaty-public-header .public-nav-group > button,
+.borsaty-public-header .borsaty-public-actions button,
+.borsaty-public-header .borsaty-public-actions svg,
+.borsaty-public-header .borsaty-public-nav svg {
+	color: #ffffff;
+}
+.borsaty-public-header .borsaty-public-nav > button,
+.borsaty-public-header .public-nav-group > button {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+}
+.borsaty-public-header .borsaty-public-nav svg,
+.borsaty-public-header .borsaty-public-actions svg {
+	filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
+}
+.borsaty-home-button,
+.global-home-shortcut {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	background: rgba(255, 255, 255, 0.1);
+	color: #ffffff;
+	font-weight: 800;
+	cursor: pointer;
+	transition: 180ms ease;
+}
+.borsaty-home-button {
+	min-height: 38px;
+	padding: 0 13px;
+	border-radius: 10px;
+}
+.borsaty-home-button:hover,
+.borsaty-home-button:focus-visible,
+.global-home-shortcut:hover,
+.global-home-shortcut:focus-visible {
+	background: #ffffff;
+	color: #0b3850;
+	transform: translateY(-1px);
+	outline: none;
+}
+.global-home-shortcut {
+	position: fixed;
+	inset-inline-start: 18px;
+	bottom: 22px;
+	z-index: 1200;
+	min-height: 42px;
+	padding: 0 14px;
+	border-radius: 999px;
+	background: #0b3d55;
+	box-shadow: 0 10px 26px rgba(4, 32, 48, 0.22);
+}
+.global-home-shortcut svg {
+	color: #ffffff;
+}
+@media (max-width: 720px) {
+	.global-home-shortcut {
+		display: none;
+	}
+	.mobile-topbar .mobile-icon,
+	.mobile-topbar .mobile-icon svg,
+	.mobile-topbar .mobile-logo,
+	.mobile-topbar .mobile-logo svg {
+		color: #ffffff;
+		stroke: #ffffff;
+	}
+	.bottom-nav .nav-item svg {
+		stroke: currentColor;
+	}
+}
