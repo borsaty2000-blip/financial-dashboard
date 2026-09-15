@@ -7096,6 +7096,270 @@ body:has(.borsaty-public-page) .global-language-switcher {
 	}
 }
 
+/* Investing-style visual system: dark terminal chrome, white gradient surfaces, precise market typography. */
+:root {
+	--terminal-ink: #101820;
+	--terminal-ink-2: #182632;
+	--market-blue: #0878ae;
+	--market-blue-dark: #07577f;
+	--market-blue-soft: #eaf5fa;
+	--market-border: #dce5ea;
+	--market-surface: #ffffff;
+	--market-surface-soft: #f5f8fa;
+	--market-text: #17232d;
+	--market-muted: #667783;
+	--market-green: #16845b;
+	--market-red: #c74750;
+	--font-market: Inter, 'Cairo', Arial, sans-serif;
+}
+
+body {
+	font-family: var(--font-market);
+	color: var(--market-text);
+	background: linear-gradient(180deg, #ffffff 0%, #f5f8fa 48%, #eef3f6 100%);
+}
+
+body,
+button,
+input,
+select,
+textarea {
+	font-variant-numeric: tabular-nums lining-nums;
+}
+
+.borsaty-public-page {
+	background:
+		radial-gradient(circle at 86% 8%, rgb(8 120 174 / 7%), transparent 28rem),
+		linear-gradient(180deg, #ffffff 0%, #f7fafb 52%, #edf3f6 100%);
+	color: var(--market-text);
+}
+
+.borsaty-public-header,
+.topbar {
+	background: linear-gradient(180deg, #0d141a 0%, #111d25 100%);
+	border-bottom: 1px solid #263944;
+	box-shadow: 0 5px 22px rgb(7 18 26 / 18%);
+}
+
+.borsaty-public-header {
+	min-height: 68px;
+	padding-inline: clamp(16px, 4vw, 64px);
+	font-family: var(--font-market);
+}
+
+.borsaty-public-brand strong,
+.borsaty-public-header nav button,
+.borsaty-text-button,
+.borsaty-public-actions button {
+	font-family: var(--font-market);
+}
+
+.borsaty-public-header nav button,
+.borsaty-text-button {
+	color: #d4dde2;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.borsaty-public-header nav button:hover,
+.borsaty-text-button:hover {
+	background: #ffffff14;
+	color: #ffffff;
+}
+
+.borsaty-public-brand > span {
+	background: linear-gradient(145deg, #0b8bbb, #075478);
+	box-shadow:
+		inset 0 1px #ffffff33,
+		0 4px 12px #00131f66;
+}
+
+.borsaty-solid-button {
+	background: linear-gradient(135deg, #0a8bc0, #05678f);
+	box-shadow: 0 7px 16px rgb(5 103 143 / 25%);
+}
+
+.borsaty-outline-button {
+	border-color: #cbd9df;
+	background: #ffffff;
+	color: var(--market-blue-dark);
+}
+
+.borsaty-hero {
+	min-height: 540px;
+	padding-top: 62px;
+	background: linear-gradient(
+		180deg,
+		rgb(255 255 255 / 82%),
+		rgb(248 251 252 / 45%)
+	);
+}
+
+.borsaty-kicker,
+.eyebrow {
+	color: var(--market-blue);
+	font-family: var(--font-market);
+}
+
+.borsaty-hero h1 {
+	color: #122a3a;
+	font-family: var(--font-market);
+	letter-spacing: -0.045em;
+}
+
+.borsaty-hero__copy > p,
+.muted {
+	color: var(--market-muted);
+}
+
+.borsaty-hero__chips span {
+	border-color: #d8e3e8;
+	background: #ffffffcc;
+	color: #536773;
+	box-shadow: 0 2px 7px rgb(20 52 68 / 4%);
+}
+
+.borsaty-terminal-card {
+	background: linear-gradient(145deg, #101f2a 0%, #123b52 100%);
+	box-shadow: 0 24px 52px rgb(12 43 61 / 24%);
+}
+
+.panel,
+.analysis-card,
+.borsaty-pulse-table-card,
+.borsaty-pulse-index,
+.stock-card {
+	border-color: var(--market-border);
+	background: linear-gradient(145deg, #ffffff 0%, #f8fafb 100%);
+	box-shadow: 0 8px 24px rgb(27 59 75 / 6%);
+}
+
+.panel-title h2,
+.analysis-card h2,
+.borsaty-pulse-table-head strong {
+	color: #132b3b;
+	font-family: var(--font-market);
+}
+
+.metric strong,
+.stock-card b,
+.borsaty-pulse-index > b,
+.borsaty-pulse-index strong,
+.borsaty-pulse-row > strong,
+.borsaty-pulse-symbol b {
+	font-family: 'JetBrains Mono', Inter, monospace;
+	font-variant-numeric: tabular-nums lining-nums;
+}
+
+.borsaty-pulse-tabs button,
+.borsaty-pulse-table-head select {
+	border-color: #d4e0e5;
+	background: #ffffff;
+	color: #334c5a;
+}
+
+.borsaty-pulse-tabs button:hover,
+.borsaty-pulse-tabs button.is-active {
+	border-color: var(--market-blue);
+	background: var(--market-blue);
+	color: #ffffff;
+}
+
+.borsaty-pulse-row:hover,
+.borsaty-pulse-row:focus-visible {
+	background: #eef8fc;
+}
+
+.borsaty-pulse-symbol b,
+.stock-card b,
+.link-button {
+	color: var(--market-blue);
+}
+
+.positive,
+.borsaty-pulse-row:not(.is-down) > span:nth-child(3) {
+	color: var(--market-green);
+}
+
+.negative,
+.borsaty-pulse-row.is-down > span:nth-child(3) {
+	color: var(--market-red);
+}
+
+.public-mega-menu {
+	border: 1px solid #d4e1e6;
+	background: #ffffff;
+	box-shadow: 0 18px 44px rgb(12 41 56 / 18%);
+}
+
+.public-menu-intro,
+.public-menu-link,
+.public-news-menu-list button {
+	border-color: #e0e8ec;
+	background: #f8fafb;
+	color: #203946;
+}
+
+.public-menu-link:hover,
+.public-menu-link:focus-visible,
+.public-news-menu-list button:hover,
+.public-news-menu-list button:focus-visible {
+	border-color: #9bc9db;
+	background: #edf8fc;
+	color: var(--market-blue-dark);
+}
+
+@media (max-width: 760px) {
+	.borsaty-public-header {
+		min-height: 60px;
+		padding-inline: 12px;
+		gap: 8px;
+	}
+	.borsaty-public-brand {
+		min-width: 0;
+		grid-template-columns: 32px auto;
+		gap: 0 7px;
+	}
+	.borsaty-public-brand > span {
+		width: 32px;
+		height: 32px;
+		font-size: 18px;
+	}
+	.borsaty-public-brand strong {
+		font-size: 14px;
+	}
+	.borsaty-public-brand small {
+		font-size: 7px;
+		letter-spacing: 1px;
+	}
+	.borsaty-public-header nav {
+		gap: 0;
+		overflow-x: auto;
+	}
+	.borsaty-public-header nav button {
+		padding: 8px 7px;
+		font-size: 10px;
+		white-space: nowrap;
+	}
+	.borsaty-public-actions {
+		gap: 5px;
+	}
+	.borsaty-public-actions .borsaty-outline-button {
+		display: none;
+	}
+	.borsaty-solid-button {
+		padding: 9px 12px;
+		font-size: 11px;
+	}
+	.borsaty-hero {
+		min-height: auto;
+		padding: 42px 16px 34px;
+	}
+	.borsaty-hero h1 {
+		font-size: clamp(32px, 10vw, 52px);
+	}
+}
+
 /* Professional stock cockpit */
 .professional-stock-chart {
 	background: #0f172a;
