@@ -24,9 +24,9 @@ additionalMarketsRoutes.get('/forex/:pair/history', async (req, res) =>
 		),
 	),
 )
-additionalMarketsRoutes.get('/commodities', (_req, res) =>
+additionalMarketsRoutes.get('/commodities', async (_req, res) =>
 	res.json({
-		data: CommoditiesService.list(),
+		data: await CommoditiesService.listWithQuotes(),
 		count: CommoditiesService.list().length,
 	}),
 )
@@ -66,13 +66,10 @@ currencyRoutes.post('/convert', async (req, res) => {
 			await CurrencyService.convert(req.body.from, req.body.to, amount),
 		)
 	} catch (error) {
-		return res
-			.status(502)
-			.json({
-				available: false,
-				error:
-					error instanceof Error ? error.message : 'Conversion unavailable',
-			})
+		return res.status(502).json({
+			available: false,
+			error: error instanceof Error ? error.message : 'Conversion unavailable',
+		})
 	}
 })
 currencyRoutes.get('/rates', async (req, res) => {
@@ -81,12 +78,10 @@ currencyRoutes.get('/rates', async (req, res) => {
 			await CurrencyService.getRates(String(req.query.base ?? 'EGP')),
 		)
 	} catch (error) {
-		return res
-			.status(502)
-			.json({
-				available: false,
-				error: error instanceof Error ? error.message : 'Rates unavailable',
-			})
+		return res.status(502).json({
+			available: false,
+			error: error instanceof Error ? error.message : 'Rates unavailable',
+		})
 	}
 })
 currencyRoutes.get('/historical', async (req, res) => {
@@ -99,14 +94,10 @@ currencyRoutes.get('/historical', async (req, res) => {
 			),
 		)
 	} catch (error) {
-		return res
-			.status(502)
-			.json({
-				available: false,
-				error:
-					error instanceof Error
-						? error.message
-						: 'Historical rate unavailable',
-			})
+		return res.status(502).json({
+			available: false,
+			error:
+				error instanceof Error ? error.message : 'Historical rate unavailable',
+		})
 	}
 })
