@@ -13,6 +13,7 @@
 		"test:server": "node --import tsx --test server/health.integration.test.ts server/analysis-fallback.test.ts server/indicators.advanced.test.ts server/security.contract.test.ts server/feature.contract.test.ts server/market-directory.contract.test.ts server/analysis-integrity.test.ts",
 		"test:auth": "tsx --test server/auth.validator.test.ts",
 		"db:seed:egx": "tsx prisma/seed-egx.ts",
+		"db:seed:tasi": "tsx prisma/seed-tasi.ts",
 		"test:watch": "npm --prefix client run test:watch",
 		"coverage": "npm --prefix client run coverage",
 		"typecheck:packages": "tsc -p packages/types/tsconfig.json && tsc -p packages/utils/tsconfig.json && tsc -p packages/design-system/tsconfig.json && tsc -p packages/charts/tsconfig.json && tsc -p packages/widgets/tsconfig.json && tsc -p packages/strategies/tsconfig.json",

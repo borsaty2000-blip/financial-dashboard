@@ -476,6 +476,21 @@ model EgxCompany {
   @@map("egx_companies")
 }
 
+model TasiCompany {
+  id         String   @id @default(uuid())
+  sourceCode String   @unique
+  symbol     String   @unique
+  nameAr     String
+  market     String   @default("TASI")
+  sector     String?
+  currency   String   @default("SAR")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([market, symbol])
+  @@map("tasi_companies")
+}
+
 model EconomicEvent {
   id         String   @id @default(uuid())
   eventKey   String   @unique

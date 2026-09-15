@@ -2268,6 +2268,22 @@ body.dark-mode {
 	margin: 4px 0;
 	font-size: 32px;
 }
+.market-badge {
+	display: inline-flex;
+	align-items: center;
+	width: fit-content;
+	padding: 4px 9px;
+	border-radius: 999px;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 700;
+}
+.market-badge.market-egx {
+	background: #c8102e;
+}
+.market-badge.market-tasi {
+	background: #006c35;
+}
 .stock-hero-card {
 	display: flex;
 	align-items: end;

@@ -19,6 +19,7 @@ import {
 } from '../services/market/twelve-data.adapter.js'
 import { FundamentalsService } from '../services/market/fundamentals.service.js'
 import { live, unavailable } from '../services/market/market.types.js'
+import { prisma } from '../lib/prisma.js'
 
 export const marketRoutes = Router()
 
@@ -106,6 +107,19 @@ marketRoutes.get('/summary', async (_request, response) => {
 		data: { egx, tasi, gold: egx.data.gold, silver: egx.data.silver },
 		available: egx.available || tasi.available,
 		timestamp: new Date().toISOString(),
+	})
+})
+
+marketRoutes.get('/stats', async (_request, response) => {
+	const [egx, tasi] = await Promise.all([
+		prisma.egxCompany.count({ where: { market: 'EGX' } }).catch(() => 0),
+		prisma.tasiCompany.count({ where: { market: 'TASI' } }).catch(() => 0),
+	])
+	return response.json({
+		egx: { count: egx, active: egx },
+		tasi: { count: tasi, active: tasi },
+		total: egx + tasi,
+		lastUpdated: new Date().toISOString(),
 	})
 })
 

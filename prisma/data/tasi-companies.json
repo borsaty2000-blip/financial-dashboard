@@ -1,0 +1,2944 @@
+{
+  "sourceFile": "أسهم_السوق_السعودية_مدققة.xlsx",
+  "sourceSha256": "3adb7ed5d259f56a6c65182c96d7023eefd67385553abf039ac40ca9b06a8f8d",
+  "sourceSheet": "الأسهم السعودية",
+  "sourceColumns": [
+    "كود التداول",
+    "اسم الشركة بالعربي"
+  ],
+  "items": [
+    {
+      "symbol": "1010",
+      "sourceCode": "1010",
+      "nameAr": "بنك الرياض",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1020",
+      "sourceCode": "1020",
+      "nameAr": "بنك الجزيرة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1030",
+      "sourceCode": "1030",
+      "nameAr": "البنك السعودي للإستثمار",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1050",
+      "sourceCode": "1050",
+      "nameAr": "البنك السعودي الفرنسي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1060",
+      "sourceCode": "1060",
+      "nameAr": "البنك السعودي الأول",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1080",
+      "sourceCode": "1080",
+      "nameAr": "البنك العربي الوطني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1090",
+      "sourceCode": "1090",
+      "nameAr": "مجموعة سامبا المالية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1111",
+      "sourceCode": "1111",
+      "nameAr": "شركة مجموعة تداول السعودية القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1120",
+      "sourceCode": "1120",
+      "nameAr": "مصرف الراجحي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1140",
+      "sourceCode": "1140",
+      "nameAr": "بنك البلاد",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1150",
+      "sourceCode": "1150",
+      "nameAr": "مصرف الإنماء",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1180",
+      "sourceCode": "1180",
+      "nameAr": "البنك الأهلي السعودي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1182",
+      "sourceCode": "1182",
+      "nameAr": "شركة أملاك العالمية للتمويل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1183",
+      "sourceCode": "1183",
+      "nameAr": "شركة سهل للتمويل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1201",
+      "sourceCode": "1201",
+      "nameAr": "شركة تكوين المتطورة للصناعات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1202",
+      "sourceCode": "1202",
+      "nameAr": "شركة الشرق الأوسط لصناعة وإنتاج الورق",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1210",
+      "sourceCode": "1210",
+      "nameAr": "شركة الصناعات الكيميائية الأساسية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1211",
+      "sourceCode": "1211",
+      "nameAr": "شركة التعدين العربية السعودية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1212",
+      "sourceCode": "1212",
+      "nameAr": "مجموعة أسترا الصناعية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1213",
+      "sourceCode": "1213",
+      "nameAr": "شركة نسيج العالمية التجارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1214",
+      "sourceCode": "1214",
+      "nameAr": "شركة الحسن غازي إبراهيم شاكر",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1301",
+      "sourceCode": "1301",
+      "nameAr": "شركة إتحاد مصانع الأسلاك",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1302",
+      "sourceCode": "1302",
+      "nameAr": "شركة بوان",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1303",
+      "sourceCode": "1303",
+      "nameAr": "شركة الصناعات الكهربائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1304",
+      "sourceCode": "1304",
+      "nameAr": "شركة اليمامة للصناعات الحديدية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1310",
+      "sourceCode": "1310",
+      "nameAr": "مجموعة محمد المعجل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1320",
+      "sourceCode": "1320",
+      "nameAr": "الشركة السعودية لأنابيب الصلب",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1321",
+      "sourceCode": "1321",
+      "nameAr": "شركة أنابيب الشرق المتكاملة للصناعة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1322",
+      "sourceCode": "1322",
+      "nameAr": "شركة المصانع الكبرى للتعدين",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1323",
+      "sourceCode": "1323",
+      "nameAr": "الشركة المتحدة لصناعات الكرتون",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1324",
+      "sourceCode": "1324",
+      "nameAr": "شركة صالح عبدالعزيز الراشد وأولاده",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1330",
+      "sourceCode": "1330",
+      "nameAr": "شركة أبناء عبدالله عبدالمحسن الخضري",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1810",
+      "sourceCode": "1810",
+      "nameAr": "مجموعة سيرا القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1820",
+      "sourceCode": "1820",
+      "nameAr": "شركة مجموعة بان القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1830",
+      "sourceCode": "1830",
+      "nameAr": "شركة لجام للرياضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1831",
+      "sourceCode": "1831",
+      "nameAr": "شركة مهارة للموارد البشرية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1832",
+      "sourceCode": "1832",
+      "nameAr": "شركة صدر للخدمات اللوجستية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1833",
+      "sourceCode": "1833",
+      "nameAr": "شركة الموارد للقوى البشرية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1834",
+      "sourceCode": "1834",
+      "nameAr": "الشركة السعودية لحلول القوى البشرية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "1835",
+      "sourceCode": "1835",
+      "nameAr": "شركة تمكين للموارد البشرية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2001",
+      "sourceCode": "2001",
+      "nameAr": "شركة كيمائيات الميثانول",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2002",
+      "sourceCode": "2002",
+      "nameAr": "الشركة الوطنية للبتروكيماويات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2010",
+      "sourceCode": "2010",
+      "nameAr": "الشركة السعودية للصناعات الأساسية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2020",
+      "sourceCode": "2020",
+      "nameAr": "شركة سابك للمغذيات الزراعية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2030",
+      "sourceCode": "2030",
+      "nameAr": "شركة المصافي العربية السعودية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2040",
+      "sourceCode": "2040",
+      "nameAr": "شركة الخزف السعودي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2050",
+      "sourceCode": "2050",
+      "nameAr": "مجموعة صافولا",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2060",
+      "sourceCode": "2060",
+      "nameAr": "شركة التصنيع الوطنية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2070",
+      "sourceCode": "2070",
+      "nameAr": "الشركة السعودية للصناعات الدوائية والمستلزمات الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2080",
+      "sourceCode": "2080",
+      "nameAr": "شركة الغاز والتصنيع الأهلية القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2081",
+      "sourceCode": "2081",
+      "nameAr": "شركة الخريف لتقنية المياه والطاقة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2082",
+      "sourceCode": "2082",
+      "nameAr": "شركة أكوا باور",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2083",
+      "sourceCode": "2083",
+      "nameAr": "شركة مرافق الكهرباء والمياه بالجبيل وينبع",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2084",
+      "sourceCode": "2084",
+      "nameAr": "شركة مياهنا",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2090",
+      "sourceCode": "2090",
+      "nameAr": "شركة الجبس الأهلية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2100",
+      "sourceCode": "2100",
+      "nameAr": "شركة وفرة للصناعة والتنمية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2110",
+      "sourceCode": "2110",
+      "nameAr": "شركة الكابلات السعودية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2120",
+      "sourceCode": "2120",
+      "nameAr": "الشركة السعودية للصناعات المتطورة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2130",
+      "sourceCode": "2130",
+      "nameAr": "الشركة السعودية للتنمية الصناعية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2140",
+      "sourceCode": "2140",
+      "nameAr": "شركة أيان للإستثمار",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2150",
+      "sourceCode": "2150",
+      "nameAr": "شركة الصناعات الزجاجية الوطنية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2160",
+      "sourceCode": "2160",
+      "nameAr": "شركة أميانتيت العربية السعودية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2170",
+      "sourceCode": "2170",
+      "nameAr": "شركة اللجين",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2180",
+      "sourceCode": "2180",
+      "nameAr": "شركة تصنيع مواد التعبئة والتغليف",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2190",
+      "sourceCode": "2190",
+      "nameAr": "شركة البنى التحتية المستدامة القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2200",
+      "sourceCode": "2200",
+      "nameAr": "الشركة العربية للأنابيب",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2210",
+      "sourceCode": "2210",
+      "nameAr": "شركة نماء للكيماويات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2220",
+      "sourceCode": "2220",
+      "nameAr": "الشركة الوطنية لتصنيع وسبك المعادن",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2222",
+      "sourceCode": "2222",
+      "nameAr": "شركة الزيت العربية السعودية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2223",
+      "sourceCode": "2223",
+      "nameAr": "شركة أرامكو السعودية لزيوت الأساس",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2230",
+      "sourceCode": "2230",
+      "nameAr": "الشركة الكيميائية السعودية القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2240",
+      "sourceCode": "2240",
+      "nameAr": "شركة صناعات البناء المتقدمة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2250",
+      "sourceCode": "2250",
+      "nameAr": "المجموعة السعودية للإستثمار الصناعي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2260",
+      "sourceCode": "2260",
+      "nameAr": "شركة الصحراء للبتروكيماويات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2270",
+      "sourceCode": "2270",
+      "nameAr": "الشركة السعودية لمنتجات الألبان والأغذية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2280",
+      "sourceCode": "2280",
+      "nameAr": "شركة المراعي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2281",
+      "sourceCode": "2281",
+      "nameAr": "شركة التنمية الغذائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2282",
+      "sourceCode": "2282",
+      "nameAr": "شركة نقي للمياه",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2283",
+      "sourceCode": "2283",
+      "nameAr": "شركة المطاحن الأولى",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2284",
+      "sourceCode": "2284",
+      "nameAr": "شركة المطاحن الحديثة للمنتجات الغذائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2285",
+      "sourceCode": "2285",
+      "nameAr": "شركة المطاحن العربية للمنتجات الغذائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2286",
+      "sourceCode": "2286",
+      "nameAr": "شركة المطاحن الرابعة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2287",
+      "sourceCode": "2287",
+      "nameAr": "الشركة العربية للاستثمار الزراعي والصناعي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2288",
+      "sourceCode": "2288",
+      "nameAr": "شركة نفوذ للمنتجات الغذائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2290",
+      "sourceCode": "2290",
+      "nameAr": "شركة ينبع الوطنية للبتروكيماويات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2300",
+      "sourceCode": "2300",
+      "nameAr": "الشركة السعودية لصناعة الورق",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2310",
+      "sourceCode": "2310",
+      "nameAr": "شركة الصحراء العالمية للبتروكيماويات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2320",
+      "sourceCode": "2320",
+      "nameAr": "شركة البابطين للطاقة والإتصالات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2330",
+      "sourceCode": "2330",
+      "nameAr": "الشركة المتقدمة للبتروكيماويات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2340",
+      "sourceCode": "2340",
+      "nameAr": "شركة ارتيكس للاستثمار الصناعي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2350",
+      "sourceCode": "2350",
+      "nameAr": "شركة كيان السعودية للبتروكيماويات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2360",
+      "sourceCode": "2360",
+      "nameAr": "الشركة السعودية لإنتاج الأنابيب الفخارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2370",
+      "sourceCode": "2370",
+      "nameAr": "شركة الشرق الأوسط للكابلات المتخصصة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2380",
+      "sourceCode": "2380",
+      "nameAr": "شركة رابغ للتكرير والبتروكيماويات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2381",
+      "sourceCode": "2381",
+      "nameAr": "شركة الحفر العربية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "2382",
+      "sourceCode": "2382",
+      "nameAr": "شركة أديس القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3001",
+      "sourceCode": "3001",
+      "nameAr": "شركة أسمنت حائل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3002",
+      "sourceCode": "3002",
+      "nameAr": "شركة أسمنت نجران",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3003",
+      "sourceCode": "3003",
+      "nameAr": "شركة أسمنت المدينة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3004",
+      "sourceCode": "3004",
+      "nameAr": "شركة أسمنت المنطقة الشمالية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3005",
+      "sourceCode": "3005",
+      "nameAr": "شركة أسمنت ام القرى",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3007",
+      "sourceCode": "3007",
+      "nameAr": "شركة زهرة الواحة للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3008",
+      "sourceCode": "3008",
+      "nameAr": "شركة الكثيري القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3010",
+      "sourceCode": "3010",
+      "nameAr": "شركة الأسمنت العربية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3020",
+      "sourceCode": "3020",
+      "nameAr": "شركة أسمنت اليمامة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3030",
+      "sourceCode": "3030",
+      "nameAr": "شركة الأسمنت السعودية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3040",
+      "sourceCode": "3040",
+      "nameAr": "شركة أسمنت القصيم",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3050",
+      "sourceCode": "3050",
+      "nameAr": "شركة أسمنت المنطقة الجنوبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3060",
+      "sourceCode": "3060",
+      "nameAr": "شركة أسمنت ينبع",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3080",
+      "sourceCode": "3080",
+      "nameAr": "شركة أسمنت المنطقة الشرقية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3090",
+      "sourceCode": "3090",
+      "nameAr": "شركة أسمنت تبوك",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3091",
+      "sourceCode": "3091",
+      "nameAr": "شركة أسمنت الجوف",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "3092",
+      "sourceCode": "3092",
+      "nameAr": "شركة أسمنت الرياض",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4001",
+      "sourceCode": "4001",
+      "nameAr": "شركة أسواق عبدالله العثيم",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4002",
+      "sourceCode": "4002",
+      "nameAr": "شركة المواساة للخدمات الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4003",
+      "sourceCode": "4003",
+      "nameAr": "الشركة المتحدة للإلكترونيات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4004",
+      "sourceCode": "4004",
+      "nameAr": "شركة دله للخدمات الصحية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4005",
+      "sourceCode": "4005",
+      "nameAr": "الشركة الوطنية للرعاية الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4006",
+      "sourceCode": "4006",
+      "nameAr": "الشركة السعودية للتسويق",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4007",
+      "sourceCode": "4007",
+      "nameAr": "شركة الحمادي القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4008",
+      "sourceCode": "4008",
+      "nameAr": "الشركة السعودية للعدد والأدوات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4009",
+      "sourceCode": "4009",
+      "nameAr": "شركة الشرق الأوسط للرعاية الصحية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4010",
+      "sourceCode": "4010",
+      "nameAr": "شركة دور للضيافة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4011",
+      "sourceCode": "4011",
+      "nameAr": "شركة لازوردي للمجوهرات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4012",
+      "sourceCode": "4012",
+      "nameAr": "شركة ثوب الأصيل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4013",
+      "sourceCode": "4013",
+      "nameAr": "مجموعة الدكتور سليمان الحبيب للخدمات الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4014",
+      "sourceCode": "4014",
+      "nameAr": "شركة دار المعدات الطبية والعلمية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4015",
+      "sourceCode": "4015",
+      "nameAr": "شركة مصنع جمجوم للأدوية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4016",
+      "sourceCode": "4016",
+      "nameAr": "شركة الشرق الأوسط للصناعات الدوائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4017",
+      "sourceCode": "4017",
+      "nameAr": "شركة مستشفى الدكتور سليمان عبدالقادر فقيه",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4018",
+      "sourceCode": "4018",
+      "nameAr": "شركة الموسى الصحية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4019",
+      "sourceCode": "4019",
+      "nameAr": "الشركة الطبية التخصصية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4020",
+      "sourceCode": "4020",
+      "nameAr": "الشركة العقارية السعودية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4021",
+      "sourceCode": "4021",
+      "nameAr": "شركة مجمع المركز الكندي الطبي العام",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4030",
+      "sourceCode": "4030",
+      "nameAr": "الشركة الوطنية السعودية للنقل البحري",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4031",
+      "sourceCode": "4031",
+      "nameAr": "الشركة السعودية للخدمات الأرضية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4040",
+      "sourceCode": "4040",
+      "nameAr": "الشركة السعودية للنقل الجماعي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4050",
+      "sourceCode": "4050",
+      "nameAr": "الشركة السعودية لخدمات السيارات والمعدات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4051",
+      "sourceCode": "4051",
+      "nameAr": "شركة باعظيم التجارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4061",
+      "sourceCode": "4061",
+      "nameAr": "مجموعة أنعام الدولية القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4070",
+      "sourceCode": "4070",
+      "nameAr": "شركة تهامة للإعلان والعلاقات العامة والتسويق",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4071",
+      "sourceCode": "4071",
+      "nameAr": "الشركة العربية للتعهدات الفنية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4072",
+      "sourceCode": "4072",
+      "nameAr": "شركة مجموعة إم بي سي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4080",
+      "sourceCode": "4080",
+      "nameAr": "شركة سناد القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4081",
+      "sourceCode": "4081",
+      "nameAr": "شركة النايفات للتمويل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4082",
+      "sourceCode": "4082",
+      "nameAr": "شركة المرابحة المرنة للتمويل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4083",
+      "sourceCode": "4083",
+      "nameAr": "الشركة المتحدة الدولية القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4084",
+      "sourceCode": "4084",
+      "nameAr": "شركة دراية المالية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4090",
+      "sourceCode": "4090",
+      "nameAr": "شركة طيبة للإستثمار",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4100",
+      "sourceCode": "4100",
+      "nameAr": "شركة مكة للإنشاء والتعمير",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4110",
+      "sourceCode": "4110",
+      "nameAr": "شركة باتك للإستثمار والأعمال اللوجستية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4130",
+      "sourceCode": "4130",
+      "nameAr": "شركة درب السعودية الأستثمارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4140",
+      "sourceCode": "4140",
+      "nameAr": "الشركة السعودية للصادرات الصناعية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4141",
+      "sourceCode": "4141",
+      "nameAr": "شركة العمران للصناعة والتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4142",
+      "sourceCode": "4142",
+      "nameAr": "شركة مجموعة كابلات الرياض",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4143",
+      "sourceCode": "4143",
+      "nameAr": "شركة مجموعة التيسير تالكو الصناعية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4144",
+      "sourceCode": "4144",
+      "nameAr": "شركة رؤوم التجارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4145",
+      "sourceCode": "4145",
+      "nameAr": "شركة العبيكان للزجاج",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4146",
+      "sourceCode": "4146",
+      "nameAr": "شركة جاز العربية للخدمات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4147",
+      "sourceCode": "4147",
+      "nameAr": "شركة اتحاد جروننفلدر سعدي القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4148",
+      "sourceCode": "4148",
+      "nameAr": "شركة الوسائل الصناعية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4150",
+      "sourceCode": "4150",
+      "nameAr": "شركة الرياض للتعمير",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4160",
+      "sourceCode": "4160",
+      "nameAr": "شركة ثمار التنمية القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4161",
+      "sourceCode": "4161",
+      "nameAr": "شركة بن داود القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4162",
+      "sourceCode": "4162",
+      "nameAr": "شركة المنجم للأغذية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4163",
+      "sourceCode": "4163",
+      "nameAr": "شركة الدواء للخدمات الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4164",
+      "sourceCode": "4164",
+      "nameAr": "شركة النهدي الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4165",
+      "sourceCode": "4165",
+      "nameAr": "شركة الماجد للعود",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4170",
+      "sourceCode": "4170",
+      "nameAr": "شركة المشروعات السياحية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4180",
+      "sourceCode": "4180",
+      "nameAr": "مجموعة فتيحي القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4190",
+      "sourceCode": "4190",
+      "nameAr": "شركة جرير للتسويق",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4191",
+      "sourceCode": "4191",
+      "nameAr": "شركة عبد الله سعد محمد أبو معطي للمكتبات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4192",
+      "sourceCode": "4192",
+      "nameAr": "شركة متاجر السيف للتنمية والاستثمار",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4193",
+      "sourceCode": "4193",
+      "nameAr": "شركة نايس ون بيوتي للتسويق الإلكتروني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4194",
+      "sourceCode": "4194",
+      "nameAr": "شركة مجموعة منزل التسويق للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4200",
+      "sourceCode": "4200",
+      "nameAr": "شركة الدريس للخدمات البترولية و النقليات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4210",
+      "sourceCode": "4210",
+      "nameAr": "المجموعة السعودية للأبحاث والإعلام",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4220",
+      "sourceCode": "4220",
+      "nameAr": "إعمار المدينة الإقتصادية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4230",
+      "sourceCode": "4230",
+      "nameAr": "شركة البحر الأحمر العالمية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4240",
+      "sourceCode": "4240",
+      "nameAr": "شركة إيه إف جي إنترناشونال",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4250",
+      "sourceCode": "4250",
+      "nameAr": "شركة جبل عمر للتطوير",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4260",
+      "sourceCode": "4260",
+      "nameAr": "الشركة المتحدة الدولية للمواصلات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4261",
+      "sourceCode": "4261",
+      "nameAr": "شركة ذيب لتأجير السيارات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4262",
+      "sourceCode": "4262",
+      "nameAr": "شركة لومي للتأجير",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4263",
+      "sourceCode": "4263",
+      "nameAr": "شركة سال السعودية للخدمات اللوجستية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4264",
+      "sourceCode": "4264",
+      "nameAr": "شركة طيران ناس",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4265",
+      "sourceCode": "4265",
+      "nameAr": "شركة شري للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4270",
+      "sourceCode": "4270",
+      "nameAr": "الشركة السعودية للطباعة والتغليف",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4280",
+      "sourceCode": "4280",
+      "nameAr": "شركة المملكة القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4290",
+      "sourceCode": "4290",
+      "nameAr": "شركة الخليج للتدريب والتعليم",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4291",
+      "sourceCode": "4291",
+      "nameAr": "الشركة الوطنية للتربية و التعليم",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4292",
+      "sourceCode": "4292",
+      "nameAr": "شركة عطاء التعليمية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4300",
+      "sourceCode": "4300",
+      "nameAr": "شركة دار الأركان للتطوير العقاري",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4310",
+      "sourceCode": "4310",
+      "nameAr": "مدينة المعرفة الإقتصادية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4320",
+      "sourceCode": "4320",
+      "nameAr": "شركة الأندلس العقارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4321",
+      "sourceCode": "4321",
+      "nameAr": "شركة المراكز العربية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4322",
+      "sourceCode": "4322",
+      "nameAr": "شركة رتال للتطوير العمراني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4323",
+      "sourceCode": "4323",
+      "nameAr": "شركة سمو العقارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4324",
+      "sourceCode": "4324",
+      "nameAr": "شركة بنان العقارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4325",
+      "sourceCode": "4325",
+      "nameAr": "شركة أم القرى للتنمية والإعمار",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4326",
+      "sourceCode": "4326",
+      "nameAr": "شركة دار الماجد العقارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4327",
+      "sourceCode": "4327",
+      "nameAr": "شركة الرمز للعقارات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "4328",
+      "sourceCode": "4328",
+      "nameAr": "شركة لدن للاستثمار",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "5110",
+      "sourceCode": "5110",
+      "nameAr": "الشركة السعودية للطاقة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6001",
+      "sourceCode": "6001",
+      "nameAr": "شركة حلواني إخوان",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6002",
+      "sourceCode": "6002",
+      "nameAr": "شركة هرفي للخدمات الغذائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6004",
+      "sourceCode": "6004",
+      "nameAr": "شركة كاتريون للتموين القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6010",
+      "sourceCode": "6010",
+      "nameAr": "الشركة الوطنية للتنمية الزراعية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6012",
+      "sourceCode": "6012",
+      "nameAr": "شركة ريدان الغذائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6013",
+      "sourceCode": "6013",
+      "nameAr": "شركة الأعمال التطويرية الغذائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6014",
+      "sourceCode": "6014",
+      "nameAr": "شركة الآمار الغذائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6015",
+      "sourceCode": "6015",
+      "nameAr": "شركة أمريكانا للمطاعم العالمية بي إل سي - شركة أجنبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6016",
+      "sourceCode": "6016",
+      "nameAr": "شركة مطاعم بيت الشطيرة للوجبات السريعة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6017",
+      "sourceCode": "6017",
+      "nameAr": "شركة جاهز الدولية لتقنية نظم المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6018",
+      "sourceCode": "6018",
+      "nameAr": "شركة الأندية للرياضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6019",
+      "sourceCode": "6019",
+      "nameAr": "شركة المسار الشامل للتعليم",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6020",
+      "sourceCode": "6020",
+      "nameAr": "شركة القصيم القابضة للاستثمار",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6022",
+      "sourceCode": "6022",
+      "nameAr": "شركة أرماح الرياضية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6030",
+      "sourceCode": "6030",
+      "nameAr": "شركة حائل للتنمية الزراعية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6040",
+      "sourceCode": "6040",
+      "nameAr": "شركة تبوك للتنمية الزراعية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6050",
+      "sourceCode": "6050",
+      "nameAr": "الشركة السعودية للأسماك",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6060",
+      "sourceCode": "6060",
+      "nameAr": "شركة الشرقية للتنمية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6070",
+      "sourceCode": "6070",
+      "nameAr": "شركة الجوف الزراعية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6080",
+      "sourceCode": "6080",
+      "nameAr": "شركة بيشة للتنمية الزراعية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "6090",
+      "sourceCode": "6090",
+      "nameAr": "شركة جازان للتنمية والاستثمار",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "7010",
+      "sourceCode": "7010",
+      "nameAr": "شركة الإتصالات السعودية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "7020",
+      "sourceCode": "7020",
+      "nameAr": "شركة إتحاد إتصالات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "7030",
+      "sourceCode": "7030",
+      "nameAr": "شركة الإتصالات المتنقلة السعودية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "7040",
+      "sourceCode": "7040",
+      "nameAr": "شركة إتحاد قو للإتصالات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "7050",
+      "sourceCode": "7050",
+      "nameAr": "الشركة السعودية للإتصالات المتكاملة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "7200",
+      "sourceCode": "7200",
+      "nameAr": "شركة المعمر لأنظمة المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "7201",
+      "sourceCode": "7201",
+      "nameAr": "شركة بحر العرب لأنظمة المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "7202",
+      "sourceCode": "7202",
+      "nameAr": "الشركة العربية لخدمات الإنترنت والاتصالات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "7203",
+      "sourceCode": "7203",
+      "nameAr": "شركة علم",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "7204",
+      "sourceCode": "7204",
+      "nameAr": "شركة العرض المتقن للخدمات التجارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "7205",
+      "sourceCode": "7205",
+      "nameAr": "شرکة دار البلد لحلول الأعمال",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "7211",
+      "sourceCode": "7211",
+      "nameAr": "شركة عزم السعودية للاتصالات وتقنية المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8010",
+      "sourceCode": "8010",
+      "nameAr": "الشركة التعاونية للتأمين",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8011",
+      "sourceCode": "8011",
+      "nameAr": "شركة متلايف وايه أي جي والبنك العربي للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8012",
+      "sourceCode": "8012",
+      "nameAr": "شركة الجزيرة تكافل تعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8020",
+      "sourceCode": "8020",
+      "nameAr": "شركة ملاذ للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8030",
+      "sourceCode": "8030",
+      "nameAr": "شركة المتوسط والخليج للتأمين وإعادة التأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8040",
+      "sourceCode": "8040",
+      "nameAr": "شركة متكاملة للتأمين",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8050",
+      "sourceCode": "8050",
+      "nameAr": "شركة سلامة للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8060",
+      "sourceCode": "8060",
+      "nameAr": "شركة ولاء للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8070",
+      "sourceCode": "8070",
+      "nameAr": "شركة الدرع العربي للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8080",
+      "sourceCode": "8080",
+      "nameAr": "شركة ساب للتكافل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8090",
+      "sourceCode": "8090",
+      "nameAr": "شركة سند للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8100",
+      "sourceCode": "8100",
+      "nameAr": "الشركة العربية السعودية للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8110",
+      "sourceCode": "8110",
+      "nameAr": "الشركة السعودية الهندية للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8120",
+      "sourceCode": "8120",
+      "nameAr": "شركة إتحاد الخليج الأهلية للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8130",
+      "sourceCode": "8130",
+      "nameAr": "شركة الأهلي للتكافل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8140",
+      "sourceCode": "8140",
+      "nameAr": "الشركة الأهلية للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8150",
+      "sourceCode": "8150",
+      "nameAr": "المجموعة المتحدة للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8160",
+      "sourceCode": "8160",
+      "nameAr": "شركة التأمين العربية التعاونية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8170",
+      "sourceCode": "8170",
+      "nameAr": "شركة الاتحاد للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8180",
+      "sourceCode": "8180",
+      "nameAr": "شركة الصقر للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8190",
+      "sourceCode": "8190",
+      "nameAr": "الشركة المتحدة للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8200",
+      "sourceCode": "8200",
+      "nameAr": "الشركة السعودية لإعادة التأمين",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8210",
+      "sourceCode": "8210",
+      "nameAr": "شركة بوبا العربية للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8220",
+      "sourceCode": "8220",
+      "nameAr": "شركة وقاية للتأمين وإعادة التأمين التكافلي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8230",
+      "sourceCode": "8230",
+      "nameAr": "شركة الراجحي للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8240",
+      "sourceCode": "8240",
+      "nameAr": "شركة تْشب العربية للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8250",
+      "sourceCode": "8250",
+      "nameAr": "مجموعة الخليج للتأمين",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8260",
+      "sourceCode": "8260",
+      "nameAr": "الشركة الخليجية العامة للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8270",
+      "sourceCode": "8270",
+      "nameAr": "شركة بروج للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8280",
+      "sourceCode": "8280",
+      "nameAr": "شركة ليفا للتأمين",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8290",
+      "sourceCode": "8290",
+      "nameAr": "شركة سوليدرتي السعودية للتكافل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8300",
+      "sourceCode": "8300",
+      "nameAr": "الشركة الوطنية للتأمين",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8310",
+      "sourceCode": "8310",
+      "nameAr": "شركة أمانة للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8311",
+      "sourceCode": "8311",
+      "nameAr": "شركة عناية السعودية للتأمين التعاوني",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8312",
+      "sourceCode": "8312",
+      "nameAr": "شركة الإنماء طوكيو مارين",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "8313",
+      "sourceCode": "8313",
+      "nameAr": "شركة رسن لتقنية المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9500",
+      "sourceCode": "9500",
+      "nameAr": "شركة عبد الله سعد محمد أبو معطي للمكتبات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9501",
+      "sourceCode": "9501",
+      "nameAr": "شركة الأعمال التطويرية الغذائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9502",
+      "sourceCode": "9502",
+      "nameAr": "شركة العمران للصناعة والتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9503",
+      "sourceCode": "9503",
+      "nameAr": "شركة باعظيم التجارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9504",
+      "sourceCode": "9504",
+      "nameAr": "شركة مصنع الصمعاني للصناعات المعدنية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9505",
+      "sourceCode": "9505",
+      "nameAr": "شركة بحر العرب لأنظمة المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9506",
+      "sourceCode": "9506",
+      "nameAr": "شركة ريدان الغذائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9507",
+      "sourceCode": "9507",
+      "nameAr": "شركة ثوب الأصيل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9508",
+      "sourceCode": "9508",
+      "nameAr": "شركة الكثيري القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9510",
+      "sourceCode": "9510",
+      "nameAr": "الشركة الوطنية للبناء والتسويق",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9511",
+      "sourceCode": "9511",
+      "nameAr": "شركة سمو العقارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9512",
+      "sourceCode": "9512",
+      "nameAr": "شركة أسمنت الرياض",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9513",
+      "sourceCode": "9513",
+      "nameAr": "شركة وطني للحديد والصلب",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9514",
+      "sourceCode": "9514",
+      "nameAr": "شركة أبناء محمد حسن الناقول",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9515",
+      "sourceCode": "9515",
+      "nameAr": "شركة مصنع فش فاش للمواد الغذائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9516",
+      "sourceCode": "9516",
+      "nameAr": "شركة توزيع الغاز الطبيعي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9517",
+      "sourceCode": "9517",
+      "nameAr": "شركة موبي للصناعة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9518",
+      "sourceCode": "9518",
+      "nameAr": "شركة مجمع المركز الكندي الطبي العام",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9519",
+      "sourceCode": "9519",
+      "nameAr": "شركة بنان العقارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9520",
+      "sourceCode": "9520",
+      "nameAr": "شركة مطاعم بيت الشطيرة للوجبات السريعة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9521",
+      "sourceCode": "9521",
+      "nameAr": "شركة إنمار للتطوير والاستثمار العقاري",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9522",
+      "sourceCode": "9522",
+      "nameAr": "شركة الحاسوب للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9523",
+      "sourceCode": "9523",
+      "nameAr": "شركة جروب فايف السعودية للأنابيب",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9524",
+      "sourceCode": "9524",
+      "nameAr": "شركة تقدم العالمية للاتصالات وتقنية المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9525",
+      "sourceCode": "9525",
+      "nameAr": "شركة الوسائل الصناعية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9526",
+      "sourceCode": "9526",
+      "nameAr": "شركة جاهز الدولية لتقنية نظم المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9527",
+      "sourceCode": "9527",
+      "nameAr": "شركة ألف ميم ياء للمعدات والأجهزة الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9528",
+      "sourceCode": "9528",
+      "nameAr": "شركة جاز العربية للخدمات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9529",
+      "sourceCode": "9529",
+      "nameAr": "شركة رؤوم التجارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9530",
+      "sourceCode": "9530",
+      "nameAr": "الشركة الطبية العربية العالمية القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9531",
+      "sourceCode": "9531",
+      "nameAr": "شركة العبيكان للزجاج",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9532",
+      "sourceCode": "9532",
+      "nameAr": "شركة مصنع مياه الجوف الصحية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9533",
+      "sourceCode": "9533",
+      "nameAr": "شركة المركز الآلي السعودي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9534",
+      "sourceCode": "9534",
+      "nameAr": "شركة عزم السعودية للاتصالات وتقنية المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9535",
+      "sourceCode": "9535",
+      "nameAr": "شركة لدن للاستثمار",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9536",
+      "sourceCode": "9536",
+      "nameAr": "شركة المصانع العربية للمأكولات والألبان",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9537",
+      "sourceCode": "9537",
+      "nameAr": "شركة أمواج الدولية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9538",
+      "sourceCode": "9538",
+      "nameAr": "شركة نسيج للتقنية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9539",
+      "sourceCode": "9539",
+      "nameAr": "شركة مصنع أقاسيم لصناعة المواد الكيماوية والبلاستيكية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9540",
+      "sourceCode": "9540",
+      "nameAr": "شركة تدوير البيئة الأهلية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9541",
+      "sourceCode": "9541",
+      "nameAr": "شركة أكاديمية التعلم",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9542",
+      "sourceCode": "9542",
+      "nameAr": "شركة كير الدولية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9543",
+      "sourceCode": "9543",
+      "nameAr": "شركة نت وركرس السعودية للخدمات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9544",
+      "sourceCode": "9544",
+      "nameAr": "شركة الرعاية المستقبلية التجارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9545",
+      "sourceCode": "9545",
+      "nameAr": "الشركة الدولية للموارد البشرية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9546",
+      "sourceCode": "9546",
+      "nameAr": "شركة نبع الصحة للخدمات الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9547",
+      "sourceCode": "9547",
+      "nameAr": "شركة رواسي البناء للاستثمار",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9548",
+      "sourceCode": "9548",
+      "nameAr": "شركة صناعة البلاستيك العربية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9549",
+      "sourceCode": "9549",
+      "nameAr": "شركة عبدالعزيز ومنصور ابراهيم البابطين",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9550",
+      "sourceCode": "9550",
+      "nameAr": "شركة شور العالمية للتقنية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9551",
+      "sourceCode": "9551",
+      "nameAr": "شركة برج المعرفة التجارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9552",
+      "sourceCode": "9552",
+      "nameAr": "شركة قمة السعودية للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9553",
+      "sourceCode": "9553",
+      "nameAr": "شركة ملان لمنتجات الحديد",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9555",
+      "sourceCode": "9555",
+      "nameAr": "شركة لين الخير للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9556",
+      "sourceCode": "9556",
+      "nameAr": "شركة نفوذ للمنتجات الغذائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9557",
+      "sourceCode": "9557",
+      "nameAr": "شركة إدارات للاتصالات وتقنية المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9558",
+      "sourceCode": "9558",
+      "nameAr": "شركة تقنيات القمم للحاسبات والنظم التجارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9559",
+      "sourceCode": "9559",
+      "nameAr": "شركة بلدي للدواجن",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9560",
+      "sourceCode": "9560",
+      "nameAr": "شركة وجا",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9561",
+      "sourceCode": "9561",
+      "nameAr": "شركة شبكة المعرفة للحاسب الالي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9562",
+      "sourceCode": "9562",
+      "nameAr": "شركة بوابة الأطعمة التجارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9563",
+      "sourceCode": "9563",
+      "nameAr": "شركة بناء للصناعات الحديدية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9564",
+      "sourceCode": "9564",
+      "nameAr": "شركة آفاق الغذاء",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9565",
+      "sourceCode": "9565",
+      "nameAr": "شركة معيار",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9566",
+      "sourceCode": "9566",
+      "nameAr": "الشركة السعودية للصناعات الجيرية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9567",
+      "sourceCode": "9567",
+      "nameAr": "شركة غذاء السلطان للوجبات السريعة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9568",
+      "sourceCode": "9568",
+      "nameAr": "شركة ميار القابضة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9569",
+      "sourceCode": "9569",
+      "nameAr": "شركة آل منيف للتجارة والصناعة والزراعة والمقاولات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9570",
+      "sourceCode": "9570",
+      "nameAr": "شركة تام التنموية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9571",
+      "sourceCode": "9571",
+      "nameAr": "شركة المناولة للشحن",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9572",
+      "sourceCode": "9572",
+      "nameAr": "شركة الرازي الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9574",
+      "sourceCode": "9574",
+      "nameAr": "شركة الخدمات الطبية المتخصصة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9575",
+      "sourceCode": "9575",
+      "nameAr": "شركة مصنع تصميم الرخام",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9576",
+      "sourceCode": "9576",
+      "nameAr": "شركة منزل الورق",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9577",
+      "sourceCode": "9577",
+      "nameAr": "شركة دار المركبة لتأجير السيارات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9578",
+      "sourceCode": "9578",
+      "nameAr": "شركة مصاعد أطلس للتجارة العامة والمقاولات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9579",
+      "sourceCode": "9579",
+      "nameAr": "شركة رماث الضيافة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9580",
+      "sourceCode": "9580",
+      "nameAr": "شركة الراشد للصناعة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9581",
+      "sourceCode": "9581",
+      "nameAr": "شركة حياة النظافة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9583",
+      "sourceCode": "9583",
+      "nameAr": "شركة المتحدة للصناعات التعدينية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9584",
+      "sourceCode": "9584",
+      "nameAr": "شركة ريال للاستثمار والتنمية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9585",
+      "sourceCode": "9585",
+      "nameAr": "شركة ملكية للاستثمار",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9586",
+      "sourceCode": "9586",
+      "nameAr": "شركة أصول وبخيت الاستثمارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9587",
+      "sourceCode": "9587",
+      "nameAr": "شركة لانا الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9588",
+      "sourceCode": "9588",
+      "nameAr": "شركة الرياض للحديد",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9589",
+      "sourceCode": "9589",
+      "nameAr": "شركة فاد العالمية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9590",
+      "sourceCode": "9590",
+      "nameAr": "شركة أرماح الرياضية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9591",
+      "sourceCode": "9591",
+      "nameAr": "شركة فيو المتحدة للتطوير العقاري",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9592",
+      "sourceCode": "9592",
+      "nameAr": "شركة المجتمع الرائدة الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9593",
+      "sourceCode": "9593",
+      "nameAr": "شركة عبر الخليج للتسويق",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9594",
+      "sourceCode": "9594",
+      "nameAr": "شركة المداواة التخصصية الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9595",
+      "sourceCode": "9595",
+      "nameAr": "شركة وسم الأعمال لتقنية المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9596",
+      "sourceCode": "9596",
+      "nameAr": "شركة كوارا للتمويل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9597",
+      "sourceCode": "9597",
+      "nameAr": "شركة الليف العالمية للخدمات البيئية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9598",
+      "sourceCode": "9598",
+      "nameAr": "شركة المحافظة للتعليم",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9599",
+      "sourceCode": "9599",
+      "nameAr": "شركة الطاقات المعدنية للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9600",
+      "sourceCode": "9600",
+      "nameAr": "شركة كومل",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9601",
+      "sourceCode": "9601",
+      "nameAr": "شركة محمد هادي الرشيد وشركاه",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9602",
+      "sourceCode": "9602",
+      "nameAr": "شركة يقين المالية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9603",
+      "sourceCode": "9603",
+      "nameAr": "شركة الأفق التعليمية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9604",
+      "sourceCode": "9604",
+      "nameAr": "شركة ميرال للعيادات الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9605",
+      "sourceCode": "9605",
+      "nameAr": "شركة نفط الشرق للصناعات الكيماوية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9606",
+      "sourceCode": "9606",
+      "nameAr": "شركة الثروة البشرية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9607",
+      "sourceCode": "9607",
+      "nameAr": "شركة مصنع عسق للبلاستيك",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9608",
+      "sourceCode": "9608",
+      "nameAr": "شركة الأشغال الميسرة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9609",
+      "sourceCode": "9609",
+      "nameAr": "شركة مصنع بترول ناس",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9610",
+      "sourceCode": "9610",
+      "nameAr": "شركة الجادة الأولى للتطوير العقاري",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9611",
+      "sourceCode": "9611",
+      "nameAr": "الشركة العربية المتحدة للزجاج المسطح",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9612",
+      "sourceCode": "9612",
+      "nameAr": "شركة مصنع مياه سما الصحية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9613",
+      "sourceCode": "9613",
+      "nameAr": "شركة شلفا لإدارة المرافق",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9614",
+      "sourceCode": "9614",
+      "nameAr": "شركة نقاوة لتقنية المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9615",
+      "sourceCode": "9615",
+      "nameAr": "شركة مفيد",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9616",
+      "sourceCode": "9616",
+      "nameAr": "شركة جنى الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9617",
+      "sourceCode": "9617",
+      "nameAr": "شركة ستار العربية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9618",
+      "sourceCode": "9618",
+      "nameAr": "شركة الفاخرة للخياطة الرجالية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9619",
+      "sourceCode": "9619",
+      "nameAr": "شركة مجموعة الأعمال المتعددة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9620",
+      "sourceCode": "9620",
+      "nameAr": "شركة بلسم الأفق الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9621",
+      "sourceCode": "9621",
+      "nameAr": "شركة الأبحاث الرقمية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9622",
+      "sourceCode": "9622",
+      "nameAr": "شركة شموع الماضي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9623",
+      "sourceCode": "9623",
+      "nameAr": "شركة مصنع البتال للصناعات الكيميائية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9624",
+      "sourceCode": "9624",
+      "nameAr": "شركة الشهيلي للصناعات المعدنية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9625",
+      "sourceCode": "9625",
+      "nameAr": "شركة الإتمام الاستشارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9626",
+      "sourceCode": "9626",
+      "nameAr": "شركة بسمة اديم الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9627",
+      "sourceCode": "9627",
+      "nameAr": "شركة طوارئيات للعناية الطبية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9628",
+      "sourceCode": "9628",
+      "nameAr": "شركة لمسات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9630",
+      "sourceCode": "9630",
+      "nameAr": "شركة النسبة المختصة للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9631",
+      "sourceCode": "9631",
+      "nameAr": "شركة هضاب الخليج التجارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9632",
+      "sourceCode": "9632",
+      "nameAr": "شركة رؤية المستقبل للتدريب الصحي",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9633",
+      "sourceCode": "9633",
+      "nameAr": "شركة آلات الصيانة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9634",
+      "sourceCode": "9634",
+      "nameAr": "شركة أدير العقارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9635",
+      "sourceCode": "9635",
+      "nameAr": "شركة دخون الوطنية للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9636",
+      "sourceCode": "9636",
+      "nameAr": "شركة الخزامى التجارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9637",
+      "sourceCode": "9637",
+      "nameAr": "شركة الحلول المتسارعة للاتصالات و تقنية المعلومات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9639",
+      "sourceCode": "9639",
+      "nameAr": "شركة أنماط التقنية للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9640",
+      "sourceCode": "9640",
+      "nameAr": "شركة أساس مكين للتطوير والاستثمار العقاري",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9641",
+      "sourceCode": "9641",
+      "nameAr": "شركة هوية للمزادات",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9642",
+      "sourceCode": "9642",
+      "nameAr": "شركة الوقت للفعاليات الترفيهية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9644",
+      "sourceCode": "9644",
+      "nameAr": "شركة ناف للعلف للصناعة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9645",
+      "sourceCode": "9645",
+      "nameAr": "شركة اللوحات الوطنية للصناعة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9647",
+      "sourceCode": "9647",
+      "nameAr": "شركة وجد الحياة للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9648",
+      "sourceCode": "9648",
+      "nameAr": "شركة حمد محمد بن سعيدان العقارية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9649",
+      "sourceCode": "9649",
+      "nameAr": "شركة جمجوم فاشن للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9650",
+      "sourceCode": "9650",
+      "nameAr": "شركة ساحة المجد للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9651",
+      "sourceCode": "9651",
+      "nameAr": "شركة عبدالعزيز بن أحمد التويجري للتجارة",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9653",
+      "sourceCode": "9653",
+      "nameAr": "شركة خالد ظافر وإخوانه للخدمات اللوجستية",
+      "market": "TASI",
+      "currency": "SAR"
+    },
+    {
+      "symbol": "9655",
+      "sourceCode": "9655",
+      "nameAr": "شركة مسقا للاستثمار",
+      "market": "TASI",
+      "currency": "SAR"
+    }
+  ]
+}

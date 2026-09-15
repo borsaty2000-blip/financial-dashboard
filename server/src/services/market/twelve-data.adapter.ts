@@ -127,6 +127,25 @@ async function getEgyptCompaniesFromCatalog(): Promise<TwelveCompany[]> {
 }
 
 export function getSaudiCompanies(): Promise<TwelveCompany[]> {
+	return getSaudiCompaniesFromCatalog()
+}
+async function getSaudiCompaniesFromCatalog(): Promise<TwelveCompany[]> {
+	const catalog = await prisma.tasiCompany
+		.findMany({ where: { market: 'TASI' }, orderBy: { symbol: 'asc' } })
+		.catch(() => [])
+	if (catalog.length) {
+		return catalog.map((company) => ({
+			symbol: company.symbol,
+			displaySymbol: company.symbol,
+			name: company.nameAr,
+			currency: 'SAR',
+			exchange: 'TASI',
+			micCode: 'XSAU',
+			country: 'Saudi Arabia',
+			type: 'Common Stock',
+			figiCode: null,
+		}))
+	}
 	return getCompaniesByExchange('XSAU')
 }
 

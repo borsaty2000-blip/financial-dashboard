@@ -487,6 +487,9 @@ export function StockDetailPage({
 				</button>
 				<div>
 					<p className="eyebrow">تفاصيل السهم</p>
+					<span className={`market-badge ${market === 'TASI' ? 'market-tasi' : 'market-egx'}`}>
+						{market === 'TASI' ? '🇸🇦 السعودية · SAR' : '🇪🇬 مصر · EGP'}
+					</span>
 					<h1>
 						{displayCompanyName ?? normalized}
 						<small className="stock-symbol-label">{normalized}</small>
