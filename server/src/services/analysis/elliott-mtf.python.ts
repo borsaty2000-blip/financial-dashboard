@@ -56,25 +56,50 @@ export async function analyzeElliottMTF(
 			const result = analyzeElliottFallback(
 				frameCandles.map((item) => item.close),
 			)
-			const direction = result.current_wave?.direction ?? 'unknown'
+			const wave = result.current_wave?.wave ?? '?'
+			const direction =
+				wave === 'C' ? 'down' : (result.current_wave?.direction ?? 'unknown')
+			const targets = result.targets ?? {}
+			const lastPivot = result.pivots?.at(-1)?.price
 			frames[timeframe] = {
+				available: true,
 				timeframe,
 				timeframe_ar:
 					timeframe === 'monthly'
 						? 'شهري'
 						: timeframe === 'weekly'
 							? 'أسبوعي'
-							: 'يومي',
-				weight: timeframe === 'monthly' ? 4 : timeframe === 'weekly' ? 3 : 2,
-				current_wave: result.current_wave?.wave ?? '?',
+							: timeframe === '4h'
+								? '4 ساعات'
+								: 'يومي',
+				weight:
+					timeframe === 'monthly'
+						? 4
+						: timeframe === 'weekly'
+							? 3
+							: timeframe === '4h'
+								? 1
+								: 2,
+				current_wave: wave,
 				direction,
 				confidence: result.confidence ?? 0,
-				wave_personality: 'تصنيف احتياطي يحتاج تحققاً',
+				wave_personality:
+					wave === 'C'
+						? 'موجة تصحيحية هابطة محتملة'
+						: 'تصنيف احتياطي يحتاج تحققاً',
 				primary_count: result,
 				alternate_count: {
+					wave: wave === 'C' ? '3' : wave === '5' ? '3' : 'C',
 					confidence: 0.25,
 					condition: 'تحتاج بيانات Python متعددة الأطر',
 				},
+				targets,
+				invalidation_level: lastPivot
+					? {
+							level: lastPivot,
+							reason: 'يتغير التصنيف عند كسر المستوى بإغلاق مؤكد',
+						}
+					: {},
 			}
 			return frames
 		}, {})
@@ -88,7 +113,7 @@ export async function analyzeElliottMTF(
 					direction: dailyDirection,
 					confidence: daily.confidence ?? 0,
 					agreement: 1,
-					timeframes: 1,
+					timeframes: Object.keys(fallbackFrames).length,
 				},
 				dominant_direction: dailyDirection,
 				dominant_confidence: daily.confidence ?? 0,
