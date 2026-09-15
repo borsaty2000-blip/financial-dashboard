@@ -41,6 +41,12 @@ type IntegratedAnalysis = {
 }
 type FullAnalysisResponse = {
 	data?: Partial<IntegratedAnalysis>
+	data_quality?: {
+		status?: string
+		price_freshness?: string
+		decision?: string
+		message?: string
+	}
 	stages?: string[]
 	completed_engines?: number
 }
@@ -66,6 +72,7 @@ type InsiderTrade = {
 }
 type Ownership = {
 	shareholders?: Array<{ name: string; percentage: number | null }>
+	available?: boolean
 }
 
 const analysisPayload = (response: AnalysisResponse | null) => {
@@ -119,6 +126,8 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 			backtest: null,
 		})
 	const [analysisStages, setAnalysisStages] = useState<string[]>([])
+	const [analysisQuality, setAnalysisQuality] =
+		useState<FullAnalysisResponse['data_quality']>()
 	const [completedEngines, setCompletedEngines] = useState(0)
 	const [fundamentals, setFundamentals] = useState<Fundamentals | null>(null)
 	const [insiderTrades, setInsiderTrades] = useState<InsiderTrade[]>([])
@@ -176,6 +185,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 					backtest: result.data?.backtest ?? null,
 				})
 				setAnalysisStages(result.stages ?? [])
+				setAnalysisQuality(result.data_quality)
 				setCompletedEngines(result.completed_engines ?? 0)
 			})
 			.catch(() => undefined)
@@ -277,6 +287,14 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 	const lstmResult = analysisPayload(integratedAnalysis.lstm)
 	const backtestResult = analysisPayload(integratedAnalysis.backtest)
 	const consensusSignal = stringValue(consensusResult, ['signal'])
+	const consensusSignalArabic =
+		consensusSignal === 'STRONG_BUY' || consensusSignal === 'BUY'
+			? 'ميل إيجابي'
+			: consensusSignal === 'STRONG_SELL' || consensusSignal === 'SELL'
+				? 'ميل سلبي'
+				: consensusSignal === 'HOLD'
+					? 'محايد / غير حاسم'
+					: 'غير متاح'
 	const elliottDirection = stringValue(elliottResult, [
 		'current_wave',
 		'direction',
@@ -322,7 +340,7 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 		backtestResult,
 	].filter((result) => Object.keys(result).length > 0).length
 	const signalExplanation = consensusSignal
-		? `الإجماع الحالي المسجل هو ${consensusSignal}. تتم قراءته مع المؤشرات والموجات، ولا يُستخدم منفرداً.`
+		? `القراءة الحالية هي «${consensusSignalArabic}». هذا مقياس اتفاق بين محركات تعليمية، وليس احتمال نجاح أو أمر شراء/بيع.`
 		: 'لم يكتمل إجماع المحركات لهذا الرمز؛ ستظهر القراءة عند توفر بيانات صالحة.'
 	const riskExplanation = numberValue(statisticalResult, ['var_95'])
 		? 'تظهر مقاييس التقلب وVaR وSharpe لتوضيح المخاطر التاريخية قبل تفسير أي حركة سعرية.'
@@ -457,6 +475,11 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 							</div>
 							<span className="eyebrow">{completedEngines}/8 محركات</span>
 						</div>
+						<div className="analysis-data-quality" role="note">
+							<strong>حدود القراءة:</strong>{' '}
+							{analysisQuality?.message ??
+								'النتائج تعليمية ولا تمثل توصية استثمارية أو قراراً آلياً.'}
+						</div>
 						{analysisStages.length > 0 && (
 							<div className="analysis-pipeline" aria-label="مراحل التحليل">
 								{analysisStages.map((stage, index) => (
@@ -477,12 +500,12 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 									)}
 								</strong>
 								<small>
-									{consensusSignal ?? 'غير متاح'} · ثقة{' '}
+									{consensusSignalArabic} · اتفاق المحركات{' '}
 									{formatEnglishNumber(
 										numberValue(consensusResult, ['confidence']),
 										0,
 									)}
-									%
+									% (ليس احتمال نجاح)
 								</small>
 							</div>
 							<div className="integrated-analysis-card">
@@ -754,6 +777,11 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 									<b>{item.percentage == null ? '—' : `${item.percentage}%`}</b>
 								</div>
 							))}
+							{!ownership?.available && (
+								<p className="muted">
+									لا تتوفر إفصاحات ملكية موثوقة لهذا الرمز حالياً.
+								</p>
+							)}
 						</div>
 						<div className="fundamentals-table">
 							{insiderTrades.slice(0, 6).map((item) => (
@@ -771,6 +799,11 @@ export function StockDetailPage({ symbol }: { symbol: string }) {
 									<b>{formatEnglishNumber(item.shares, 0)}</b>
 								</div>
 							))}
+							{insiderTrades.length === 0 && (
+								<p className="muted">
+									لا توجد معاملات داخلية موثقة متاحة حالياً.
+								</p>
+							)}
 						</div>
 						<small>
 							الأرقام غير المتاحة تظهر كشرطة ولا تمثل توصية استثمارية.

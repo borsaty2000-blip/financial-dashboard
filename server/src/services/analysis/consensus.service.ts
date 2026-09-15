@@ -12,6 +12,8 @@ export interface ConsensusResult {
 	score: number
 	signal: Signal
 	confidence: number
+	confidenceMeaning: 'agreement_score_not_probability'
+	decision: 'NO_TRADE_DECISION'
 	breakdown: Record<string, { score: number; weight: number; signal: Signal }>
 	recommendation: string
 	timestamp: string
@@ -119,7 +121,9 @@ export class ConsensusService {
 		return {
 			score,
 			signal,
-			confidence: Math.round(clamp(40 + Math.abs(score - 50) * 1.5)),
+			confidence: Math.round(clamp(35 + Math.abs(score - 50))),
+			confidenceMeaning: 'agreement_score_not_probability',
+			decision: 'NO_TRADE_DECISION',
 			breakdown: Object.fromEntries(
 				Object.entries(scores).map(([key, value]) => [
 					key,
@@ -131,15 +135,7 @@ export class ConsensusService {
 				]),
 			),
 			recommendation:
-				signal === 'STRONG_BUY'
-					? 'شراء قوي — توافق مرتفع بين المحركات'
-					: signal === 'BUY'
-						? 'شراء — أغلبية المحركات إيجابية'
-						: signal === 'HOLD'
-							? 'انتظار — الإشارات غير حاسمة'
-							: signal === 'SELL'
-								? 'بيع — أغلبية المحركات سلبية'
-								: 'بيع قوي — توافق سلبي مرتفع',
+				'قراءة تعليمية فقط: لا يوجد قرار شراء أو بيع آلي. راجع السعر، السيولة، الإفصاحات، وملاءمة المخاطر بشكل مستقل.',
 			timestamp: new Date().toISOString(),
 		}
 	}

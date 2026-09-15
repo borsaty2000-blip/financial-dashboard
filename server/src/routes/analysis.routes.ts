@@ -129,6 +129,13 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 			market: queryMarket(request.query.market),
 			source: series.source,
 			candles_count: series.count,
+			data_quality: {
+				status: 'historical_or_delayed',
+				price_freshness: 'not_guaranteed_realtime',
+				decision: 'NO_TRADE_DECISION',
+				message:
+					'البيانات والتحليلات تعليمية؛ لا تُستخدم وحدها لاتخاذ قرار شراء أو بيع.',
+			},
 			stages,
 			completed_engines: settled.filter((item) => item.status === 'fulfilled')
 				.length,

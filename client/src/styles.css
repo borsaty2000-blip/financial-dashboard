@@ -6803,3 +6803,27 @@ body:has(.borsaty-public-page) .global-language-switcher {
 		display: none;
 	}
 }
+
+
+.analysis-data-quality {
+	margin: 12px 0 4px;
+	padding: 10px 12px;
+	border-inline-start: 3px solid #d49b24;
+	border-radius: 8px;
+	background: #fff9e8;
+	color: #5d4a20;
+	font-size: 12px;
+	line-height: 1.7;
+}
+.analysis-data-quality strong {
+	color: #8a5d00;
+}
+@media (prefers-color-scheme: dark) {
+	.analysis-data-quality {
+		background: #2b2517;
+		color: #f3dfaa;
+	}
+	.analysis-data-quality strong {
+		color: #ffd66b;
+	}
+}
