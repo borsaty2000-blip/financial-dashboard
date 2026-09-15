@@ -137,12 +137,54 @@ const arabicCompanyNames: Record<string, string> = {
 	'2222': 'أرامكو السعودية',
 	'1120': 'مصرف الراجحي',
 	'1211': 'شركة التعدين العربية السعودية - معادن',
+	'1010': 'بنك الرياض',
+	'1020': 'بنك الجزيرة',
+	'1030': 'البنك السعودي للاستثمار',
+	'1050': 'البنك السعودي الفرنسي',
+	'1060': 'البنك السعودي الأول',
+	'1080': 'البنك العربي الوطني',
+	'1090': 'بنك البلاد',
+	'1140': 'مصرف الراجحي',
+	'1150': 'مصرف الإنماء',
+	'1180': 'البنك الأهلي السعودي',
+	'2010': 'سابك',
+	'2020': 'سابك للمغذيات الزراعية',
+	'2280': 'المملكة القابضة',
+	'2310': 'سبكيم العالمية',
+	'2380': 'بترو رابغ',
+	'4001': 'أسواق العثيم',
+	'4003': 'إكسترا',
+	'4008': 'ساكو',
+	'4190': 'جرير',
+	'4191': 'أبو معطي',
+	'4192': 'السيف غاليري',
+	'4280': 'المملكة القابضة',
+	'4290': 'الخدمات الأرضية',
+	'4321': 'سينومي سنترز',
+	'5110': 'كهرباء السعودية',
+	'7010': 'الاتصالات السعودية',
+	'7020': 'اتحاد اتصالات',
+	'7030': 'زين السعودية',
 }
 
 const arabicCompanyName = (company: DirectoryCompany, displaySymbol: string) =>
 	arabicCompanyNames[displaySymbol.toUpperCase()] ??
 	arabicCompanyNames[company.symbol.toUpperCase()] ??
 	company.name
+
+const canonicalDirectory = (
+	companies: DirectoryCompany[],
+	market: 'EGX' | 'TASI',
+) => {
+	const seen = new Set<string>()
+	return companies.filter((company) => {
+		const raw = (company.displaySymbol ?? company.symbol).toUpperCase()
+		const canonical = market === 'TASI' ? raw.replace(/\.SABE$/u, '') : raw
+		if (seen.has(canonical)) return false
+		seen.add(canonical)
+		return true
+	})
+}
 
 function MarketMetric({ card }: { card: MarketCard }) {
 	return (
@@ -194,12 +236,16 @@ function MarketDirectory({
 	>('symbol')
 	const [page, setPage] = useState(1)
 	const pageSize = 25
+	const directoryCompanies = useMemo(
+		() => canonicalDirectory(companies, market),
+		[companies, market],
+	)
 	const filtered = useMemo(() => {
 		const normalized = query.trim().toLowerCase()
 		const matching = !normalized
-			? companies
-			: companies.filter((company) =>
-					`${company.displaySymbol ?? ''} ${company.symbol} ${company.name}`
+			? directoryCompanies
+			: directoryCompanies.filter((company) =>
+					`${company.displaySymbol ?? ''} ${company.symbol} ${company.name} ${arabicCompanyName(company, company.displaySymbol ?? company.symbol)}`
 						.toLowerCase()
 						.includes(normalized),
 				)
@@ -215,14 +261,14 @@ function MarketDirectory({
 				right.displaySymbol ?? right.symbol,
 			)
 		})
-	}, [companies, query, sortKey])
+	}, [directoryCompanies, query, sortKey])
 	const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
 	const safePage = Math.min(page, pageCount)
 	const visibleCompanies = filtered.slice(
 		(safePage - 1) * pageSize,
 		safePage * pageSize,
 	)
-	const availableCount = companies.filter(
+	const availableCount = directoryCompanies.filter(
 		(company) => company.available || company.price != null,
 	).length
 
@@ -235,7 +281,7 @@ function MarketDirectory({
 				</div>
 				<div className="borsaty-directory-heading-stats">
 					<strong>
-						{filtered.length} من {companies.length} سهم
+						{filtered.length} من {directoryCompanies.length} سهم
 					</strong>
 					<span>{availableCount} بسعر متاح</span>
 				</div>
@@ -280,7 +326,7 @@ function MarketDirectory({
 					</select>
 				</label>
 			</div>
-			{companies.length ? (
+			{directoryCompanies.length ? (
 				<div className="borsaty-directory-table-wrap">
 					<table className="borsaty-directory-table">
 						<thead>
@@ -313,7 +359,7 @@ function MarketDirectory({
 												className="borsaty-directory-symbol"
 												onClick={() =>
 													navigate(
-														`/stock/${company.symbol}?name=${encodeURIComponent(arabicName)}`,
+														`/stock/${company.symbol}?market=${market}&name=${encodeURIComponent(arabicName)}`,
 													)
 												}
 											>
@@ -352,7 +398,7 @@ function MarketDirectory({
 												className="borsaty-row-analysis"
 												onClick={() =>
 													navigate(
-														`/stock/${company.symbol}?name=${encodeURIComponent(arabicName)}`,
+														`/stock/${company.symbol}?market=${market}&name=${encodeURIComponent(arabicName)}`,
 													)
 												}
 											>
@@ -1229,18 +1275,36 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 					</div>
 				</section>
 
-				<MarketDirectory
-					title="كل أسهم البورصة المصرية"
-					market="EGX"
-					companies={egxCompanies}
-					prices={moverPrices}
-				/>
-				<MarketDirectory
-					title="كل أسهم السوق السعودي"
-					market="TASI"
-					companies={tasiCompanies}
-					prices={new Map()}
-				/>
+				{focus === 'TASI' ? (
+					<MarketDirectory
+						title="كل أسهم السوق السعودي"
+						market="TASI"
+						companies={tasiCompanies}
+						prices={new Map()}
+					/>
+				) : focus === 'EGX' ? (
+					<MarketDirectory
+						title="كل أسهم البورصة المصرية"
+						market="EGX"
+						companies={egxCompanies}
+						prices={moverPrices}
+					/>
+				) : (
+					<>
+						<MarketDirectory
+							title="كل أسهم البورصة المصرية"
+							market="EGX"
+							companies={egxCompanies}
+							prices={moverPrices}
+						/>
+						<MarketDirectory
+							title="كل أسهم السوق السعودي"
+							market="TASI"
+							companies={tasiCompanies}
+							prices={new Map()}
+						/>
+					</>
+				)}
 
 				<section className="borsaty-ticker" aria-label="حالة الأسواق">
 					{cards.map((card) => (

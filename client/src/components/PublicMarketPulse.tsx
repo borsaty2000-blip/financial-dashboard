@@ -156,7 +156,11 @@ export function PublicMarketPulse({
 									<button
 										className="borsaty-pulse-row"
 										key={`${company.market}-${company.symbol}`}
-										onClick={() => navigate(`/stock/${company.symbol}`)}
+										onClick={() =>
+											navigate(
+												`/stock/${company.symbol}?market=${company.market}&name=${encodeURIComponent(company.name)}`,
+											)
+										}
 									>
 										<span className="borsaty-pulse-symbol">
 											<b>{company.displaySymbol ?? company.symbol}</b>

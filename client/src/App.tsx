@@ -332,8 +332,12 @@ function RoutedApp() {
 	if (path === '/stock') return <NotFoundPage />
 	if (path.startsWith('/stock/')) {
 		const [symbol, query = ''] = path.slice('/stock/'.length).split('?')
-		const name = new URLSearchParams(query).get('name') ?? undefined
-		return <StockDetailPage symbol={symbol} companyName={name} />
+		const params = new URLSearchParams(query)
+		const name = params.get('name') ?? undefined
+		const market = params.get('market') === 'TASI' ? 'TASI' : undefined
+		return (
+			<StockDetailPage symbol={symbol} companyName={name} market={market} />
+		)
 	}
 	if (
 		path === '/dashboard' ||

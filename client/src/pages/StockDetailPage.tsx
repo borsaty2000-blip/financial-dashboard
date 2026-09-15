@@ -111,9 +111,11 @@ const stringValue = (value: unknown, path: string[] = []) => {
 export function StockDetailPage({
 	symbol,
 	companyName,
+	market: marketOverride,
 }: {
 	symbol: string
 	companyName?: string
+	market?: 'EGX' | 'TASI'
 }) {
 	const [data, setData] = useState<Candles | null>(null)
 	const [ensembleData, setEnsembleData] = useState<FeatureResponse | null>(null)
@@ -148,7 +150,8 @@ export function StockDetailPage({
 		companyName && companyName.toUpperCase() !== normalized
 			? companyName
 			: undefined
-	const market = /^\d{4,5}$/u.test(normalized) ? 'TASI' : 'EGX'
+	const market =
+		marketOverride ?? (/^\d{4,5}$/u.test(normalized) ? 'TASI' : 'EGX')
 	const livePrice = useLivePrice(normalized, market)
 
 	useEffect(() => {
