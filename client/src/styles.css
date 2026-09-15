@@ -6478,3 +6478,90 @@ body.dark-mode .analysis-orchestration-steps span {
 	background: #14394a;
 	color: #c9e1e7;
 }
+
+/* Compact language control belongs to the dark mobile chrome, not the hero. */
+@media (max-width: 720px) {
+	.language-switcher {
+		top: 12px;
+		inset-inline-start: 12px;
+		inset-inline-end: auto;
+		z-index: 1100;
+		width: 78px;
+		min-width: 78px;
+		height: 32px;
+		justify-content: center;
+		gap: 4px;
+		padding: 3px 6px;
+		border: 1px solid rgb(255 255 255 / 28%);
+		border-radius: 9px;
+		background: rgb(23 27 32 / 94%);
+		box-shadow: 0 2px 8px rgb(0 0 0 / 24%);
+		color: #fff;
+		font-size: 11px;
+	}
+	.language-switcher > span {
+		font-size: 13px;
+		line-height: 1;
+	}
+	.language-switcher select {
+		width: 46px;
+		min-width: 46px;
+		padding: 0 1px;
+		color: #fff;
+		font-size: 11px;
+		line-height: 1.1;
+	}
+	.language-switcher select option {
+		background: #171b20;
+		color: #fff;
+	}
+}
+
+/* Final placement: compact language control inside the dark top chrome. */
+.language-switcher {
+	top: 10px;
+	inset-inline-start: auto;
+	inset-inline-end: 12px;
+	z-index: 1100;
+	width: 86px;
+	min-width: 86px;
+	height: 30px;
+	justify-content: center;
+	gap: 4px;
+	padding: 3px 6px;
+	border: 1px solid rgb(255 255 255 / 24%);
+	border-radius: 8px;
+	background: rgb(23 27 32 / 94%);
+	box-shadow: 0 2px 8px rgb(0 0 0 / 24%);
+	color: #fff;
+	font-size: 11px;
+}
+.language-switcher > span {
+	font-size: 13px;
+	line-height: 1;
+}
+.language-switcher select {
+	width: 52px;
+	min-width: 52px;
+	padding: 0 1px;
+	color: #fff;
+	font-size: 11px;
+	line-height: 1.1;
+}
+.language-switcher select option {
+	background: #171b20;
+	color: #fff;
+}
+@media (max-width: 720px) {
+	.language-switcher {
+		top: 12px;
+		inset-inline-end: 10px;
+		width: 78px;
+		min-width: 78px;
+		height: 30px;
+	}
+	.language-switcher select {
+		width: 45px;
+		min-width: 45px;
+	}
+}
