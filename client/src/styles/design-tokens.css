@@ -43,6 +43,22 @@
 	--gray-900: #111827;
 	--primary-500: #171b20;
 	--primary-600: #090b0d;
+	--black-obsidian: #0a0e14;
+	--black-midnight: #0d1117;
+	--black-glossy: #161b22;
+	--black-elevated: #1c2333;
+	--glossy-black-gradient: linear-gradient(
+		135deg,
+		#0a0e14 0%,
+		#0d1117 50%,
+		#161b22 100%
+	);
+	--glossy-card-gradient: linear-gradient(145deg, #1c2333 0%, #161b22 100%);
+	--glossy-button-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+	--glass-border: rgb(255 255 255 / 10%);
+	--shadow-glossy:
+		0 4px 12px rgb(0 0 0 / 40%), 0 2px 4px rgb(0 0 0 / 30%),
+		inset 0 1px 0 rgb(255 255 255 / 5%);
 	--success-500: #00a651;
 	--danger-500: #e74c3c;
 	--warning-500: #f39c12;

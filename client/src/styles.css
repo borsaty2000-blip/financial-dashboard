@@ -6635,8 +6635,7 @@ body.dark-mode .analysis-orchestration-steps span {
 .borsaty-public-header .borsaty-public-actions svg {
 	filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
 }
-.borsaty-home-button,
-.global-home-shortcut {
+.borsaty-home-button {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -6654,32 +6653,13 @@ body.dark-mode .analysis-orchestration-steps span {
 	border-radius: 10px;
 }
 .borsaty-home-button:hover,
-.borsaty-home-button:focus-visible,
-.global-home-shortcut:hover,
-.global-home-shortcut:focus-visible {
+.borsaty-home-button:focus-visible {
 	background: #ffffff;
 	color: #0b3850;
 	transform: translateY(-1px);
 	outline: none;
 }
-.global-home-shortcut {
-	position: fixed;
-	inset-inline-start: 18px;
-	bottom: 22px;
-	z-index: 1200;
-	min-height: 42px;
-	padding: 0 14px;
-	border-radius: 999px;
-	background: #0b3d55;
-	box-shadow: 0 10px 26px rgba(4, 32, 48, 0.22);
-}
-.global-home-shortcut svg {
-	color: #ffffff;
-}
 @media (max-width: 720px) {
-	.global-home-shortcut {
-		display: none;
-	}
 	.mobile-topbar .mobile-icon,
 	.mobile-topbar .mobile-icon svg,
 	.mobile-topbar .mobile-logo,
@@ -7532,7 +7512,6 @@ textarea {
 	background: #252d33 !important;
 }
 
-.global-home-shortcut,
 .telegram-quick-link,
 .chat-fab,
 .ai-assistant-fab {
@@ -7542,7 +7521,6 @@ textarea {
 	color: #ffffff !important;
 }
 
-.global-home-shortcut svg,
 .telegram-quick-link svg,
 .chat-fab svg,
 .ai-assistant-fab svg {
@@ -7550,8 +7528,6 @@ textarea {
 	stroke: #ffffff !important;
 }
 
-.global-home-shortcut:hover,
-.global-home-shortcut:focus-visible,
 .telegram-quick-link:hover,
 .chat-fab:hover,
 .ai-assistant-fab:hover {
@@ -7703,7 +7679,6 @@ td,
 .primary-button,
 .borsaty-solid-button,
 .borsaty-home-button,
-.global-home-shortcut,
 .telegram-quick-link,
 .chat-fab,
 .ai-assistant-fab,
@@ -7719,7 +7694,6 @@ td,
 
 .primary-button:hover,
 .borsaty-solid-button:hover,
-.global-home-shortcut:hover,
 .telegram-quick-link:hover,
 .chat-fab:hover,
 .ai-assistant-fab:hover,

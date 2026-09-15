@@ -1,10 +1,9 @@
 import { lazy, Suspense } from 'react'
-import { Home } from 'lucide-react'
 import { AuthProvider } from './contexts/AuthContext'
 import { ToastProvider } from './contexts/ToastContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import InstallPrompt from './components/InstallPrompt'
-import { useLocation, navigate } from './router'
+import { useLocation } from './router'
 import {
 	AchievementsPage,
 	DashboardPage,
@@ -380,15 +379,6 @@ export function App() {
 			<AuthProvider>
 				<ToastProvider>
 					<RoutedApp />
-					<button
-						className="global-home-shortcut"
-						onClick={() => navigate('/')}
-						title="العودة إلى الصفحة الرئيسية"
-						aria-label="العودة إلى الصفحة الرئيسية"
-					>
-						<Home size={18} strokeWidth={2.4} />
-						<span>الرئيسية</span>
-					</button>
 					<SectionActivityBar path={location.split('?')[0]} />
 					<MobileChrome />
 					<GlobalSearch />
