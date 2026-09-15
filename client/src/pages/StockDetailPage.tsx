@@ -49,7 +49,7 @@ type FullAnalysisResponse = {
 	}
 	stages?: string[]
 	completed_engines?: number
-	engine_statuses?: Array<{ index: number; status: string }>
+	engine_statuses?: Array<{ name: string; status: string }>
 }
 type FinancialStatement = {
 	filingDate?: Scalar

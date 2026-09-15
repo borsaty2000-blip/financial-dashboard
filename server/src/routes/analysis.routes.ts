@@ -121,19 +121,32 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 			forecastLSTM(series.prices, 7),
 			runBacktest('indicators', series.prices, 30, 7),
 		])
+		const engineNames = [
+			'indicators',
+			'elliott',
+			'gann',
+			'consensus',
+			'statistical',
+			'arima',
+			'lstm',
+			'backtest',
+		] as const
 		const value = <T>(index: number): T | null => {
 			const result = settled[index]
 			return result?.status === 'fulfilled' ? (result.value as T) : null
 		}
 		const engineStatuses = settled.map((result, index) => {
 			if (result.status === 'rejected')
-				return { index, status: 'unavailable' as const }
+				return { name: engineNames[index], status: 'unavailable' as const }
 			const value = result.value as Record<string, unknown> | null
 			if (value?.status === 'fallback')
-				return { index, status: 'educational_fallback' as const }
+				return {
+					name: engineNames[index],
+					status: 'educational_fallback' as const,
+				}
 			if (value?.available === false)
-				return { index, status: 'unavailable' as const }
-			return { index, status: 'computed' as const }
+				return { name: engineNames[index], status: 'unavailable' as const }
+			return { name: engineNames[index], status: 'computed' as const }
 		})
 		return response.json({
 			status: 'success',
