@@ -106,3 +106,35 @@ test('live directory enrichment only changes rows with a returned quote', async 
 	assert.equal((result[1] as Record<string, unknown>).price, null)
 	assert.equal((result[1] as Record<string, unknown>).available, false)
 })
+
+test('Egyptian ISIN resolves to the mapped provider symbol', async () => {
+	process.env.TWELVE_DATA_API_KEY = 'test-key'
+	const originalFetch = globalThis.fetch
+	globalThis.fetch = async (input) => {
+		const url = String(input)
+		if (url.includes('exchange=XCAI'))
+			return new Response(
+				JSON.stringify({
+					data: [
+						{
+							symbol: 'EGS38191C010',
+							name: 'Abu Qir Fertilizers and Chemical Industries',
+							currency: 'EGP',
+							exchange: 'EGX',
+						},
+					],
+				}),
+				{ status: 200, headers: { 'content-type': 'application/json' } },
+			)
+		throw new Error(`unexpected URL in resolver test: ${url}`)
+	}
+
+	try {
+		const { clearTwelveDirectoryCacheForTest, resolveEgyptSymbol } =
+			await import('./src/services/market/twelve-data.adapter.js')
+		clearTwelveDirectoryCacheForTest()
+		assert.equal(await resolveEgyptSymbol('EGS38191C010'), 'ABUK')
+	} finally {
+		globalThis.fetch = originalFetch
+	}
+})

@@ -138,6 +138,10 @@ export function StockDetailPage({
 	const [analysisQuality, setAnalysisQuality] =
 		useState<FullAnalysisResponse['data_quality']>()
 	const [completedEngines, setCompletedEngines] = useState(0)
+	const [analysisEngineStatuses, setAnalysisEngineStatuses] = useState<
+		FullAnalysisResponse['engine_statuses']
+	>([])
+	const [analysisError, setAnalysisError] = useState('')
 	const [fallbackEngines, setFallbackEngines] = useState(0)
 	const [fundamentals, setFundamentals] = useState<Fundamentals | null>(null)
 	const [insiderTrades, setInsiderTrades] = useState<InsiderTrade[]>([])
@@ -211,13 +215,19 @@ export function StockDetailPage({
 				setAnalysisStages(result.stages ?? [])
 				setAnalysisQuality(result.data_quality)
 				setCompletedEngines(result.completed_engines ?? 0)
+				setAnalysisEngineStatuses(result.engine_statuses ?? [])
 				setFallbackEngines(
 					(result.engine_statuses ?? []).filter(
 						(item) => item.status === 'educational_fallback',
 					).length,
 				)
 			})
-			.catch(() => undefined)
+			.catch(() => {
+				if (!cancelled)
+					setAnalysisError(
+						'تعذر إكمال بعض محركات التحليل حالياً؛ أعد المحاولة بعد قليل.',
+					)
+			})
 		void api<Fundamentals>(`/api/fundamentals/${normalized}`, {
 			suppressToast: true,
 		})
@@ -374,6 +384,10 @@ export function StockDetailPage({
 		lstmResult,
 		backtestResult,
 	].filter((result) => Object.keys(result).length > 0).length
+	const engineStatuses = analysisEngineStatuses ?? []
+	const displayedEnginesAvailable = engineStatuses.length
+		? engineStatuses.filter((item) => item.status !== 'unavailable').length
+		: analysisEnginesAvailable
 	const signalExplanation = consensusSignal
 		? `القراءة الحالية هي «${consensusSignalArabic}». هذا مقياس اتفاق بين محركات تعليمية، وليس احتمال نجاح أو أمر شراء/بيع.`
 		: 'لم يكتمل إجماع المحركات لهذا الرمز؛ ستظهر القراءة عند توفر بيانات صالحة.'
@@ -523,6 +537,12 @@ export function StockDetailPage({
 							{fallbackEngines > 0 &&
 								` يوجد ${fallbackEngines} محرك احتياطي تعليمي؛ لا تخلطه بنتيجة مزود تحليلي متخصص.`}
 						</div>
+						{analysisError && (
+							<div className="analysis-empty-panel" role="status">
+								<strong>التحليل الجزئي متاح</strong>
+								<p>{analysisError} ستظهر المحركات التي اكتملت فقط.</p>
+							</div>
+						)}
 						{analysisStages.length > 0 && (
 							<div className="analysis-pipeline" aria-label="مراحل التحليل">
 								{analysisStages.map((stage, index) => (
@@ -725,7 +745,7 @@ export function StockDetailPage({
 								</p>
 							</div>
 							<span className="eyebrow">
-								{analysisEnginesAvailable}/8 محركات
+								{displayedEnginesAvailable}/8 محركات
 							</span>
 						</div>
 						<div className="analysis-reading-grid">

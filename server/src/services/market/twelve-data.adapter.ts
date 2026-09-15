@@ -111,16 +111,17 @@ export function getSaudiCompanies(): Promise<TwelveCompany[]> {
 export async function resolveEgyptSymbol(input: string): Promise<string> {
 	const normalized = input.trim().toUpperCase()
 	if (!normalized) throw new Error('Symbol is required')
-	if (/^EGS[A-Z0-9]+$/u.test(normalized)) return normalized
+	if (!process.env.TWELVE_DATA_API_KEY?.trim()) return normalized
 	const companies = await getEgyptCompanies()
 	const direct = companies.find((company) => company.symbol === normalized)
+	if (direct?.displaySymbol) return direct.displaySymbol
 	if (direct) return direct.symbol
 	const aliases = egxAliases[normalized] ?? []
 	const match = companies.find((company) => {
 		const name = company.name.toLowerCase()
 		return aliases.some((alias) => name.includes(alias))
 	})
-	return match?.symbol ?? normalized
+	return match?.displaySymbol ?? match?.symbol ?? normalized
 }
 
 export function clearTwelveDirectoryCacheForTest() {

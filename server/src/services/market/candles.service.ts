@@ -115,30 +115,26 @@ export class CandlesService {
 		days = 250,
 	): Promise<CandlesResponse> {
 		const normalized = symbol.trim().toUpperCase()
-		const cacheKey = `candles:${market}:${normalized}:${interval}:${days}`
+		const resolved =
+			market === 'EGX' ? await resolveEgyptSymbol(normalized) : normalized
+		const cacheKey = `candles:${market}:${resolved}:${interval}:${days}`
 		const cached = cache.get(cacheKey)
 		if (cached && cached.expires > Date.now())
 			return { ...cached.value, freshness: 'cached' }
 		const sources: Array<() => Promise<CandlesResponse>> = [
-			() => this.fetchTwelveData(normalized, market, interval, days),
-			() => this.fetchSahmk(normalized, market, interval, days),
-			() => this.fetchPolygon(normalized, market, days),
-			() => this.fetchYahoo(normalized, market, interval, days),
-			() => this.fetchStooq(normalized, market, interval, days),
-			() => this.fetchFinnhub(normalized, market, days),
+			() => this.fetchTwelveData(resolved, market, interval, days),
+			() => this.fetchSahmk(resolved, market, interval, days),
+			() => this.fetchPolygon(resolved, market, days),
+			() => this.fetchYahoo(resolved, market, interval, days),
+			() => this.fetchStooq(resolved, market, interval, days),
+			() => this.fetchFinnhub(resolved, market, days),
 		]
 		for (const fetcher of sources) {
 			try {
 				const value = await fetcher()
 				if (value.candles.length) {
 					cache.set(cacheKey, { value, expires: Date.now() + CACHE_TTL })
-					void persist(
-						normalized,
-						market,
-						interval,
-						value.source,
-						value.candles,
-					)
+					void persist(resolved, market, interval, value.source, value.candles)
 					return value
 				}
 			} catch (error) {
@@ -150,7 +146,7 @@ export class CandlesService {
 		}
 		const stored = await prisma.marketCandle
 			.findMany({
-				where: { symbol: normalized, market, interval },
+				where: { symbol: resolved, market, interval },
 				orderBy: { date: 'desc' },
 				take: days,
 			})
@@ -165,7 +161,7 @@ export class CandlesService {
 				volume: item.volume,
 			}))
 			const value = response(
-				normalized,
+				resolved,
 				market,
 				interval,
 				candles,

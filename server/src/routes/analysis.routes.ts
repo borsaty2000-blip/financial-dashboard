@@ -63,6 +63,7 @@ async function resolveSeries(request: Request) {
 			: []
 	if (prices.length)
 		return {
+			symbol: request.params.symbol.toUpperCase(),
 			prices,
 			dates,
 			candles: [],
@@ -76,6 +77,7 @@ async function resolveSeries(request: Request) {
 		250,
 	)
 	return {
+		symbol: candles.symbol,
 		prices: candles.candles.map((candle) => candle.close),
 		dates: candles.candles.map((candle) => candle.date),
 		candles: candles.candles,
@@ -95,7 +97,7 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 				candles_count: series.count,
 			})
 
-		const symbol = request.params.symbol.toUpperCase()
+		const symbol = series.symbol
 		const candles: Candle[] = series.candles.map((candle) => ({
 			open: candle.open,
 			high: candle.high,
@@ -251,7 +253,7 @@ analysisRoutes.get('/:symbol/consensus', async (request, response) => {
 				tried_sources: ['Yahoo', 'Stooq', 'TwelveData', 'Finnhub'],
 			})
 		const result = await ConsensusService.calculate(
-			request.params.symbol.toUpperCase(),
+			series.symbol,
 			series.prices,
 			series.dates,
 		)
@@ -399,10 +401,7 @@ analysisRoutes.get('/:symbol/indicators', async (request, response) => {
 			timestamp: new Date().toISOString(),
 			freshness: 'cached',
 			delay_minutes: 15,
-			data: calculateIndicatorSnapshot(
-				request.params.symbol.toUpperCase(),
-				candles,
-			),
+			data: calculateIndicatorSnapshot(series.symbol, candles),
 		})
 	} catch (error) {
 		return response.status(502).json({
@@ -461,7 +460,7 @@ analysisRoutes.get('/:symbol/anomalies', async (request, response) => {
 			})
 		return response.json(
 			await anomaly(
-				request.params.symbol.toUpperCase(),
+				series.symbol,
 				series.prices,
 				series.candles.length
 					? series.candles.map((candle) => candle.volume)
