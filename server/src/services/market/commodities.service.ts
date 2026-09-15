@@ -19,6 +19,15 @@ type CommodityQuote = {
 	source: string
 }
 
+const yahooFallbackSymbols: Partial<Record<string, string>> = {
+	ALUMINUM: 'ALI=F',
+	IRON_ORE: 'TIO=F',
+	'XAU/USD': 'GC=F',
+	'XAG/USD': 'SI=F',
+	'XPT/USD': 'PL=F',
+	'XPD/USD': 'PA=F',
+}
+
 export const COMMODITIES: CommodityMapping[] = [
 	{
 		symbol: 'WTI',
@@ -241,6 +250,14 @@ export class CommoditiesService {
 		try {
 			return withMetadata(item, await fetchQuote(item))
 		} catch (error) {
+			const fallbackSymbol = yahooFallbackSymbols[item.symbol]
+			if (fallbackSymbol) {
+				try {
+					return withMetadata(item, await yahooQuote(fallbackSymbol))
+				} catch {
+					// Keep the primary-source error; never fabricate a quote.
+				}
+			}
 			return withMetadata(item, undefined, error)
 		}
 	}
