@@ -154,14 +154,16 @@ export function StockDetailPage({
 	const [fundamentals, setFundamentals] = useState<Fundamentals | null>(null)
 	const [insiderTrades, setInsiderTrades] = useState<InsiderTrade[]>([])
 	const [ownership, setOwnership] = useState<Ownership | null>(null)
+	const [resolvedCompanyName, setResolvedCompanyName] = useState<string>()
 	const [message, setMessage] = useState('')
 	const [loading, setLoading] = useState(true)
 	const [isPlaying, setIsPlaying] = useState(false)
 	const normalized = symbol.toUpperCase()
 	const displayCompanyName =
-		companyName && companyName.toUpperCase() !== normalized
+		resolvedCompanyName ??
+		(companyName && companyName.toUpperCase() !== normalized
 			? companyName
-			: undefined
+			: undefined)
 	const market =
 		marketOverride ?? (/^\d{4,5}$/u.test(normalized) ? 'TASI' : 'EGX')
 	const livePrice = useLivePrice(normalized, market)
@@ -241,6 +243,14 @@ export function StockDetailPage({
 			suppressToast: true,
 		})
 			.then(setFundamentals)
+			.catch(() => undefined)
+		void api<{ nameAr?: string }>(`/api/market/company/${normalized}`, {
+			suppressToast: true,
+		})
+			.then((result) => {
+				if (result.nameAr && result.nameAr.toUpperCase() !== normalized)
+					setResolvedCompanyName(result.nameAr)
+			})
 			.catch(() => undefined)
 		void api<{ data: InsiderTrade[] }>(`/api/insider-trades/${normalized}`, {
 			suppressToast: true,
@@ -353,6 +363,16 @@ export function StockDetailPage({
 		'current_wave',
 		'direction',
 	])
+	const elliottDirectionArabic =
+		elliottDirection === 'up'
+			? 'صاعد'
+			: elliottDirection === 'down'
+				? 'هابط'
+				: elliottDirection === 'sideways'
+					? 'جانبي'
+					: elliottDirection === 'unknown'
+						? 'غير واضح'
+						: 'غير متاح'
 	const gannSupport = numberValue(gannResult, ['square_of_nine', 'support'])
 	const gannResistance = numberValue(gannResult, [
 		'square_of_nine',
@@ -684,7 +704,7 @@ export function StockDetailPage({
 							</div>
 							<div className="integrated-analysis-card">
 								<span>Elliott Wave</span>
-								<strong>{elliottDirection ?? 'غير متاح'}</strong>
+								<strong>{elliottDirectionArabic}</strong>
 								<small>
 									الموجة{' '}
 									{stringValue(elliottResult, ['current_wave', 'wave']) ?? '—'}{' '}

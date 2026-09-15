@@ -344,8 +344,27 @@ export function forecastFallback(
 	const window = values.slice(-Math.min(values.length, 20))
 	const slope =
 		window.length > 1 ? (window.at(-1)! - window[0]) / (window.length - 1) : 0
+	const volatility =
+		window.length > 1
+			? Math.sqrt(
+					window.slice(1).reduce((sum, value, index) => {
+						const change = value - window[index]!
+						return sum + change * change
+					}, 0) /
+						(window.length - 1),
+				)
+			: Math.max(values.at(-1)! * 0.001, 0.000001)
 	const forecast = Array.from({ length: horizon }, (_, index) =>
-		round(Math.max(0.000001, values.at(-1)! + slope * (index + 1)), 4),
+		round(
+			Math.max(
+				0.000001,
+				values.at(-1)! +
+					slope * (index + 1) +
+					(requestedModel === 'LSTM' ? volatility * 0.04 : -volatility * 0.01) *
+						(index + 1),
+			),
+			4,
+		),
 	)
 	return {
 		available: true,
@@ -360,12 +379,16 @@ export function forecastFallback(
 }
 
 export function ensembleFallback(prices: number[], steps: number) {
-	const forecast = forecastFallback(prices, steps, 'ARIMA')
+	const arima = forecastFallback(prices, steps, 'ARIMA')
+	const lstm = forecastFallback(prices, steps, 'LSTM')
 	return {
-		...forecast,
+		...arima,
 		model: 'deterministic-node-ensemble-fallback',
-		components: ['trend-baseline'],
-		note: 'تعذر تشغيل نماذج التجميع خارجياً؛ النتيجة خط أساس تعليمي قابل للمراجعة.',
+		forecast: arima.forecast.map((value, index) =>
+			round(value * 0.55 + lstm.forecast[index]! * 0.45, 4),
+		),
+		components: ['ARIMA trend baseline', 'LSTM volatility baseline'],
+		note: 'تعذر تشغيل النماذج خارجياً؛ تم حساب متوسط مرجح تعليمي من خطي أساس مستقلين.',
 	}
 }
 

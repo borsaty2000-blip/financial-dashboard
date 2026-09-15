@@ -13,10 +13,61 @@ import {
 	CandlesService,
 	type CandleMarket,
 } from '../services/market/candles.service.js'
-import { getEgyptCompanies } from '../services/market/twelve-data.adapter.js'
+import {
+	getEgyptCompanies,
+	getSaudiCompanies,
+} from '../services/market/twelve-data.adapter.js'
+import { FundamentalsService } from '../services/market/fundamentals.service.js'
 import { live, unavailable } from '../services/market/market.types.js'
 
 export const marketRoutes = Router()
+
+const arabicCompanyNames: Record<string, string> = {
+	'1010': 'بنك الرياض',
+	'1120': 'مصرف الراجحي',
+	'2010': 'سابك',
+	'2222': 'أرامكو السعودية',
+	COMI: 'البنك التجاري الدولي',
+	ETEL: 'المصرية للاتصالات',
+	SWDY: 'السويدي إليكتريك',
+	TMGH: 'مجموعة طلعت مصطفى',
+}
+
+marketRoutes.get('/company/:symbol', async (request, response) => {
+	const symbol = request.params.symbol.toUpperCase()
+	const market = /^\d{4,5}$/u.test(symbol) ? 'TASI' : 'EGX'
+	try {
+		const companies =
+			market === 'TASI' ? await getSaudiCompanies() : await getEgyptCompanies()
+		const match = companies.find((company) => company.symbol === symbol)
+		return response.json({
+			symbol,
+			nameAr: arabicCompanyNames[symbol] ?? match?.name ?? symbol,
+			name: match?.name ?? symbol,
+			market,
+		})
+	} catch {
+		return response.json({
+			symbol,
+			nameAr: arabicCompanyNames[symbol] ?? symbol,
+			name: symbol,
+			market,
+		})
+	}
+})
+
+marketRoutes.get('/fundamentals/:symbol', async (request, response) => {
+	try {
+		return response.json(
+			await FundamentalsService.getFundamentals(request.params.symbol),
+		)
+	} catch {
+		return response.status(502).json({
+			available: false,
+			error: 'Fundamentals unavailable',
+		})
+	}
+})
 
 marketRoutes.get('/quote/:symbol', async (request, response) => {
 	const market: CandleMarket =

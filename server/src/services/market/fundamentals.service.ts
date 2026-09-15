@@ -26,9 +26,9 @@ export class FundamentalsService {
 		const cached = cache.get(normalized)
 		if (cached && cached.expires > Date.now()) return cached.value
 		const sources = [
+			() => this.fromTwelveData(normalized),
 			() => this.fromFinnhub(normalized),
 			() => this.fromSahmk(normalized),
-			() => this.fromTwelveData(normalized),
 		]
 		for (const source of sources) {
 			try {
@@ -131,27 +131,57 @@ export class FundamentalsService {
 			keyRatios: fundamentals ?? {},
 			dividendHistory: data?.dividends ?? [],
 			earningsHistory: data?.earnings ?? [],
-				source: 'SAHMK',
+			source: 'SAHMK',
 			available: Boolean(fundamentals && Object.keys(fundamentals).length),
 		}
 	}
 	private static async fromTwelveData(symbol: string): Promise<Fundamentals> {
 		const key = process.env.TWELVE_DATA_API_KEY
 		if (!key) throw new Error('TWELVE_DATA_API_KEY is not configured')
+		const exchange = /^\d{4,5}$/u.test(symbol) ? 'SAU' : 'EGX'
 		const data = await json(
-			`https://api.twelvedata.com/statistics?symbol=${encodeURIComponent(symbol)}&apikey=${encodeURIComponent(key)}`,
+			`https://api.twelvedata.com/statistics?symbol=${encodeURIComponent(symbol)}&exchange=${exchange}&apikey=${encodeURIComponent(key)}`,
 		)
 		const stats = data?.statistics ?? data
+		const valuations = stats?.valuations_metrics ?? {}
+		const financials = stats?.financials ?? {}
+		const incomeStatement = financials?.income_statement ?? {}
+		const dividends = stats?.dividends_and_splits ?? stats?.dividends ?? {}
+		const first = (...values: unknown[]) =>
+			values.find(
+				(value) => value !== undefined && value !== null && value !== '',
+			)
+		const keyRatios = {
+			...valuations,
+			peRatio: first(valuations.pe_ratio, valuations.peRatio),
+			marketCap: first(valuations.market_capitalization, valuations.market_cap),
+			eps: first(
+				incomeStatement.eps,
+				incomeStatement.basic_eps,
+				stats?.financials?.income_statement?.eps,
+			),
+			dividendYield: first(
+				dividends.forward_annual_dividend_yield,
+				dividends.dividend_yield,
+			),
+		}
 		return {
 			symbol,
-			incomeStatement: stats?.financials?.income_statement ?? [],
+			incomeStatement: Array.isArray(incomeStatement)
+				? incomeStatement
+				: [incomeStatement],
 			balanceSheet: stats?.financials?.balance_sheet ?? [],
 			cashFlow: stats?.financials?.cash_flow ?? [],
-			keyRatios: stats?.valuations_metrics ?? stats?.statistics ?? {},
+			keyRatios,
 			dividendHistory: stats?.dividends ?? [],
 			earningsHistory: stats?.earnings ?? [],
 			source: 'Twelve Data',
-			available: Boolean(stats && Object.keys(stats).length),
+			available: Boolean(
+				stats &&
+				Object.values(keyRatios).some(
+					(value) => value !== undefined && value !== null && value !== '',
+				),
+			),
 		}
 	}
 }
