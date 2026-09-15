@@ -79,6 +79,7 @@ import {
 } from './pages/MarketLeadershipPages'
 import { AnalysisOverviewPage, PublicHomePage } from './pages/PublicPages'
 import { HeatmapPage } from './pages/HeatmapPage'
+import { DecisionReviewPage } from './pages/DecisionReviewPage'
 
 const FinancialReportSection = lazy(
 	() => import('@client/modules/financial-report/ui/FinancialReportSection'),
@@ -137,6 +138,7 @@ function RoutedApp() {
 		return <HelpPage category={path.slice('/help/'.length)} />
 	if (path === '/backtest') return <BacktestPage />
 	if (path === '/analysis/consensus') return <BacktestPage />
+	if (path === '/analysis/decisions') return <DecisionReviewPage />
 	if (path === '/analysis/elliott')
 		return <AnalysisOverviewPage engine="elliott" />
 	if (path === '/analysis/gann') return <AnalysisOverviewPage engine="gann" />

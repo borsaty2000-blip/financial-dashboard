@@ -584,35 +584,6 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 					<Home size={17} strokeWidth={2.5} aria-hidden="true" />
 					<span>الرئيسية</span>
 				</button>
-				<button
-					className="public-quick-nav"
-					onClick={() => go('/analysis/elliott')}
-					aria-label="مركز التحليل المتقدم"
-					title="مركز التحليل المتقدم"
-				>
-					<BarChart3 size={17} strokeWidth={2.4} aria-hidden="true" />
-					<span>مركز التحليل</span>
-				</button>
-				<button
-					className="public-quick-nav"
-					onClick={() => go('/news')}
-					aria-label="أخبار السوق"
-					title="أخبار السوق"
-				>
-					<Newspaper size={17} strokeWidth={2.4} aria-hidden="true" />
-					<span>الأخبار</span>
-				</button>
-				<button
-					className="public-quick-nav"
-					onClick={() =>
-						window.dispatchEvent(new CustomEvent('borsaty-open-search'))
-					}
-					aria-label="البحث عن سهم"
-					title="البحث عن سهم"
-				>
-					<Search size={17} strokeWidth={2.4} aria-hidden="true" />
-					<span>بحث</span>
-				</button>
 				<HeaderMenu
 					id="markets"
 					label="الأسواق"
@@ -659,6 +630,12 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 								path="/markets/commodities"
 								label="الذهب والفضة"
 								description="أسعار السلع المتاحة"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/markets/commodities"
+								label="السلع"
+								description="نفط وغاز ومعادن"
 								onSelect={go}
 							/>
 							<MenuLink
@@ -747,6 +724,18 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 								description="قراءة فنية تعليمية"
 								onSelect={go}
 							/>
+							<MenuLink
+								path="/analysis/consensus"
+								label="الإجماع"
+								description="دمج محركات التحليل"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/analysis/decisions"
+								label="قرارات قابلة للمراجعة"
+								description="من التحليل إلى الاختبار"
+								onSelect={go}
+							/>
 						</div>
 					</div>
 				</HeaderMenu>
@@ -822,6 +811,18 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 								description="أحداث السوق"
 								onSelect={go}
 							/>
+							<MenuLink
+								path="/screener"
+								label="ماسح الأسهم"
+								description="فلترة وبحث متقدم"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/compare"
+								label="المقارنة"
+								description="قارن الأسهم والأسواق"
+								onSelect={go}
+							/>
 						</div>
 						<div className="public-menu-intro">
 							<span className="public-menu-eyebrow">مساحة العمل</span>
@@ -886,11 +887,33 @@ function PublicHeader({ live, news }: PublicHeaderProps) {
 								description="محاكاة تعليمية"
 								onSelect={go}
 							/>
+							<MenuLink
+								path="/blog"
+								label="المدونة"
+								description="مقالات السوق والتحليل"
+								onSelect={go}
+							/>
+							<MenuLink
+								path="/achievements"
+								label="الإنجازات"
+								description="تقدمك التعليمي"
+								onSelect={go}
+							/>
 						</div>
 					</div>
 				</HeaderMenu>
 			</nav>
 			<div className="borsaty-public-actions">
+				<button
+					className="public-header-icon-action"
+					onClick={() =>
+						window.dispatchEvent(new CustomEvent('borsaty-open-search'))
+					}
+					aria-label="البحث عن سهم"
+					title="البحث عن سهم"
+				>
+					<Search size={17} strokeWidth={2.4} aria-hidden="true" />
+				</button>
 				<LanguageSwitcher className="public-header-language" />
 				<button
 					className="public-header-icon-action"
