@@ -6836,3 +6836,120 @@ body:has(.borsaty-public-page) .global-language-switcher {
 	color: #1675a5;
 	direction: ltr;
 }
+
+/* Compact market-first landing layout: the stock directories follow the hero immediately. */
+.borsaty-hero {
+	min-height: 390px;
+	padding-block: 44px 34px;
+}
+
+.borsaty-hero h1 {
+	max-width: 680px;
+	font-size: clamp(32px, 4.2vw, 58px);
+}
+
+.borsaty-market-switcher {
+	display: grid;
+	grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
+	gap: 24px;
+	align-items: center;
+	max-width: 1240px;
+	margin: 0 auto;
+	padding: 20px 24px 8px;
+}
+
+.borsaty-market-switcher__intro h2 {
+	margin: 5px 0 4px;
+	color: #0b263b;
+	font-size: clamp(24px, 3vw, 36px);
+}
+
+.borsaty-market-switcher__intro p {
+	margin: 0;
+	color: #607583;
+	font-size: 13px;
+}
+
+.borsaty-market-switcher__tabs {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 10px;
+}
+
+.borsaty-market-switcher__tabs button {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 3px 10px;
+	align-items: center;
+	min-height: 76px;
+	padding: 14px 16px;
+	border: 1px solid #d9e6ed;
+	border-radius: 14px;
+	background: #fff;
+	color: #0b263b;
+	text-align: start;
+	cursor: pointer;
+	transition:
+		border-color 160ms ease,
+		box-shadow 160ms ease,
+		transform 160ms ease;
+}
+
+.borsaty-market-switcher__tabs button:hover,
+.borsaty-market-switcher__tabs button:focus-visible,
+.borsaty-market-switcher__tabs button.is-active {
+	border-color: #0875aa;
+	box-shadow: 0 10px 24px rgb(8 117 170 / 14%);
+	outline: none;
+	transform: translateY(-2px);
+}
+
+.borsaty-market-switcher__tabs svg,
+.borsaty-market-switcher__tabs button > span {
+	grid-row: span 2;
+	width: 30px;
+	height: 30px;
+	padding: 6px;
+	border-radius: 9px;
+	background: #e7f4fa;
+	color: #0875aa;
+	font:
+		800 13px 'JetBrains Mono',
+		monospace;
+	text-align: center;
+}
+
+.borsaty-market-switcher__tabs strong {
+	font-size: 14px;
+}
+
+.borsaty-market-switcher__tabs small {
+	color: #6d808c;
+	font:
+		11px 'JetBrains Mono',
+		monospace;
+	direction: ltr;
+	text-align: start;
+}
+
+@media (max-width: 800px) {
+	.borsaty-hero {
+		min-height: auto;
+		padding-block: 36px 26px;
+	}
+
+	.borsaty-market-switcher {
+		grid-template-columns: 1fr;
+		padding-inline: 17px;
+	}
+}
+
+@media (max-width: 640px) {
+	.borsaty-hero h1 {
+		font-size: clamp(30px, 10vw, 46px);
+	}
+
+	.borsaty-market-switcher__tabs {
+		grid-template-columns: 1fr;
+	}
+}

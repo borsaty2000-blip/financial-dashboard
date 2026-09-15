@@ -167,13 +167,22 @@ export function StockDetailPage({
 				window.clearTimeout(timeout)
 				if (!cancelled) setLoading(false)
 			})
-		void api<FeatureResponse>(`/api/analysis/${normalized}/ensemble?steps=7`)
+		void api<FeatureResponse>(
+			`/api/analysis/${normalized}/ensemble?market=${market}&steps=7`,
+			{ suppressToast: true },
+		)
 			.then(setEnsembleData)
 			.catch(() => undefined)
-		void api<FeatureResponse>(`/api/analysis/${normalized}/sentiment`)
+		void api<FeatureResponse>(
+			`/api/analysis/${normalized}/sentiment?market=${market}`,
+			{ suppressToast: true },
+		)
 			.then(setSentimentData)
 			.catch(() => undefined)
-		void api<FeatureResponse>(`/api/analysis/${normalized}/anomalies`)
+		void api<FeatureResponse>(
+			`/api/analysis/${normalized}/anomalies?market=${market}`,
+			{ suppressToast: true },
+		)
 			.then(setAnomalyData)
 			.catch(() => undefined)
 		void api<FullAnalysisResponse>(
@@ -202,13 +211,19 @@ export function StockDetailPage({
 				)
 			})
 			.catch(() => undefined)
-		void api<Fundamentals>(`/api/fundamentals/${normalized}`)
+		void api<Fundamentals>(`/api/fundamentals/${normalized}`, {
+			suppressToast: true,
+		})
 			.then(setFundamentals)
 			.catch(() => undefined)
-		void api<{ data: InsiderTrade[] }>(`/api/insider-trades/${normalized}`)
+		void api<{ data: InsiderTrade[] }>(`/api/insider-trades/${normalized}`, {
+			suppressToast: true,
+		})
 			.then((result) => setInsiderTrades(result.data))
 			.catch(() => undefined)
-		void api<Ownership>(`/api/ownership/${normalized}`)
+		void api<Ownership>(`/api/ownership/${normalized}`, {
+			suppressToast: true,
+		})
 			.then(setOwnership)
 			.catch(() => undefined)
 		return () => {

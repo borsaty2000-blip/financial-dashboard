@@ -1192,6 +1192,56 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 					</div>
 				</section>
 
+				<section className="borsaty-market-switcher" aria-label="اختيار السوق">
+					<div className="borsaty-market-switcher__intro">
+						<span className="borsaty-kicker">دليل الأسواق</span>
+						<h2>الأسهم العربية</h2>
+						<p>اختر السوق لعرض الشركات والبيانات المتاحة فعلياً.</p>
+					</div>
+					<div className="borsaty-market-switcher__tabs">
+						<button
+							className={focus === 'EGX' ? 'is-active' : ''}
+							type="button"
+							onClick={() => navigate('/markets/egx')}
+						>
+							<BarChart3 aria-hidden="true" />
+							<strong>الأسهم المصرية</strong>
+							<small>EGX · 265 شركة</small>
+						</button>
+						<button
+							className={focus === 'TASI' ? 'is-active' : ''}
+							type="button"
+							onClick={() => navigate('/markets/tasi')}
+						>
+							<ChartNoAxesCombined aria-hidden="true" />
+							<strong>الأسهم السعودية</strong>
+							<small>TASI · 531 شركة</small>
+						</button>
+						<button
+							className="is-commodity"
+							type="button"
+							onClick={() => navigate('/markets/commodities')}
+						>
+							<span aria-hidden="true">Au</span>
+							<strong>الذهب والفضة</strong>
+							<small>أسواق السلع</small>
+						</button>
+					</div>
+				</section>
+
+				<MarketDirectory
+					title="كل أسهم البورصة المصرية"
+					market="EGX"
+					companies={egxCompanies}
+					prices={moverPrices}
+				/>
+				<MarketDirectory
+					title="كل أسهم السوق السعودي"
+					market="TASI"
+					companies={tasiCompanies}
+					prices={new Map()}
+				/>
+
 				<section className="borsaty-ticker" aria-label="حالة الأسواق">
 					{cards.map((card) => (
 						<span key={card.label}>
@@ -1296,19 +1346,6 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 						</div>
 					)}
 				</section>
-
-				<MarketDirectory
-					title="كل أسهم البورصة المصرية"
-					market="EGX"
-					companies={egxCompanies}
-					prices={moverPrices}
-				/>
-				<MarketDirectory
-					title="كل أسهم السوق السعودي"
-					market="TASI"
-					companies={tasiCompanies}
-					prices={new Map()}
-				/>
 
 				<section className="borsaty-why">
 					<div>
