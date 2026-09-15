@@ -299,6 +299,7 @@ analysisRoutes.get('/:symbol/brilliant-summary', async (request, response) => {
 				: null
 		const first = series.prices[0] ?? null
 		const last = series.prices.at(-1) ?? null
+		const lastCandle = series.candles.at(-1)
 		const summary = buildSmartSummary({
 			symbol: series.symbol,
 			price: Number.isFinite(last) ? last : null,
@@ -321,6 +322,12 @@ analysisRoutes.get('/:symbol/brilliant-summary', async (request, response) => {
 			gannSupport: Number(gannSquare?.support) || null,
 			gannResistance: Number(gannSquare?.resistance) || null,
 			volatility: Number(statistical?.volatility) || null,
+			candleSignal:
+				lastCandle && lastCandle.close !== lastCandle.open
+					? lastCandle.close > lastCandle.open
+						? 'bullish'
+						: 'bearish'
+					: null,
 		})
 		return response.json({
 			status: 'success',

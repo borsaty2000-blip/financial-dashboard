@@ -12,6 +12,7 @@ export type SmartSummaryInput = {
 	gannSupport?: number | null
 	gannResistance?: number | null
 	volatility?: number | null
+	candleSignal?: 'bullish' | 'bearish' | null
 	arima?: number | null
 	lstm?: number | null
 }
@@ -122,6 +123,17 @@ export function buildSmartSummary(input: SmartSummaryInput) {
 			weight: bullish ? 1 : -1,
 		})
 	}
+	if (input.candleSignal) {
+		const bullish = input.candleSignal === 'bullish'
+		points.push({
+			title: 'الشمعة الأخيرة',
+			detail: bullish
+				? 'إغلاق أعلى من الافتتاح — إشارة صاعدة'
+				: 'إغلاق أدنى من الافتتاح — إشارة هابطة',
+			sentiment: bullish ? 'positive' : 'negative',
+			weight: 1,
+		})
+	}
 	if (finite(input.volatility)) {
 		const high = input.volatility! >= 0.35
 		points.push({
@@ -216,6 +228,7 @@ export function buildSmartSummary(input: SmartSummaryInput) {
 			wave: input.wave ?? null,
 			macd: input.macd ?? null,
 			volatility: input.volatility ?? null,
+			candleSignal: input.candleSignal ?? null,
 		},
 		disclaimer:
 			'ملخص تحليلي تعليمي احتمالي، وليس توصية شراء أو بيع أو ضماناً للنتيجة.',

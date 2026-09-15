@@ -3,11 +3,7 @@ import { api } from '../lib/api'
 import { useLivePrice } from '../hooks/useLivePrice'
 import ProfessionalStockChart from '../components/ProfessionalStockChart'
 import { BrilliantSummary } from '../components/Analysis/BrilliantSummary'
-import {
-	formatEnglishNumber,
-	formatEnglishPercent,
-	formatEnglishScalar,
-} from '../lib/format'
+import { formatEnglishNumber, formatEnglishPercent } from '../lib/format'
 
 type Candle = {
 	date: string
@@ -17,128 +13,17 @@ type Candle = {
 	close: number
 	volume: number
 }
-type Scalar = string | number | null | undefined
+
 type Candles = {
 	symbol: string
 	candles: Candle[]
 	count: number
 	freshness?: 'live' | 'delayed' | 'cached'
 }
+
 type Watchlist = { id: string; items: { symbol: string }[] }
-type FeaturePayload = {
-	forecast?: number[]
-	confidence?: number
-	articleCount?: number
-	distribution?: Record<string, number>
-	latest?: boolean
-	anomalyCount?: number
-}
-type FeatureResponse = FeaturePayload & { data?: FeaturePayload }
-type AnalysisResponse = {
-	data?: Record<string, unknown>
-	[key: string]: unknown
-}
-type MarketMood = {
-	available?: boolean
-	score?: number
-	label?: string
-	positive?: number
-	negative?: number
-}
-type IntegratedAnalysis = {
-	indicators: AnalysisResponse | null
-	elliott: AnalysisResponse | null
-	gann: AnalysisResponse | null
-	candlestick: AnalysisResponse | null
-	consensus: AnalysisResponse | null
-	statistical: AnalysisResponse | null
-	arima: AnalysisResponse | null
-	lstm: AnalysisResponse | null
-	backtest: AnalysisResponse | null
-}
-type FullAnalysisResponse = {
-	data?: Partial<IntegratedAnalysis> & { marketMood?: MarketMood }
-	data_quality?: {
-		status?: string
-		price_freshness?: string
-		decision?: string
-		message?: string
-	}
-	stages?: string[]
-	completed_engines?: number
-	engine_statuses?: Array<{ name: string; status: string }>
-}
-type FinancialStatement = {
-	filingDate?: Scalar
-	period?: Scalar
-	revenue?: Scalar
-	totalRevenue?: Scalar
-	netIncome?: Scalar
-	netIncomeLoss?: Scalar
-}
-type Fundamentals = {
-	keyRatios?: Record<string, Scalar>
-	incomeStatement?: FinancialStatement[]
-	available?: boolean
-}
-type InsiderTrade = {
-	id: string
-	insiderName: string
-	insiderRole: string
-	transactionType: 'BUY' | 'SELL'
-	shares: number
-}
-type Ownership = {
-	shareholders?: Array<{ name: string; percentage: number | null }>
-	available?: boolean
-}
-type NewsItem = {
-	id: string
-	title: string
-	description?: string
-	summary?: string
-	source: string
-	publishedAt: string
-	url: string
-}
-type RelatedStock = {
-	symbol: string
-	nameAr: string
-	market: string
-	changePercent?: number | null
-}
 
-const analysisPayload = (response: AnalysisResponse | null) => {
-	if (response?.data && typeof response.data === 'object') return response.data
-	return response ?? {}
-}
-
-const nestedValue = (value: unknown, path: string[]) => {
-	let current = value
-	for (const key of path) {
-		if (!current || typeof current !== 'object') return undefined
-		current = (current as Record<string, unknown>)[key]
-	}
-	return current
-}
-
-const numberValue = (value: unknown, path: string[] = []) => {
-	const candidate = nestedValue(value, path)
-	if (typeof candidate === 'number' && Number.isFinite(candidate))
-		return candidate
-	if (typeof candidate === 'string' && candidate.trim() !== '') {
-		const parsed = Number(candidate)
-		if (Number.isFinite(parsed)) return parsed
-	}
-	return undefined
-}
-
-const stringValue = (value: unknown, path: string[] = []) => {
-	const candidate = nestedValue(value, path)
-	return typeof candidate === 'string' && candidate.trim()
-		? candidate
-		: undefined
-}
+type CompanyResponse = { nameAr?: string }
 
 export function StockDetailPage({
 	symbol,
@@ -149,51 +34,14 @@ export function StockDetailPage({
 	companyName?: string
 	market?: 'EGX' | 'TASI'
 }) {
+	const normalized = symbol.toUpperCase()
+	const market =
+		marketOverride ?? (/^\d{4,5}$/u.test(normalized) ? 'TASI' : 'EGX')
 	const [data, setData] = useState<Candles | null>(null)
-	const [ensembleData, setEnsembleData] = useState<FeatureResponse | null>(null)
-	const [sentimentData, setSentimentData] = useState<FeatureResponse | null>(
-		null,
-	)
-	const [anomalyData, setAnomalyData] = useState<FeatureResponse | null>(null)
-	const [integratedAnalysis, setIntegratedAnalysis] =
-		useState<IntegratedAnalysis>({
-			indicators: null,
-			elliott: null,
-			gann: null,
-			candlestick: null,
-			consensus: null,
-			statistical: null,
-			arima: null,
-			lstm: null,
-			backtest: null,
-		})
-	const [analysisStages, setAnalysisStages] = useState<string[]>([])
-	const [analysisQuality, setAnalysisQuality] =
-		useState<FullAnalysisResponse['data_quality']>()
-	const [completedEngines, setCompletedEngines] = useState(0)
-	const [analysisEngineStatuses, setAnalysisEngineStatuses] = useState<
-		FullAnalysisResponse['engine_statuses']
-	>([])
-	const [analysisError, setAnalysisError] = useState('')
-	const [marketMood, setMarketMood] = useState<MarketMood | undefined>()
-	const [fallbackEngines, setFallbackEngines] = useState(0)
-	const [fundamentals, setFundamentals] = useState<Fundamentals | null>(null)
-	const [insiderTrades, setInsiderTrades] = useState<InsiderTrade[]>([])
-	const [ownership, setOwnership] = useState<Ownership | null>(null)
 	const [resolvedCompanyName, setResolvedCompanyName] = useState<string>()
-	const [stockNews, setStockNews] = useState<NewsItem[]>([])
-	const [relatedStocks, setRelatedStocks] = useState<RelatedStock[]>([])
 	const [message, setMessage] = useState('')
 	const [loading, setLoading] = useState(true)
 	const [isPlaying, setIsPlaying] = useState(false)
-	const normalized = symbol.toUpperCase()
-	const displayCompanyName =
-		resolvedCompanyName ??
-		(companyName && companyName.toUpperCase() !== normalized
-			? companyName
-			: undefined)
-	const market =
-		marketOverride ?? (/^\d{4,5}$/u.test(normalized) ? 'TASI' : 'EGX')
 	const livePrice = useLivePrice(normalized, market)
 
 	useEffect(() => {
@@ -201,10 +49,8 @@ export function StockDetailPage({
 		const timeout = window.setTimeout(() => controller.abort(), 12_000)
 		let cancelled = false
 		void api<Candles>(
-			`/api/market/candles/${normalized}?market=${market}&days=120`,
-			{
-				signal: controller.signal,
-			},
+			`/api/market/candles/${normalized}?market=${market}&days=250`,
+			{ signal: controller.signal },
 		)
 			.then((result) => {
 				if (!cancelled) setData(result)
@@ -216,90 +62,17 @@ export function StockDetailPage({
 				window.clearTimeout(timeout)
 				if (!cancelled) setLoading(false)
 			})
-		void api<FeatureResponse>(
-			`/api/analysis/${normalized}/ensemble?market=${market}&steps=7`,
-			{ suppressToast: true },
-		)
-			.then(setEnsembleData)
-			.catch(() => undefined)
-		void api<FeatureResponse>(
-			`/api/analysis/${normalized}/sentiment?market=${market}`,
-			{ suppressToast: true },
-		)
-			.then(setSentimentData)
-			.catch(() => undefined)
-		void api<FeatureResponse>(
-			`/api/analysis/${normalized}/anomalies?market=${market}`,
-			{ suppressToast: true },
-		)
-			.then(setAnomalyData)
-			.catch(() => undefined)
-		void api<FullAnalysisResponse>(
-			`/api/analysis/${normalized}/full?market=${market}`,
-			{ suppressToast: true },
-		)
+		void api<CompanyResponse>(`/api/market/company/${normalized}`, {
+			suppressToast: true,
+		})
 			.then((result) => {
-				if (cancelled) return
-				setIntegratedAnalysis({
-					indicators: result.data?.indicators ?? null,
-					elliott: result.data?.elliott ?? null,
-					gann: result.data?.gann ?? null,
-					candlestick: result.data?.candlestick ?? null,
-					consensus: result.data?.consensus ?? null,
-					statistical: result.data?.statistical ?? null,
-					arima: result.data?.arima ?? null,
-					lstm: result.data?.lstm ?? null,
-					backtest: result.data?.backtest ?? null,
-				})
-				setAnalysisStages(result.stages ?? [])
-				setAnalysisQuality(result.data_quality)
-				setCompletedEngines(result.completed_engines ?? 0)
-				setAnalysisEngineStatuses(result.engine_statuses ?? [])
-				setMarketMood(result.data?.marketMood)
-				setFallbackEngines(
-					(result.engine_statuses ?? []).filter(
-						(item) => item.status === 'educational_fallback',
-					).length,
+				if (
+					!cancelled &&
+					result.nameAr &&
+					result.nameAr.toUpperCase() !== normalized
 				)
-			})
-			.catch(() => {
-				if (!cancelled)
-					setAnalysisError(
-						'تعذر إكمال بعض محركات التحليل حالياً؛ أعد المحاولة بعد قليل.',
-					)
-			})
-		void api<Fundamentals>(`/api/fundamentals/${normalized}`, {
-			suppressToast: true,
-		})
-			.then(setFundamentals)
-			.catch(() => undefined)
-		void api<{ nameAr?: string }>(`/api/market/company/${normalized}`, {
-			suppressToast: true,
-		})
-			.then((result) => {
-				if (result.nameAr && result.nameAr.toUpperCase() !== normalized)
 					setResolvedCompanyName(result.nameAr)
 			})
-			.catch(() => undefined)
-		void api<{ data: InsiderTrade[] }>(`/api/insider-trades/${normalized}`, {
-			suppressToast: true,
-		})
-			.then((result) => setInsiderTrades(result.data))
-			.catch(() => undefined)
-		void api<Ownership>(`/api/ownership/${normalized}`, {
-			suppressToast: true,
-		})
-			.then(setOwnership)
-			.catch(() => undefined)
-		void api<{ data?: NewsItem[] }>(`/api/news/${normalized}`, {
-			suppressToast: true,
-		})
-			.then((result) => setStockNews(result.data ?? []))
-			.catch(() => undefined)
-		void api<{ data?: RelatedStock[] }>(`/api/stock/${normalized}/related`, {
-			suppressToast: true,
-		})
-			.then((result) => setRelatedStocks(result.data ?? []))
 			.catch(() => undefined)
 		return () => {
 			cancelled = true
@@ -315,17 +88,17 @@ export function StockDetailPage({
 		return {
 			last,
 			changePercent:
-				last && previous
+				last && previous && previous.close !== 0
 					? ((last.close - previous.close) / previous.close) * 100
 					: null,
-			high: candles.length
-				? Math.max(...candles.map((item) => item.close))
-				: null,
-			low: candles.length
-				? Math.min(...candles.map((item) => item.close))
-				: null,
 		}
 	}, [data])
+
+	const displayCompanyName =
+		resolvedCompanyName ??
+		(companyName && companyName.toUpperCase() !== normalized
+			? companyName
+			: undefined)
 
 	const addToWatchlist = async () => {
 		try {
@@ -345,6 +118,7 @@ export function StockDetailPage({
 			setMessage('سجّل الدخول لإضافة السهم إلى قائمتك')
 		}
 	}
+
 	const listen = async () => {
 		const text = `السعر الحالي لسهم ${normalized} هو ${formatEnglishNumber(stats.last?.close)}. التغير ${formatEnglishPercent(stats.changePercent)}.`
 		try {
@@ -362,13 +136,14 @@ export function StockDetailPage({
 				return
 			}
 		} catch {
-			/* use browser speech fallback */
+			/* Browser speech is the intentional fallback. */
 		}
 		if ('speechSynthesis' in window) {
 			window.speechSynthesis.cancel()
 			window.speechSynthesis.speak(new SpeechSynthesisUtterance(text))
 		}
 	}
+
 	const shareStock = async () => {
 		const url = `${window.location.origin}/stock/${normalized}`
 		try {
@@ -379,191 +154,58 @@ export function StockDetailPage({
 		}
 	}
 
-	const ai = ensembleData?.data ?? ensembleData
-	const mood = sentimentData?.data ?? sentimentData
-	const anomalyResult = anomalyData?.data ?? anomalyData
-	const fundamentalMetrics: Array<[string, Scalar]> = [
-		['P/E', fundamentals?.keyRatios?.peRatio],
-		['EPS', fundamentals?.keyRatios?.eps],
-		['القيمة السوقية', fundamentals?.keyRatios?.marketCap],
-		['عائد التوزيعات', fundamentals?.keyRatios?.dividendYield],
-		['أعلى 52 أسبوعاً', fundamentals?.keyRatios?.fiftyTwoWeekHigh],
-		['أدنى 52 أسبوعاً', fundamentals?.keyRatios?.fiftyTwoWeekLow],
-	]
-	const indicatorResult = analysisPayload(integratedAnalysis.indicators)
-	const elliottResult = analysisPayload(integratedAnalysis.elliott)
-	const gannResult = analysisPayload(integratedAnalysis.gann)
-	const candlestickResult = analysisPayload(integratedAnalysis.candlestick)
-	const consensusResult = analysisPayload(integratedAnalysis.consensus)
-	const statisticalResult = analysisPayload(integratedAnalysis.statistical)
-	const arimaResult = analysisPayload(integratedAnalysis.arima)
-	const lstmResult = analysisPayload(integratedAnalysis.lstm)
-	const backtestResult = analysisPayload(integratedAnalysis.backtest)
-	const consensusSignal = stringValue(consensusResult, ['signal'])
-	const consensusSignalArabic =
-		consensusSignal === 'STRONG_BUY' || consensusSignal === 'BUY'
-			? 'ميل إيجابي'
-			: consensusSignal === 'STRONG_SELL' || consensusSignal === 'SELL'
-				? 'ميل سلبي'
-				: consensusSignal === 'HOLD'
-					? 'محايد / غير حاسم'
-					: 'غير متاح'
-	const elliottDirection = stringValue(elliottResult, [
-		'current_wave',
-		'direction',
-	])
-	const elliottDirectionArabic =
-		elliottDirection === 'up'
-			? 'صاعد'
-			: elliottDirection === 'down'
-				? 'هابط'
-				: elliottDirection === 'sideways'
-					? 'جانبي'
-					: elliottDirection === 'unknown'
-						? 'غير واضح'
-						: 'غير متاح'
-	const gannSupport = numberValue(gannResult, ['square_of_nine', 'support'])
-	const gannResistance = numberValue(gannResult, [
-		'square_of_nine',
-		'resistance',
-	])
-	const arimaForecast = numberValue(arimaResult, ['forecast', '0'])
-	const lstmForecast = numberValue(lstmResult, ['forecast', '0'])
-	const keltnerPosition = stringValue(indicatorResult, ['keltner', 'position'])
-	const trendDirection = stringValue(indicatorResult, [
-		'trendAngle',
-		'direction',
-	])
-	const trendDirectionArabic =
-		trendDirection === 'up'
-			? 'صاعد'
-			: trendDirection === 'down'
-				? 'هابط'
-				: trendDirection === 'flat'
-					? 'جانبي'
-					: 'غير متاح'
-	const fibonacciDirection = stringValue(indicatorResult, [
-		'fibonacci',
-		'direction',
-	])
-	const fibonacciDirectionArabic =
-		fibonacciDirection === 'up'
-			? 'اتجاه صاعد'
-			: fibonacciDirection === 'down'
-				? 'اتجاه هابط'
-				: 'غير متاح'
-	const analysisEnginesAvailable = [
-		indicatorResult,
-		elliottResult,
-		gannResult,
-		candlestickResult,
-		consensusResult,
-		statisticalResult,
-		arimaResult,
-		lstmResult,
-		backtestResult,
-	].filter((result) => Object.keys(result).length > 0).length
-	const engineStatuses = analysisEngineStatuses ?? []
-	const displayedEnginesAvailable = engineStatuses.length
-		? engineStatuses.filter((item) => item.status !== 'unavailable').length
-		: analysisEnginesAvailable
-	const signalExplanation = consensusSignal
-		? `القراءة الحالية هي «${consensusSignalArabic}». هذا مقياس اتفاق بين محركات تعليمية، وليس احتمال نجاح أو أمر شراء/بيع.`
-		: 'لم يكتمل إجماع المحركات لهذا الرمز؛ ستظهر القراءة عند توفر بيانات صالحة.'
-	const rsiValue =
-		numberValue(indicatorResult, ['rsi', 'value']) ??
-		numberValue(indicatorResult, ['rsi'])
-	const macdSignal = stringValue(indicatorResult, ['macd', 'signal'])
-	const smartVerdict =
-		consensusSignalArabic !== 'غير متاح'
-			? consensusSignalArabic
-			: rsiValue != null
-				? rsiValue < 30
-					? 'تشبع بيعي محتمل'
-					: rsiValue > 70
-						? 'تشبع شرائي محتمل'
-						: 'قراءة محايدة'
-				: 'بيانات غير كافية'
-	const smartNarrative = [
-		`الاتجاه العام: ${trendDirectionArabic}.`,
-		rsiValue != null
-			? `RSI عند ${formatEnglishNumber(rsiValue)}.`
-			: 'RSI غير متاح.',
-		macdSignal ? `إشارة MACD: ${macdSignal}.` : 'MACD غير متاح.',
-		`موجة Elliott: ${elliottDirectionArabic}.`,
-	].join(' ')
-	const riskExplanation = numberValue(statisticalResult, ['var_95'])
-		? 'تظهر مقاييس التقلب وVaR وSharpe لتوضيح المخاطر التاريخية قبل تفسير أي حركة سعرية.'
-		: 'لا تتوفر مقاييس مخاطر كافية حالياً؛ لذلك لا نضع حكماً رقمياً على المخاطرة.'
-	const validationExplanation = numberValue(backtestResult, ['win_rate'])
-		? 'الاختبار التاريخي يعرض سلوك الفرضية على بيانات سابقة، ولا يثبت نجاحها في المستقبل.'
-		: 'لم تتوفر نتيجة اختبار تاريخي مكتملة لهذا الرمز؛ لا يتم استبدالها بتقدير.'
-	const pricePosition =
-		stats.high != null &&
-		stats.low != null &&
-		stats.high !== stats.low &&
-		stats.last
-			? ((stats.last.close - stats.low) / (stats.high - stats.low)) * 100
-			: undefined
-	const consensusScore = numberValue(consensusResult, ['score'])
-	const consensusConfidence = numberValue(consensusResult, ['confidence'])
-	const decisionHeadline =
-		consensusSignalArabic !== 'غير متاح'
-			? `السهم يظهر ${consensusSignalArabic} وفق اتفاق المحركات المتاحة.`
-			: `قراءة ${trendDirectionArabic} مع حاجة إلى بيانات إضافية قبل بناء حكم مركب.`
-	const evidenceLine = [
-		`الاتجاه ${trendDirectionArabic}`,
-		`Elliott ${elliottDirectionArabic}`,
-		macdSignal ? `MACD ${macdSignal}` : 'MACD غير متاح',
-	].join(' · ')
-	const invalidationLine =
-		gannSupport != null
-			? `تتغير القراءة إذا كُسر الدعم المحسوب ${formatEnglishNumber(gannSupport)} بإغلاق واضح.`
-			: 'منطقة إبطال السيناريو غير متاحة حتى تكتمل بيانات الدعم والمقاومة.'
-	const dataQualityLabel =
-		analysisQuality?.status === 'high'
-			? 'جودة مرتفعة'
-			: analysisQuality?.status === 'medium'
-				? 'جودة متوسطة'
-				: 'تحتاج تحققاً'
-
 	return (
 		<main className="stock-detail-page" dir="rtl">
-			<header className="stock-detail-header">
+			<header className="stock-detail-header stock-detail-header--unified">
 				<a className="stock-brand" href="/" aria-label="العودة إلى borsatyai">
 					<img src="/branding/borsatyai-logo.png" alt="BorsatyAI" />
 				</a>
 				<button className="link-button" onClick={() => window.history.back()}>
 					← العودة
 				</button>
-				<div>
-					<p className="eyebrow">تفاصيل السهم</p>
+				<div className="stock-identity">
+					<p className="eyebrow">تحليل سهم موحد</p>
 					<span
 						className={`market-badge ${market === 'TASI' ? 'market-tasi' : 'market-egx'}`}
 					>
-						{market === 'TASI' ? '🇸🇦 السعودية · SAR' : '🇪🇬 مصر · EGP'}
+						{market === 'TASI' ? 'السعودية · SAR' : 'مصر · EGP'}
 					</span>
 					<h1>
 						{displayCompanyName ?? normalized}
 						<small className="stock-symbol-label">{normalized}</small>
 					</h1>
 				</div>
+				<div className="stock-header-quote" aria-label="السعر والتغير">
+					<span>السعر الحالي</span>
+					<strong>
+						{formatEnglishNumber(livePrice?.price ?? stats.last?.close)}
+					</strong>
+					<b
+						className={
+							stats.changePercent != null && stats.changePercent >= 0
+								? 'positive'
+								: 'negative'
+						}
+					>
+						{formatEnglishPercent(stats.changePercent)}
+					</b>
+				</div>
 				<div className="stock-header-actions">
 					<button className="secondary-button" onClick={listen}>
-						{isPlaying ? '⏸ إيقاف الصوت' : '🎧 استمع للتحليل'}
+						{isPlaying ? 'إيقاف الصوت' : 'استمع للتحليل'}
 					</button>
 					<button className="primary-button" onClick={addToWatchlist}>
 						＋ أضف إلى قائمتي
 					</button>
 					<button className="secondary-button" onClick={shareStock}>
-						🔗 مشاركة
+						مشاركة
 					</button>
 					<a
 						className="secondary-button"
 						href={`/api/reports/stock/${normalized}/pdf`}
 						download
 					>
-						📄 PDF
+						PDF
 					</a>
 				</div>
 			</header>
@@ -585,597 +227,22 @@ export function StockDetailPage({
 				</section>
 			)}
 			{data && !loading && (
-				<>
-					<section className="stock-hero-card">
-						<div>
-							<span>السعر الحالي</span>
-							<strong>
-								{formatEnglishNumber(livePrice?.price ?? stats.last?.close)}
-							</strong>
-							<span
-								className={`freshness-badge ${livePrice?.freshness ?? data.freshness ?? 'cached'}`}
-								title={
-									livePrice?.freshness === 'delayed'
-										? 'السعر متأخر عن السوق'
-										: 'بيانات السعر متاحة حالياً'
-								}
-							>
-								{livePrice?.freshness === 'live'
-									? 'Live'
-									: livePrice?.freshness === 'delayed'
-										? 'Delayed'
-										: 'Cached'}
-							</span>
-						</div>
-						<div
-							className={
-								stats.changePercent != null && stats.changePercent >= 0
-									? 'positive'
-									: 'negative'
-							}
-						>
-							{formatEnglishPercent(stats.changePercent)}
-						</div>
-					</section>
-					<section className="stock-stats-grid">
-						<div>
-							<span>أعلى فترة</span>
-							<b>{formatEnglishNumber(stats.high)}</b>
-						</div>
-						<div>
-							<span>أدنى فترة</span>
-							<b>{formatEnglishNumber(stats.low)}</b>
-						</div>
-						<div>
-							<span>عدد الشموع</span>
-							<b>{data.count}</b>
-						</div>
-						<div>
-							<span>آخر حجم</span>
-							<b>{formatEnglishNumber(stats.last?.volume, 0)}</b>
-						</div>
-					</section>
-					<section
-						className="stock-command-center"
-						aria-label="مذكرة السهم الموحدة"
-					>
-						<div className="stock-command-center__heading">
-							<div>
-								<span className="eyebrow">
-									BORSATY RESEARCH NOTE · {normalized}
-								</span>
-								<h2>مذكرة السهم الموحدة</h2>
-								<p>
-									قراءة واحدة تربط السعر، الاتجاه، المحركات، المخاطر وجودة
-									البيانات.
-								</p>
-							</div>
-							<strong>{dataQualityLabel}</strong>
-						</div>
-						<div className="stock-command-center__verdict">
-							<span>الخلاصة التنفيذية التعليمية</span>
-							<b>{decisionHeadline}</b>
-							<small>{evidenceLine}</small>
-						</div>
-						<div className="stock-command-center__grid">
-							<div>
-								<span>اتفاق المحركات</span>
-								<b>{formatEnglishNumber(consensusScore, 0)}</b>
-								<small>من 100</small>
-							</div>
-							<div>
-								<span>ثقة القراءة</span>
-								<b>{formatEnglishPercent(consensusConfidence)}</b>
-								<small>ليست احتمال نجاح</small>
-							</div>
-							<div>
-								<span>موقع السعر في النطاق</span>
-								<b>{formatEnglishNumber(pricePosition, 0)}%</b>
-								<small>بين أعلى وأدنى فترة</small>
-							</div>
-						</div>
-						<div className="stock-command-center__risk">
-							<span>شرط تغيّر السيناريو</span>
-							<b>{invalidationLine}</b>
-						</div>
-						<p className="stock-command-center__disclaimer">
-							هذه مذكرة تحليلية تعليمية وليست توصية شراء أو بيع. عند تعارض
-							المحركات نعرض التعارض بدلاً من إخفائه.
-						</p>
-					</section>
+				<div className="stock-analysis-single-page">
 					<BrilliantSummary symbol={normalized} market={market} />
-					<section className="analysis-card stock-chart-card">
+					<section
+						className="analysis-card stock-chart-card"
+						aria-label="الرسم والمؤشرات الفنية"
+					>
 						<div className="panel-title">
 							<div>
-								<span className="eyebrow">
-									غرفة السعر والحجم · {normalized}
-								</span>
+								<span className="eyebrow">السعر والحجم · {normalized}</span>
 								<h2>الرسم السعري الاحترافي</h2>
 							</div>
-							<span className="muted">شموع · حجم · مؤشرات قابلة للتفعيل</span>
+							<span className="muted">شموع · حجم · RSI · MACD</span>
 						</div>
 						<ProfessionalStockChart candles={data.candles} />
 					</section>
-					<section
-						className="analysis-card smart-summary-card"
-						aria-label="الملخص الذكي"
-					>
-						<div className="panel-title">
-							<div>
-								<span className="eyebrow">موجز القرار · {normalized}</span>
-								<h2>الملخص الذكي المدعّم بالأدلة</h2>
-							</div>
-							<strong className="smart-summary-verdict">{smartVerdict}</strong>
-						</div>
-						<p className="smart-summary-narrative">{smartNarrative}</p>
-						<div className="smart-summary-grid">
-							<div>
-								<span>الإجماع</span>
-								<b>{consensusSignalArabic}</b>
-							</div>
-							<div>
-								<span>الدعم</span>
-								<b>{formatEnglishNumber(gannSupport)}</b>
-							</div>
-							<div>
-								<span>المقاومة</span>
-								<b>{formatEnglishNumber(gannResistance)}</b>
-							</div>
-							<div>
-								<span>جودة البيانات</span>
-								<b>{analysisQuality?.status ?? 'غير متاح'}</b>
-							</div>
-						</div>
-						<div className="smart-summary-disclaimer">
-							الملخص تعليمي احتمالي؛ لا يمثل توصية شراء أو بيع، ولا يحوّل
-							المؤشرات إلى ضمان للنتيجة.
-						</div>
-					</section>
-					<section className="analysis-card integrated-analysis-panel">
-						<div className="panel-title">
-							<div>
-								<h2>غرفة التحليل المتكاملة</h2>
-								<p className="muted">
-									يُبحث عن السهم أولاً، ثم تُقرأ البيانات و9 محركات مستقلة قبل
-									بناء الخلاصة. لا تمثل النتائج توصية أو ضماناً.
-								</p>
-							</div>
-							<span className="eyebrow">
-								{completedEngines}/9 محركات
-								{fallbackEngines ? ` · ${fallbackEngines} تعليمية` : ''}
-							</span>
-						</div>
-						<div className="analysis-data-quality" role="note">
-							<strong>حدود القراءة:</strong>{' '}
-							{analysisQuality?.message ??
-								'النتائج تعليمية ولا تمثل توصية استثمارية أو قراراً آلياً.'}
-							{fallbackEngines > 0 &&
-								` يوجد ${fallbackEngines} محرك احتياطي تعليمي؛ لا تخلطه بنتيجة مزود تحليلي متخصص.`}
-						</div>
-						{analysisError && (
-							<div className="analysis-empty-panel" role="status">
-								<strong>التحليل الجزئي متاح</strong>
-								<p>{analysisError} ستظهر المحركات التي اكتملت فقط.</p>
-							</div>
-						)}
-						{analysisStages.length > 0 && (
-							<div className="analysis-pipeline" aria-label="مراحل التحليل">
-								{analysisStages.map((stage, index) => (
-									<span key={stage}>
-										<b>{index + 1}</b>
-										{stage}
-									</span>
-								))}
-							</div>
-						)}
-						<div className="integrated-analysis-grid">
-							<div className="integrated-analysis-card is-primary">
-								<span>الإجماع</span>
-								<strong>
-									{formatEnglishNumber(
-										numberValue(consensusResult, ['score']),
-										0,
-									)}
-								</strong>
-								<small>
-									{consensusSignalArabic} · اتفاق المحركات{' '}
-									{formatEnglishNumber(
-										numberValue(consensusResult, ['confidence']),
-										0,
-									)}
-									% (ليس احتمال نجاح)
-								</small>
-							</div>
-							<div className="integrated-analysis-card">
-								<span>المؤشرات الفنية</span>
-								<strong>
-									RSI{' '}
-									{formatEnglishNumber(
-										numberValue(indicatorResult, ['rsi', 'value']),
-									)}
-								</strong>
-								<small>
-									MACD {stringValue(indicatorResult, ['macd', 'signal']) ?? '—'}{' '}
-									· SMA20{' '}
-									{formatEnglishNumber(numberValue(indicatorResult, ['sma20']))}
-								</small>
-							</div>
-							<div className="integrated-analysis-card">
-								<span>قنوات كايتلر</span>
-								<strong>
-									{keltnerPosition === 'above'
-										? 'فوق القناة'
-										: keltnerPosition === 'below'
-											? 'تحت القناة'
-											: keltnerPosition === 'inside'
-												? 'داخل القناة'
-												: 'غير متاح'}
-								</strong>
-								<small>
-									علوي{' '}
-									{formatEnglishNumber(
-										numberValue(indicatorResult, ['keltner', 'upper']),
-									)}{' '}
-									· سفلي{' '}
-									{formatEnglishNumber(
-										numberValue(indicatorResult, ['keltner', 'lower']),
-									)}
-								</small>
-							</div>
-							<div className="integrated-analysis-card">
-								<span>زاوية الاتجاه</span>
-								<strong>{trendDirectionArabic}</strong>
-								<small>
-									{formatEnglishNumber(
-										numberValue(indicatorResult, [
-											'trendAngle',
-											'angleDegrees',
-										]),
-									)}
-									° ·{' '}
-									{formatEnglishNumber(
-										numberValue(indicatorResult, [
-											'trendAngle',
-											'percentPerCandle',
-										]),
-									)}
-									% لكل شمعة
-								</small>
-							</div>
-							<div className="integrated-analysis-card">
-								<span>فيبوناتشي المتقدم</span>
-								<strong>{fibonacciDirectionArabic}</strong>
-								<small>
-									23.6%{' '}
-									{formatEnglishNumber(
-										numberValue(indicatorResult, [
-											'fibonacci',
-											'retracement',
-											'0.236',
-										]),
-									)}{' '}
-									· 61.8%{' '}
-									{formatEnglishNumber(
-										numberValue(indicatorResult, [
-											'fibonacci',
-											'retracement',
-											'0.618',
-										]),
-									)}
-								</small>
-							</div>
-							<div className="integrated-analysis-card">
-								<span>المناطق الديناميكية</span>
-								<strong>
-									دعم{' '}
-									{formatEnglishNumber(
-										numberValue(indicatorResult, [
-											'fibonacci',
-											'dynamicSupport',
-											'level',
-										]),
-									)}
-								</strong>
-								<small>
-									مقاومة{' '}
-									{formatEnglishNumber(
-										numberValue(indicatorResult, [
-											'fibonacci',
-											'dynamicResistance',
-											'level',
-										]),
-									)}{' '}
-									· نطاق ATR
-								</small>
-							</div>
-							<div className="integrated-analysis-card">
-								<span>Elliott Wave</span>
-								<strong>{elliottDirectionArabic}</strong>
-								<small>
-									الموجة{' '}
-									{stringValue(elliottResult, ['current_wave', 'wave']) ?? '—'}{' '}
-									· ثقة{' '}
-									{formatEnglishPercent(
-										(numberValue(elliottResult, ['confidence']) ?? 0) * 100,
-									)}
-								</small>
-							</div>
-							<div className="integrated-analysis-card">
-								<span>Gann</span>
-								<strong>دعم {formatEnglishNumber(gannSupport)}</strong>
-								<small>
-									مقاومة {formatEnglishNumber(gannResistance)} · قمة{' '}
-									{stringValue(gannResult, [
-										'price_time_context',
-										'high_date',
-									]) ?? '—'}
-								</small>
-							</div>
-							<div className="integrated-analysis-card">
-								<span>الشموع اليابانية</span>
-								<strong>
-									{stringValue(candlestickResult, ['pattern']) ?? 'غير متاح'}
-								</strong>
-								<small>
-									{stringValue(candlestickResult, ['signal']) === 'bullish'
-										? 'إشارة صاعدة'
-										: stringValue(candlestickResult, ['signal']) === 'bearish'
-											? 'إشارة هابطة'
-											: 'قراءة محايدة'}{' '}
-									· إغلاق{' '}
-									{formatEnglishNumber(
-										numberValue(candlestickResult, ['latest', 'close']),
-									)}
-								</small>
-							</div>
-							<div className="integrated-analysis-card">
-								<span>الإحصاء والمخاطر</span>
-								<strong>
-									Volatility{' '}
-									{formatEnglishPercent(
-										(numberValue(statisticalResult, ['volatility']) ??
-											Number.NaN) * 100,
-									)}
-								</strong>
-								<small>
-									VaR 95%{' '}
-									{formatEnglishPercent(
-										(numberValue(statisticalResult, ['var_95']) ?? Number.NaN) *
-											100,
-									)}{' '}
-									· Sharpe{' '}
-									{formatEnglishNumber(
-										numberValue(statisticalResult, ['sharpe_ratio']),
-									)}
-								</small>
-							</div>
-							<div className="integrated-analysis-card">
-								<span>خطوط التنبؤ التعليمية</span>
-								<strong>ARIMA {formatEnglishNumber(arimaForecast)}</strong>
-								<small>
-									LSTM {formatEnglishNumber(lstmForecast)} · قراءة تعليمية
-								</small>
-							</div>
-							<div className="integrated-analysis-card">
-								<span>اختبار تاريخي تعليمي</span>
-								<strong>
-									نسبة النجاح{' '}
-									{formatEnglishPercent(
-										(numberValue(backtestResult, ['win_rate']) ?? Number.NaN) *
-											100,
-									)}
-								</strong>
-								<small>
-									أقصى تراجع{' '}
-									{formatEnglishPercent(
-										(numberValue(backtestResult, ['max_drawdown']) ??
-											Number.NaN) * 100,
-									)}
-								</small>
-							</div>
-						</div>
-					</section>
-					<section className="analysis-card analysis-reading-panel">
-						<div className="panel-title">
-							<div>
-								<h2>كيف نقرأ هذه النتائج؟</h2>
-								<p className="muted">
-									شرح مختصر يربط المخرجات بالسياق بدلاً من ترك المستخدم أمام
-									أرقام منفصلة.
-								</p>
-							</div>
-							<span className="eyebrow">
-								{displayedEnginesAvailable}/9 محركات
-							</span>
-						</div>
-						<div className="analysis-reading-grid">
-							<div>
-								<span>الإشارة المركبة</span>
-								<strong>{signalExplanation}</strong>
-							</div>
-							<div>
-								<span>سياق المخاطر</span>
-								<strong>{riskExplanation}</strong>
-							</div>
-							<div>
-								<span>التحقق التاريخي</span>
-								<strong>{validationExplanation}</strong>
-							</div>
-						</div>
-						<p className="analysis-reading-note">
-							النتيجة التعليمية الأقوى هي التي تتفق فيها عدة محركات مع بيانات
-							سعرية كافية. عند اختلافها، نعرض الاختلاف بدلاً من إخفائه.
-						</p>
-					</section>
-					<section className="analysis-card stock-ai-grid">
-						<div>
-							<span className="eyebrow">Ensemble Prediction</span>
-							<strong>{formatEnglishNumber(ai?.forecast?.[0])}</strong>
-							<small>
-								ثقة مجمعة: {formatEnglishPercent(ai?.confidence ?? null)}
-							</small>
-						</div>
-						<div>
-							<span className="eyebrow">مزاج السوق</span>
-							<strong>
-								{marketMood?.available
-									? `${marketMood.label ?? 'محايد'} ${formatEnglishNumber(marketMood.score)}`
-									: 'غير متاح'}
-							</strong>
-							<small>
-								{marketMood?.available
-									? `إيجابي ${formatEnglishPercent(marketMood.positive)} · سلبي ${formatEnglishPercent(marketMood.negative)}`
-									: 'لا تتوفر مدخلات كافية'}
-							</small>
-							<small>مشاعر الأخبار: {mood?.articleCount ?? 0} خبر موثوق</small>
-						</div>
-						<div>
-							<span className="eyebrow">رصد الشذوذ</span>
-							<strong
-								className={anomalyResult?.latest ? 'negative' : 'positive'}
-							>
-								{anomalyResult?.latest ? '⚠️ شذوذ' : 'طبيعي'}
-							</strong>
-							<small>{anomalyResult?.anomalyCount ?? 0} حالات مرصودة</small>
-						</div>
-					</section>
-					<section className="analysis-card fundamentals-panel">
-						<div className="panel-title">
-							<h2>البيانات المالية</h2>
-							<span className="eyebrow">مالية</span>
-						</div>
-						<div className="fundamentals-grid">
-							{fundamentalMetrics.map(([label, value]) => (
-								<div key={String(label)}>
-									<span>{label}</span>
-									<strong>
-										{value == null ? '—' : formatEnglishScalar(value)}
-									</strong>
-								</div>
-							))}
-						</div>
-						{fundamentals?.incomeStatement?.length ? (
-							<div className="fundamentals-table">
-								{fundamentals.incomeStatement.slice(0, 5).map((item, index) => (
-									<div key={index}>
-										<span>
-											{item.filingDate ?? item.period ?? `سنة ${index + 1}`}
-										</span>
-										<b>{item.revenue ?? item.totalRevenue ?? '—'}</b>
-										<b>{item.netIncome ?? item.netIncomeLoss ?? '—'}</b>
-									</div>
-								))}
-							</div>
-						) : (
-							<p className="muted">
-								لا تتوفر قوائم مالية منظمة لهذا الرمز حالياً.
-							</p>
-						)}
-						<small>
-							{fundamentals?.available
-								? `بيانات مالية متاحة`
-								: 'لا تتوفر بيانات مالية موثوقة حالياً.'}
-						</small>
-					</section>
-					<section className="analysis-card governance-panel">
-						<div className="panel-title">
-							<h2>الحوكمة والإفصاحات</h2>
-							<span className="eyebrow">Insider Trading</span>
-						</div>
-						<div className="ownership-list">
-							{(ownership?.shareholders ?? []).map((item) => (
-								<div key={item.name}>
-									<span>{item.name}</span>
-									<b>{item.percentage == null ? '—' : `${item.percentage}%`}</b>
-								</div>
-							))}
-							{!ownership?.available && (
-								<p className="muted">
-									لا تتوفر إفصاحات ملكية موثوقة لهذا الرمز حالياً.
-								</p>
-							)}
-						</div>
-						<div className="fundamentals-table">
-							{insiderTrades.slice(0, 6).map((item) => (
-								<div key={item.id}>
-									<span>
-										{item.insiderName} · {item.insiderRole}
-									</span>
-									<b
-										className={
-											item.transactionType === 'BUY' ? 'positive' : 'negative'
-										}
-									>
-										{item.transactionType === 'BUY' ? 'شراء' : 'بيع'}
-									</b>
-									<b>{formatEnglishNumber(item.shares, 0)}</b>
-								</div>
-							))}
-							{insiderTrades.length === 0 && (
-								<p className="muted">
-									لا توجد معاملات داخلية موثقة متاحة حالياً.
-								</p>
-							)}
-						</div>
-						<small>
-							الأرقام غير المتاحة تظهر كشرطة ولا تمثل توصية استثمارية.
-						</small>
-					</section>
-					<section className="analysis-card stock-news-panel">
-						<div className="panel-title">
-							<h2>أخبار {displayCompanyName ?? normalized}</h2>
-							<span className="eyebrow">أخبار السهم</span>
-						</div>
-						{stockNews.length ? (
-							<div className="news-list">
-								{stockNews.slice(0, 6).map((item) => (
-									<a
-										className="news-item"
-										href={item.url}
-										target="_blank"
-										rel="noreferrer"
-										key={item.id}
-									>
-										<strong>{item.title}</strong>
-										<small>
-											{item.source} ·{' '}
-											{new Date(item.publishedAt).toLocaleDateString('ar-EG')}
-										</small>
-										<p>
-											{item.summary ?? item.description ?? 'لا يوجد ملخص متاح.'}
-										</p>
-									</a>
-								))}
-							</div>
-						) : (
-							<p className="muted">
-								لا توجد أخبار موثوقة مرتبطة بهذا الرمز حالياً.
-							</p>
-						)}
-					</section>
-					<section className="analysis-card related-stocks-panel">
-						<div className="panel-title">
-							<h2>أسهم مرتبطة</h2>
-							<span className="eyebrow">EGX / TASI</span>
-						</div>
-						{relatedStocks.length ? (
-							<div className="related-stocks-grid">
-								{relatedStocks.map((item) => (
-									<a
-										className="related-stock-card"
-										href={`/stock/${item.symbol}`}
-										key={item.symbol}
-									>
-										<strong>{item.symbol}</strong>
-										<span>{item.nameAr}</span>
-									</a>
-								))}
-							</div>
-						) : (
-							<p className="muted">لا تتوفر قائمة مرتبطة حالياً.</p>
-						)}
-					</section>
-				</>
+				</div>
 			)}
 		</main>
 	)
