@@ -121,6 +121,7 @@ export function SectionActivityBar({ path }: { path: string }) {
 	)
 		return null
 	const section = sectionForPath(path)
+	if (path === '/' || section.key === 'general') return null
 	return (
 		<section className="section-activity-bar" aria-label={section.label}>
 			<div className="section-activity-copy">

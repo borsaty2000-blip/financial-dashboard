@@ -13,20 +13,11 @@ import {
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { navigate } from '../router'
 import { formatEnglishNumber, formatEnglishPercent } from '../lib/format'
-import { PublicMarketPulse } from '../components/PublicMarketPulse'
 
 type MarketEnvelope<T = unknown> = {
 	available?: boolean
 	freshness?: 'live' | 'delayed' | 'cached' | 'stale'
 	data?: T
-}
-
-type MarketCard = {
-	label: string
-	caption: string
-	value?: number
-	change?: number
-	status: 'live' | 'cached' | 'unavailable'
 }
 
 type NewsItem = {
@@ -75,27 +66,6 @@ type UnifiedLive = {
 	news?: NewsItem[]
 }
 
-const numberFrom = (value: unknown, keys: string[]): number | undefined => {
-	if (typeof value === 'number' && Number.isFinite(value)) return value
-	if (!value || typeof value !== 'object') return undefined
-	const record = value as Record<string, unknown>
-	for (const key of keys) {
-		const candidate = record[key]
-		if (typeof candidate === 'number' && Number.isFinite(candidate))
-			return candidate
-		if (typeof candidate === 'string') {
-			const parsed = Number(candidate.replaceAll(',', ''))
-			if (Number.isFinite(parsed)) return parsed
-		}
-	}
-	return undefined
-}
-
-const nested = (value: unknown, key: string): unknown => {
-	if (!value || typeof value !== 'object') return undefined
-	return (value as Record<string, unknown>)[key]
-}
-
 const safeJson = async <T,>(path: string): Promise<T | null> => {
 	try {
 		const response = await fetch(path, {
@@ -111,13 +81,6 @@ const safeJson = async <T,>(path: string): Promise<T | null> => {
 		return null
 	}
 }
-
-const toStatus = (envelope: MarketEnvelope | null): MarketCard['status'] => {
-	if (!envelope?.available) return 'unavailable'
-	return envelope.freshness === 'live' ? 'live' : 'cached'
-}
-const quoteValue = (value: unknown) =>
-	numberFrom(value, ['value', 'price', 'close', 'indexValue', 'index_value'])
 
 const formatValue = (value?: number) => formatEnglishNumber(value)
 
@@ -185,39 +148,6 @@ const canonicalDirectory = (
 		seen.add(canonical)
 		return true
 	})
-}
-
-function MarketMetric({ card }: { card: MarketCard }) {
-	return (
-		<article className="borsaty-market-card">
-			<div className="borsaty-market-card__top">
-				<div>
-					<strong>{card.label}</strong>
-					<span>{card.caption}</span>
-				</div>
-				<i
-					className={`borsaty-status-dot is-${card.status}`}
-					aria-hidden="true"
-				/>
-			</div>
-			<div className="borsaty-market-card__value">
-				{formatValue(card.value)}
-			</div>
-			<div
-				className={`borsaty-market-card__change ${
-					card.change == null
-						? 'is-muted'
-						: card.change > 0
-							? 'is-up'
-							: card.change < 0
-								? 'is-down'
-								: ''
-				}`}
-			>
-				{card.change == null ? '—' : formatEnglishPercent(card.change)}
-			</div>
-		</article>
-	)
 }
 
 function MarketDirectory({
@@ -1054,8 +984,6 @@ function PublicPromoBanner() {
 }
 
 export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
-	const [egx, setEgx] = useState<MarketEnvelope | null>(null)
-	const [tasi, setTasi] = useState<MarketEnvelope | null>(null)
 	const [news, setNews] = useState<NewsItem[]>([])
 	const [live, setLive] = useState<UnifiedLive | null>(null)
 	const [egxCompanies, setEgxCompanies] = useState<DirectoryCompany[]>([])
@@ -1065,14 +993,10 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 		let active = true
 		void Promise.all([
 			safeJson<UnifiedLive>('/api/v1/market/live'),
-			safeJson<MarketEnvelope>('/api/market/egx/summary'),
-			safeJson<MarketEnvelope>('/api/market/tasi/summary'),
 			safeJson<{ data?: NewsItem[] }>('/api/news?limit=6'),
-		]).then(([nextLive, nextEgx, nextTasi, nextNews]) => {
+		]).then(([nextLive, nextNews]) => {
 			if (!active) return
 			setLive(nextLive)
-			setEgx(nextEgx)
-			setTasi(nextTasi)
 			if (nextLive?.directories) {
 				setEgxCompanies(nextLive.directories.egx ?? [])
 				setTasiCompanies(nextLive.directories.tasi ?? [])
@@ -1108,98 +1032,6 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 			active = false
 		}
 	}, [])
-
-	const cards = useMemo<MarketCard[]>(() => {
-		if (live?.indices) {
-			const labels: Array<[string, string, string]> = [
-				['egx30', 'EGX30', 'السوق المصري'],
-				['egx70', 'EGX70', 'السوق المصري'],
-				['egx100', 'EGX100', 'السوق المصري'],
-				['tasi', 'TASI', 'السوق السعودي'],
-				['gold', 'GOLD', 'الذهب'],
-				['silver', 'SILVER', 'الفضة'],
-			]
-			return labels.map(([key, label, caption]) => {
-				const item = live.indices?.[key]
-				return {
-					label,
-					caption,
-					value: item?.value ?? undefined,
-					change: item?.changePercent ?? undefined,
-					status:
-						item?.available && item.freshness === 'live'
-							? 'live'
-							: item?.available
-								? 'cached'
-								: 'unavailable',
-				}
-			})
-		}
-		const egxData = egx?.data
-		const tasiData = tasi?.data
-		const tasiValue = numberFrom(tasiData, [
-			'value',
-			'price',
-			'close',
-			'indexValue',
-			'index_value',
-		])
-		const tasiChange = numberFrom(tasiData, [
-			'changePercent',
-			'change_percent',
-			'index_change_percent',
-			'percentChange',
-			'change',
-		])
-		const gold = nested(egxData, 'gold')
-		const silver = nested(egxData, 'silver')
-		return [
-			{
-				label: 'EGX',
-				caption: 'السوق المصري',
-				value:
-					quoteValue(nested(egxData, 'egx30')) ??
-					numberFrom(egxData, ['value', 'close', 'indexValue', 'egx30']),
-				change:
-					numberFrom(nested(egxData, 'egx30'), [
-						'changePercent',
-						'change_percent',
-						'percentChange',
-					]) ??
-					numberFrom(egxData, [
-						'changePercent',
-						'change_percent',
-						'percentChange',
-					]),
-				status: toStatus(egx),
-			},
-			{
-				label: 'TASI',
-				caption: 'السوق السعودي',
-				value: tasiValue,
-				change: tasiChange,
-				status: toStatus(tasi),
-			},
-			{
-				label: 'GOLD',
-				caption: 'الذهب',
-				value: numberFrom(gold, ['value', 'price', 'close', 'last']),
-				change: numberFrom(gold, ['changePercent', 'change_percent', 'change']),
-				status: egx?.available && gold ? toStatus(egx) : 'unavailable',
-			},
-			{
-				label: 'SILVER',
-				caption: 'الفضة',
-				value: numberFrom(silver, ['value', 'price', 'close', 'last']),
-				change: numberFrom(silver, [
-					'changePercent',
-					'change_percent',
-					'change',
-				]),
-				status: egx?.available && silver ? toStatus(egx) : 'unavailable',
-			},
-		]
-	}, [egx, live, tasi])
 
 	const moverPrices = useMemo(
 		() => new Map((live?.topMovers ?? []).map((item) => [item.symbol, item])),
@@ -1335,111 +1167,6 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 						/>
 					</>
 				)}
-
-				<section className="borsaty-ticker" aria-label="حالة الأسواق">
-					{cards.map((card) => (
-						<span key={card.label}>
-							<i className={`borsaty-status-dot is-${card.status}`} />
-							<b>{card.label}</b>
-							{formatValue(card.value)}
-						</span>
-					))}
-				</section>
-
-				<section className="borsaty-section">
-					<div className="borsaty-section__heading">
-						<div>
-							<span className="borsaty-kicker">نظرة موحدة</span>
-							<h2>مؤشرات السوق</h2>
-						</div>
-						<p>تظهر القيم فقط عندما تعيد خدمات السوق بيانات صالحة.</p>
-					</div>
-					<div className="borsaty-market-grid">
-						{cards.map((card) => (
-							<MarketMetric card={card} key={card.label} />
-						))}
-					</div>
-				</section>
-
-				<PublicMarketPulse
-					cards={cards}
-					egxCompanies={egxCompanies}
-					tasiCompanies={tasiCompanies}
-				/>
-
-				<section className="borsaty-section borsaty-tool-section">
-					<div className="borsaty-section__heading">
-						<div>
-							<span className="borsaty-kicker">قرارات قابلة للمراجعة</span>
-							<h2>من التحليل إلى الاختبار</h2>
-						</div>
-					</div>
-					<div className="borsaty-tool-grid">
-						{[
-							{
-								number: '01',
-								title: 'تحليل السهم',
-								text: 'مؤشرات فنية وموجات Elliott وزوايا Gann مع إخلاء تعليمي.',
-								path: '/stock/COMI',
-							},
-							{
-								number: '02',
-								title: 'منشئ الاستراتيجيات',
-								text: 'كوّن رسماً منطقياً صالحاً قبل أي محاكاة تاريخية.',
-								path: '/strategies',
-							},
-							{
-								number: '03',
-								title: 'الاختبار التاريخي',
-								text: 'قارن الفرضية بالأداء التاريخي بدلاً من الاعتماد على الانطباع.',
-								path: '/backtest',
-							},
-						].map((tool) => (
-							<button key={tool.title} onClick={() => navigate(tool.path)}>
-								<span>{tool.number}</span>
-								<h3>{tool.title}</h3>
-								<p>{tool.text}</p>
-								<b>فتح الأداة ←</b>
-							</button>
-						))}
-					</div>
-				</section>
-
-				<section className="borsaty-section">
-					<div className="borsaty-section__heading">
-						<div>
-							<span className="borsaty-kicker">متابعة عربية</span>
-							<h2>أخبار السوق</h2>
-						</div>
-						<button
-							className="borsaty-text-button"
-							onClick={() => navigate('/news')}
-						>
-							كل الأخبار
-						</button>
-					</div>
-					{news.length ? (
-						<div className="borsaty-news-grid">
-							{news.map((item) => (
-								<a
-									href={item.url}
-									key={item.id}
-									rel="noreferrer"
-									target="_blank"
-								>
-									<span>{item.category ?? 'السوق'}</span>
-									<h3>{item.title}</h3>
-									<p>{item.summary ?? 'اقرأ التفاصيل من الخبر الأصلي.'}</p>
-								</a>
-							))}
-						</div>
-					) : (
-						<div className="borsaty-empty-state">
-							<strong>لا توجد أخبار متاحة الآن</strong>
-							<p>سيتم عرض الأخبار تلقائياً عند عودة الخدمة.</p>
-						</div>
-					)}
-				</section>
 
 				<section className="borsaty-why">
 					<div>
