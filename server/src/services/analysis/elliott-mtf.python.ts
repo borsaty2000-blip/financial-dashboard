@@ -28,11 +28,15 @@ function aggregate(candles: MtfCandle[], step: number): MtfCandle[] {
 	return result
 }
 
-export async function analyzeElliottMTF(candles: MtfCandle[]) {
+export async function analyzeElliottMTF(
+	candles: MtfCandle[],
+	provided?: Record<string, MtfCandle[]>,
+) {
 	const candlesByTf = {
 		monthly: aggregate(candles, 21),
 		weekly: aggregate(candles, 5),
 		daily: candles,
+		...(provided ?? {}),
 	}
 	try {
 		const response = await fetch(`${pythonServiceUrl}/analyze/elliott/mtf`, {

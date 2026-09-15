@@ -64,6 +64,8 @@ class ElliottMTF:
         targets = cls._targets(pivots, wave)
         invalidation = cls._invalidation(pivots, wave)
         return {
+	            "available": len(pivots) >= 4,
+	            "availability_reason": "بيانات محورية كافية" if len(pivots) >= 4 else "لا توجد نقاط محورية كافية لهذا الإطار",
             "timeframe": timeframe,
             "timeframe_ar": config["name"],
             "weight": config["weight"],
@@ -78,6 +80,8 @@ class ElliottMTF:
             "fib_relationships": relationships,
             "targets": targets,
             "invalidation_level": invalidation,
+            "invalidation": invalidation,
+            "alternatives": alternate,
             "sample_size": int(prices.size),
         }
 
@@ -99,12 +103,16 @@ class ElliottMTF:
         moves = [abs(pivots[i]["price"] - pivots[i - 1]["price"]) for i in range(len(pivots) - 4, len(pivots))]
         trend = float(prices[-1] - prices[-20]) if len(prices) >= 20 else 0.0
         last_type = pivots[-1]["type"]
+        if last_type == "LOW" and trend < 0:
+            return {"wave": "C", "type": "corrective", "direction": "down", "confidence": 0.70}
+        if last_type == "HIGH" and trend < 0:
+            return {"wave": "B", "type": "corrective", "direction": "up", "confidence": 0.55}
         if trend > 0 and moves[-1] >= moves[-3] * 1.35:
             return {"wave": "3", "type": "impulse", "direction": "up", "confidence": 0.78}
         if trend > 0:
             return {"wave": "5" if last_type == "HIGH" else "3", "type": "impulse", "direction": "up", "confidence": 0.62}
         if trend < 0:
-            return {"wave": "C" if last_type == "HIGH" else "A", "type": "corrective", "direction": "down", "confidence": 0.64}
+            return {"wave": "A", "type": "corrective", "direction": "down", "confidence": 0.58}
         return {"wave": "?", "type": "sideways", "direction": "sideways", "confidence": 0.42}
 
     @classmethod
@@ -123,10 +131,19 @@ class ElliottMTF:
         wave_one = abs(second["price"] - first["price"])
         wave_two = abs(third["price"] - second["price"])
         wave_three = abs(fourth["price"] - third["price"])
+        retracement = wave_two / wave_one if wave_one else None
+        extension = wave_three / wave_one if wave_one else None
         return {
-            "wave2_retracement": round(wave_two / wave_one, 4) if wave_one else None,
-            "wave3_extension": round(wave_three / wave_one, 4) if wave_one else None,
-            "nearest_fib": min(cls.FIBS, key=lambda value: abs(value - (wave_three / wave_one if wave_one else 0))),
+            "wave2_retracement": {
+                "value": round(retracement * 100, 2) if retracement is not None else None,
+                "nearest_fib": min(cls.FIBS, key=lambda value: abs(value - retracement)) if retracement is not None else None,
+                "valid": bool(retracement is not None and 0.236 <= retracement <= 0.786),
+            },
+            "wave3_extension": {
+                "value": round(extension, 4) if extension is not None else None,
+                "nearest_fib": min(cls.FIBS, key=lambda value: abs(value - extension)) if extension is not None else None,
+                "valid": bool(extension is not None and extension >= 1.0),
+            },
         }
 
     @staticmethod
@@ -136,7 +153,12 @@ class ElliottMTF:
         base = pivots[-1]["price"]
         length = abs(pivots[-2]["price"] - pivots[-3]["price"])
         direction = 1 if wave["direction"] == "up" else -1 if wave["direction"] == "down" else 0
-        return {"target_1": round(base + direction * length, 6), "target_2": round(base + direction * length * 1.618, 6), "method": "Fibonacci extension"}
+        return {
+            "target_1": round(base + direction * length, 6),
+            "target_2": round(base + direction * length * 1.618, 6),
+            "target_3": round(base + direction * length * 2.618, 6),
+            "method": "Fibonacci extension",
+        }
 
     @staticmethod
     def _invalidation(pivots: list[dict[str, Any]], wave: dict[str, Any]) -> dict[str, Any]:

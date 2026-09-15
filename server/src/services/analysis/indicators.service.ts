@@ -221,6 +221,64 @@ export function calculateAdvancedFibonacci(
 	}
 }
 
+export function calculateStochastic(candles: Candle[], period = 14) {
+	if (candles.length < period) return null
+	const window = candles.slice(-period)
+	if (window.some((candle) => candle.high == null || candle.low == null))
+		return null
+	const high = Math.max(...window.map((candle) => candle.high!))
+	const low = Math.min(...window.map((candle) => candle.low!))
+	if (high === low) return null
+	const value = ((window.at(-1)!.close - low) / (high - low)) * 100
+	return {
+		value,
+		signal: value > 80 ? 'overbought' : value < 20 ? 'oversold' : 'neutral',
+	}
+}
+
+export function calculateWilliamsR(candles: Candle[], period = 14) {
+	const stochastic = calculateStochastic(candles, period)
+	return stochastic
+		? { value: stochastic.value - 100, signal: stochastic.signal }
+		: null
+}
+
+export function calculateCCI(candles: Candle[], period = 20) {
+	if (
+		candles.length < period ||
+		candles.some((candle) => candle.high == null || candle.low == null)
+	)
+		return null
+	const values = candles
+		.slice(-period)
+		.map((candle) => (candle.high! + candle.low! + candle.close) / 3)
+	const mean = values.reduce((sum, value) => sum + value, 0) / period
+	const deviation =
+		values.reduce((sum, value) => sum + Math.abs(value - mean), 0) / period
+	if (!deviation) return { value: 0, signal: 'neutral' }
+	const value = (values.at(-1)! - mean) / (0.015 * deviation)
+	return {
+		value,
+		signal: value > 100 ? 'bullish' : value < -100 ? 'bearish' : 'neutral',
+	}
+}
+
+export function calculateOBV(candles: Candle[]) {
+	if (candles.length < 2 || candles.some((candle) => candle.volume == null))
+		return null
+	let obv = 0
+	for (let index = 1; index < candles.length; index += 1) {
+		if (candles[index].close > candles[index - 1].close)
+			obv += candles[index].volume!
+		else if (candles[index].close < candles[index - 1].close)
+			obv -= candles[index].volume!
+	}
+	return {
+		value: obv,
+		signal: obv > 0 ? 'rising' : obv < 0 ? 'falling' : 'flat',
+	}
+}
+
 export function calculateIndicatorSnapshot(symbol: string, candles: Candle[]) {
 	const closes = candles.map((candle) => candle.close)
 	const rsi = calculateRSI(candles)
@@ -232,6 +290,10 @@ export function calculateIndicatorSnapshot(symbol: string, candles: Candle[]) {
 	const keltner = calculateKeltnerChannels(candles)
 	const trendAngle = calculateTrendAngle(candles)
 	const fibonacci = calculateAdvancedFibonacci(candles)
+	const stochastic = calculateStochastic(candles)
+	const williamsR = calculateWilliamsR(candles)
+	const cci = calculateCCI(candles)
+	const obv = calculateOBV(candles)
 	const recommendation =
 		rsi == null || macd == null
 			? 'HOLD'
@@ -270,6 +332,10 @@ export function calculateIndicatorSnapshot(symbol: string, candles: Candle[]) {
 		keltner,
 		trendAngle,
 		fibonacci,
+		stochastic,
+		williamsR,
+		cci,
+		obv,
 		risk:
 			closes.length > 1
 				? {

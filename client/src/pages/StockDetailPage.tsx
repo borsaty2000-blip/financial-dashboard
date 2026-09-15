@@ -26,6 +26,8 @@ type Watchlist = { id: string; items: { symbol: string }[] }
 type CompanyResponse = { nameAr?: string }
 
 type ElliottFrame = {
+	available?: boolean
+	availability_reason?: string
 	timeframe_ar: string
 	current_wave: string
 	wave_personality: string
@@ -308,24 +310,33 @@ export function StockDetailPage({
 										([key, frame]) => (
 											<article key={key} className="elliott-mtf-card">
 												<span>{frame.timeframe_ar}</span>
-												<strong>
-													الموجة {frame.current_wave} ·{' '}
-													{frame.direction === 'up'
-														? 'صاعد'
-														: frame.direction === 'down'
-															? 'هابط'
-															: 'جانبي'}
-												</strong>
-												<small>{frame.wave_personality}</small>
-												<small>
-													الثقة {formatEnglishPercent(frame.confidence)} ·
-													البديل {frame.alternate_count?.wave ?? '—'}
-												</small>
-												<small>
-													هدف 1: {formatEnglishNumber(frame.targets?.target_1)}{' '}
-													· إبطال:{' '}
-													{formatEnglishNumber(frame.invalidation_level?.level)}
-												</small>
+												{frame.available === false ? (
+													<strong>غير متاح: {frame.availability_reason}</strong>
+												) : (
+													<>
+														<strong>
+															الموجة {frame.current_wave} ·{' '}
+															{frame.direction === 'up'
+																? 'صاعد'
+																: frame.direction === 'down'
+																	? 'هابط'
+																	: 'جانبي'}
+														</strong>
+														<small>{frame.wave_personality}</small>
+														<small>
+															الثقة {formatEnglishPercent(frame.confidence)} ·
+															البديل {frame.alternate_count?.wave ?? '—'}
+														</small>
+														<small>
+															هدف 1:{' '}
+															{formatEnglishNumber(frame.targets?.target_1)} ·
+															إبطال:{' '}
+															{formatEnglishNumber(
+																frame.invalidation_level?.level,
+															)}
+														</small>
+													</>
+												)}
 											</article>
 										),
 									)}

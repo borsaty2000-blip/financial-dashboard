@@ -38,15 +38,31 @@ analysisRoutes.get('/:symbol/elliott-mtf', async (request, response) => {
 				status: 'unavailable',
 				message: 'يلزم توفر 60 شمعة على الأقل لبناء تحليل متعدد الأطر',
 			})
-		const result = await analyzeElliottMTF(
-			series.candles.map((candle) => ({
+		const intraday = await CandlesService.getCandles(
+			series.symbol,
+			queryMarket(request.query.market),
+			'4h',
+			250,
+		).catch(() => null)
+		const dailyCandles = series.candles.map((candle) => ({
+			open: candle.open,
+			high: candle.high,
+			low: candle.low,
+			close: candle.close,
+			volume: candle.volume,
+		}))
+		const candlesByTf: Record<string, typeof dailyCandles> = {
+			daily: dailyCandles,
+		}
+		if (intraday && intraday.candles.length >= 30)
+			candlesByTf['4h'] = intraday.candles.map((candle) => ({
 				open: candle.open,
 				high: candle.high,
 				low: candle.low,
 				close: candle.close,
 				volume: candle.volume,
-			})),
-		)
+			}))
+		const result = await analyzeElliottMTF(dailyCandles, candlesByTf)
 		return response.json({
 			...result,
 			symbol: series.symbol,
