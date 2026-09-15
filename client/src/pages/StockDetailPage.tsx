@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../lib/api'
 import { useLivePrice } from '../hooks/useLivePrice'
-import GannElliottChart from '../components/GannElliottChart'
+import ProfessionalStockChart from '../components/ProfessionalStockChart'
 import {
 	formatEnglishNumber,
 	formatEnglishPercent,
@@ -469,6 +469,28 @@ export function StockDetailPage({
 	const signalExplanation = consensusSignal
 		? `القراءة الحالية هي «${consensusSignalArabic}». هذا مقياس اتفاق بين محركات تعليمية، وليس احتمال نجاح أو أمر شراء/بيع.`
 		: 'لم يكتمل إجماع المحركات لهذا الرمز؛ ستظهر القراءة عند توفر بيانات صالحة.'
+	const rsiValue =
+		numberValue(indicatorResult, ['rsi', 'value']) ??
+		numberValue(indicatorResult, ['rsi'])
+	const macdSignal = stringValue(indicatorResult, ['macd', 'signal'])
+	const smartVerdict =
+		consensusSignalArabic !== 'غير متاح'
+			? consensusSignalArabic
+			: rsiValue != null
+				? rsiValue < 30
+					? 'تشبع بيعي محتمل'
+					: rsiValue > 70
+						? 'تشبع شرائي محتمل'
+						: 'قراءة محايدة'
+				: 'بيانات غير كافية'
+	const smartNarrative = [
+		`الاتجاه العام: ${trendDirectionArabic}.`,
+		rsiValue != null
+			? `RSI عند ${formatEnglishNumber(rsiValue)}.`
+			: 'RSI غير متاح.',
+		macdSignal ? `إشارة MACD: ${macdSignal}.` : 'MACD غير متاح.',
+		`موجة Elliott: ${elliottDirectionArabic}.`,
+	].join(' ')
 	const riskExplanation = numberValue(statisticalResult, ['var_95'])
 		? 'تظهر مقاييس التقلب وVaR وSharpe لتوضيح المخاطر التاريخية قبل تفسير أي حركة سعرية.'
 		: 'لا تتوفر مقاييس مخاطر كافية حالياً؛ لذلك لا نضع حكماً رقمياً على المخاطرة.'
@@ -487,7 +509,9 @@ export function StockDetailPage({
 				</button>
 				<div>
 					<p className="eyebrow">تفاصيل السهم</p>
-					<span className={`market-badge ${market === 'TASI' ? 'market-tasi' : 'market-egx'}`}>
+					<span
+						className={`market-badge ${market === 'TASI' ? 'market-tasi' : 'market-egx'}`}
+					>
 						{market === 'TASI' ? '🇸🇦 السعودية · SAR' : '🇪🇬 مصر · EGP'}
 					</span>
 					<h1>
@@ -583,30 +607,48 @@ export function StockDetailPage({
 						</div>
 					</section>
 					<section className="analysis-card stock-chart-card">
-						<h2>الأداء التاريخي</h2>
-						<GannElliottChart
-							candles={data.candles.map((candle) => ({
-								time: candle.date,
-								open: candle.open,
-								high: candle.high,
-								low: candle.low,
-								close: candle.close,
-							}))}
-						/>
-						<div className="stock-sparkline">
-							{data.candles.slice(-60).map((candle, index, values) => {
-								const min = Math.min(...values.map((item) => item.close))
-								const max = Math.max(...values.map((item) => item.close))
-								return (
-									<span
-										key={candle.date}
-										style={{
-											left: `${(index / Math.max(values.length - 1, 1)) * 100}%`,
-											top: `${96 - ((candle.close - min) / Math.max(max - min, 0.0001)) * 88}%`,
-										}}
-									/>
-								)
-							})}
+						<div className="panel-title">
+							<div>
+								<span className="eyebrow">TradingView-style cockpit</span>
+								<h2>الرسم الاحترافي</h2>
+							</div>
+							<span className="muted">شموع · حجم · مؤشرات قابلة للتفعيل</span>
+						</div>
+						<ProfessionalStockChart candles={data.candles} />
+					</section>
+					<section
+						className="analysis-card smart-summary-card"
+						aria-label="الملخص الذكي"
+					>
+						<div className="panel-title">
+							<div>
+								<span className="eyebrow">SMART SUMMARY · {normalized}</span>
+								<h2>الملخص الذكي المدعّم بالأدلة</h2>
+							</div>
+							<strong className="smart-summary-verdict">{smartVerdict}</strong>
+						</div>
+						<p className="smart-summary-narrative">{smartNarrative}</p>
+						<div className="smart-summary-grid">
+							<div>
+								<span>الإجماع</span>
+								<b>{consensusSignalArabic}</b>
+							</div>
+							<div>
+								<span>الدعم</span>
+								<b>{formatEnglishNumber(gannSupport)}</b>
+							</div>
+							<div>
+								<span>المقاومة</span>
+								<b>{formatEnglishNumber(gannResistance)}</b>
+							</div>
+							<div>
+								<span>جودة البيانات</span>
+								<b>{analysisQuality?.status ?? 'غير متاح'}</b>
+							</div>
+						</div>
+						<div className="smart-summary-disclaimer">
+							الملخص تعليمي احتمالي؛ لا يمثل توصية شراء أو بيع، ولا يحوّل
+							المؤشرات إلى ضمان للنتيجة.
 						</div>
 					</section>
 					<section className="analysis-card integrated-analysis-panel">
