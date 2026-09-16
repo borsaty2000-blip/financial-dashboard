@@ -6,19 +6,10 @@
 	"functions": {
 		"api/index.ts": {
 			"includeFiles": "server/data.json"
-		},
-		"api/python/**/*.py": {
-			"includeFiles": [
-				"server/python-services/services/**/*.py",
-				"server/python-services/requirements.txt"
-			]
 		}
 	},
 	"rewrites": [
-		{
-			"source": "/api/((?!python(?:/|$)).*)",
-			"destination": "/api/index.ts"
-		},
+		{ "source": "/api/(.*)", "destination": "/api/index.ts" },
 		{ "source": "/(.*)", "destination": "/index.html" }
 	]
 }
