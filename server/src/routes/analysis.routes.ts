@@ -26,6 +26,7 @@ import { runBacktest } from '../services/analysis/backtesting.python.js'
 import { SentimentService } from '../services/analysis/sentiment.service.js'
 import { buildSmartSummary } from '../services/analysis/smartSummary.service.js'
 import { analyzeElliottMTF } from '../services/analysis/elliott-mtf.python.js'
+import { buildAdvancedAnalysis } from '../services/analysis/advanced-analysis.service.js'
 
 export const analysisRoutes = Router()
 analysisRoutes.use(analysisRateLimit)
@@ -75,6 +76,36 @@ analysisRoutes.get('/:symbol/elliott-mtf', async (request, response) => {
 		return response.status(502).json({
 			status: 'error',
 			message: 'تعذر إكمال Elliott متعدد الأطر حالياً',
+		})
+	}
+})
+
+/** Evidence-first advanced report; unavailable data stays explicitly unavailable. */
+analysisRoutes.get('/:symbol/advanced', async (request, response) => {
+	try {
+		const series = await resolveSeries(request)
+		if (series.candles.length < 30)
+			return response.status(404).json({
+				status: 'unavailable',
+				message: 'يلزم توفر 30 شمعة OHLCV على الأقل لبناء التقرير المتقدم',
+				candles_count: series.count,
+			})
+		const result = buildAdvancedAnalysis({
+			symbol: series.symbol,
+			market: queryMarket(request.query.market),
+			candles: series.candles,
+			source: series.source,
+			fetchedAt: new Date().toISOString(),
+		})
+		return response.json({
+			status: 'success',
+			data: result,
+			decision: 'NO_TRADE_DECISION',
+		})
+	} catch {
+		return response.status(502).json({
+			status: 'error',
+			message: 'تعذر إكمال التقرير المتقدم حالياً؛ أعد المحاولة لاحقاً',
 		})
 	}
 })
@@ -158,6 +189,13 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 			volume: candle.volume,
 		}))
 		const dates = series.dates
+		const advancedAnalysis = buildAdvancedAnalysis({
+			symbol,
+			market: queryMarket(request.query.market),
+			candles: series.candles,
+			source: series.source,
+			fetchedAt: new Date().toISOString(),
+		})
 		const stages = [
 			'تحميل الشموع والتحقق من كفاية البيانات',
 			'المؤشرات الفنية وقنوات كايتلر وفيبوناتشي',
@@ -288,6 +326,7 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 			).length,
 			engine_statuses: engineStatuses,
 			data: {
+				advanced: advancedAnalysis,
 				marketMood,
 				indicators: value(0),
 				elliott: value(1),
