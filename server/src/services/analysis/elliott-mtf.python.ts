@@ -9,8 +9,15 @@ type MtfCandle = {
 }
 
 const pythonServiceUrl = (
-	process.env.PYTHON_SERVICE_URL ?? 'http://127.0.0.1:8001'
+	process.env.PYTHON_SERVICE_URL ??
+	(process.env.NODE_ENV === 'production'
+		? 'https://www.borsatyai.com/api/python'
+		: 'http://127.0.0.1:8001')
 ).replace(/\/$/, '')
+
+const elliottPath = pythonServiceUrl.endsWith('/api/python')
+	? '/elliott'
+	: '/analyze/elliott/mtf'
 
 function aggregate(candles: MtfCandle[], step: number): MtfCandle[] {
 	if (step <= 1) return candles
@@ -39,7 +46,7 @@ export async function analyzeElliottMTF(
 		...(provided ?? {}),
 	}
 	try {
-		const response = await fetch(`${pythonServiceUrl}/analyze/elliott/mtf`, {
+		const response = await fetch(`${pythonServiceUrl}${elliottPath}`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ candles_by_tf: candlesByTf }),
