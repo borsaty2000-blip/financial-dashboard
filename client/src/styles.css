@@ -8351,3 +8351,122 @@ select:focus-visible {
 		display: grid;
 	}
 }
+
+/* Final logo alignment and analysis-engine transparency layer. */
+.borsaty-public-brand,
+.stock-brand,
+.topbar .brand,
+.tool-header .brand,
+.mobile-topbar .mobile-logo,
+.logo-mark {
+	box-sizing: border-box;
+	background: linear-gradient(135deg, #0b0d0f 0%, #20252a 100%) !important;
+	border: 1px solid #3a4249 !important;
+	border-radius: 9px !important;
+	box-shadow:
+		0 4px 14px rgb(0 0 0 / 16%),
+		inset 0 1px 0 rgb(255 255 255 / 10%);
+	overflow: hidden;
+}
+.borsaty-public-brand {
+	width: 122px !important;
+	min-width: 122px !important;
+	height: 58px !important;
+	padding: 3px 6px !important;
+}
+.borsaty-public-brand img,
+.stock-brand img,
+.topbar .brand img,
+.tool-header .brand img,
+.mobile-logo img,
+.drawer-header img {
+	width: 100% !important;
+	height: 100% !important;
+	max-width: none !important;
+	max-height: none !important;
+	object-fit: contain !important;
+	object-position: center !important;
+	filter: none !important;
+}
+.stock-brand {
+	width: 108px !important;
+	height: 62px !important;
+	padding: 3px 5px !important;
+}
+.topbar .brand img,
+.tool-header .brand img {
+	width: 108px !important;
+	height: 56px !important;
+}
+.mobile-topbar .mobile-logo {
+	min-width: 94px !important;
+	width: 94px !important;
+	height: 48px !important;
+	padding: 2px 5px !important;
+}
+.logo-mark {
+	width: 112px !important;
+	height: 78px !important;
+	padding: 5px !important;
+	margin-bottom: 22px !important;
+}
+.borsaty-public-footer__intro img {
+	width: 150px !important;
+	height: 82px !important;
+	padding: 4px !important;
+	background: linear-gradient(135deg, #0b0d0f, #20252a) !important;
+	border: 1px solid #3a4249;
+	border-radius: 9px;
+}
+.engine-status {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	width: fit-content;
+	margin: 10px 0 0 auto;
+	padding: 6px 10px;
+	border: 1px solid #d7dce0;
+	border-radius: 999px;
+	background: #fff;
+	color: #525b63;
+	font-family: var(--font-mono);
+	font-size: 11px;
+	direction: ltr;
+}
+.engine-status > span {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #9aa3aa;
+}
+.engine-status.is-live {
+	border-color: #b8dfc6;
+	color: #176b39;
+}
+.engine-status.is-live > span {
+	background: #17a34a;
+}
+.engine-status.is-fallback {
+	border-color: #e6d19b;
+	color: #765b1d;
+	direction: rtl;
+}
+.engine-status.is-fallback > span {
+	background: #d39b25;
+}
+@media (max-width: 640px) {
+	.borsaty-public-brand {
+		width: 98px !important;
+		min-width: 98px !important;
+		height: 48px !important;
+	}
+	.stock-brand {
+		width: 92px !important;
+		height: 54px !important;
+	}
+	.topbar .brand img,
+	.tool-header .brand img {
+		width: 92px !important;
+		height: 48px !important;
+	}
+}

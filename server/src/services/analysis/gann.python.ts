@@ -37,8 +37,17 @@ export async function analyzeGann(prices: number[], dates: string[]) {
 			throw new Error(
 				`Python Gann service ${response.status}: ${JSON.stringify(body)}`,
 			)
-		return body
+		return {
+			...body,
+			source: body?.source ?? 'python_vercel',
+			engine_mode: 'python_live',
+		}
 	} catch {
-		return { status: 'fallback', data: analyzeGannFallback(prices, dates) }
+		return {
+			status: 'fallback',
+			source: 'fallback',
+			engine_mode: 'educational_fallback',
+			data: analyzeGannFallback(prices, dates),
+		}
 	}
 }

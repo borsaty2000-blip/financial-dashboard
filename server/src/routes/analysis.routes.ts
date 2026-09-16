@@ -202,6 +202,11 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 			if (result.status === 'rejected')
 				return { name: engineNames[index], status: 'unavailable' as const }
 			const value = result.value as Record<string, unknown> | null
+			if (
+				value?.engine_mode === 'python_live' ||
+				value?.source === 'python_vercel'
+			)
+				return { name: engineNames[index], status: 'python_live' as const }
 			if (value?.status === 'fallback')
 				return {
 					name: engineNames[index],
@@ -269,6 +274,15 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 					'البيانات والتحليلات تعليمية؛ لا تُستخدم وحدها لاتخاذ قرار شراء أو بيع.',
 			},
 			stages,
+			python_engine: {
+				live: engineStatuses.some((item) => item.status === 'python_live'),
+				status: engineStatuses.some((item) => item.status === 'python_live')
+					? 'Python Engine Live'
+					: 'الوضع الاحتياطي — البيانات قد تكون غير محدثة',
+				engines: engineStatuses
+					.filter((item) => item.status === 'python_live')
+					.map((item) => item.name),
+			},
 			completed_engines: engineStatuses.filter(
 				(item) => item.status !== 'unavailable',
 			).length,

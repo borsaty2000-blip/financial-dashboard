@@ -54,7 +54,11 @@ export async function analyzeElliottMTF(
 		})
 		const body = await response.json().catch(() => ({}))
 		if (!response.ok) throw new Error(`Python Elliott MTF ${response.status}`)
-		return body
+		return {
+			...body,
+			source: body?.source ?? 'python_vercel',
+			engine_mode: 'python_live',
+		}
 	} catch {
 		const fallbackFrames = Object.entries(candlesByTf).reduce<
 			Record<string, Record<string, unknown>>
@@ -114,6 +118,8 @@ export async function analyzeElliottMTF(
 		const dailyDirection = String(daily.direction ?? 'unknown')
 		return {
 			status: 'fallback',
+			source: 'fallback',
+			engine_mode: 'educational_fallback',
 			data: {
 				by_timeframe: fallbackFrames,
 				consensus: {

@@ -37,24 +37,48 @@ async function postPython(path: string, payload: unknown) {
 
 export async function analyze(prices: number[]) {
 	try {
-		return await postPython('/analyze/statistical', { prices })
+		return {
+			...(await postPython('/analyze/statistical', { prices })),
+			source: 'python_vercel',
+			engine_mode: 'python_live',
+		}
 	} catch {
-		return statisticalFallback(prices)
+		return {
+			...statisticalFallback(prices),
+			source: 'fallback',
+			engine_mode: 'educational_fallback',
+		}
 	}
 }
 
 export async function forecastARIMA(prices: number[], steps = 30) {
 	try {
-		return await postPython('/forecast/arima', { prices, steps })
+		return {
+			...(await postPython('/forecast/arima', { prices, steps })),
+			source: 'python_vercel',
+			engine_mode: 'python_live',
+		}
 	} catch {
-		return forecastFallback(prices, steps, 'ARIMA')
+		return {
+			...forecastFallback(prices, steps, 'ARIMA'),
+			source: 'fallback',
+			engine_mode: 'educational_fallback',
+		}
 	}
 }
 
 export async function forecastLSTM(prices: number[], steps = 30) {
 	try {
-		return await postPython('/forecast/lstm', { prices, steps })
+		return {
+			...(await postPython('/forecast/lstm', { prices, steps })),
+			source: 'python_vercel',
+			engine_mode: 'python_live',
+		}
 	} catch {
-		return forecastFallback(prices, steps, 'LSTM')
+		return {
+			...forecastFallback(prices, steps, 'LSTM'),
+			source: 'fallback',
+			engine_mode: 'educational_fallback',
+		}
 	}
 }

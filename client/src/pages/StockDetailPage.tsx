@@ -42,6 +42,11 @@ type ElliottMtfData = {
 	by_timeframe?: Record<string, ElliottFrame>
 	consensus?: { direction?: string; confidence?: number }
 	disclaimer?: string
+	source?: string
+}
+
+type EngineStatus = {
+	python_engine?: { live?: boolean; status?: string; engines?: string[] }
 }
 
 export function StockDetailPage({
@@ -65,6 +70,8 @@ export function StockDetailPage({
 		'technical',
 	)
 	const [elliottMtf, setElliottMtf] = useState<ElliottMtfData>()
+	const [engineStatus, setEngineStatus] =
+		useState<EngineStatus['python_engine']>()
 	const livePrice = useLivePrice(normalized, market)
 
 	useEffect(() => {
@@ -105,6 +112,20 @@ export function StockDetailPage({
 				if (!cancelled) setElliottMtf(result.data)
 			})
 			.catch(() => undefined)
+		void api<EngineStatus>(
+			`/api/analysis/${normalized}/full?market=${market}`,
+			{ suppressToast: true },
+		)
+			.then((result) => {
+				if (!cancelled) setEngineStatus(result.python_engine)
+			})
+			.catch(() => {
+				if (!cancelled)
+					setEngineStatus({
+						live: false,
+						status: 'الوضع الاحتياطي — البيانات قد تكون غير محدثة',
+					})
+			})
 		return () => {
 			cancelled = true
 			controller.abort()
@@ -285,6 +306,14 @@ export function StockDetailPage({
 										<h2>الرسم السعري الاحترافي</h2>
 									</div>
 									<span className="muted">شموع · حجم · RSI · MACD</span>
+								</div>
+								<div
+									className={`engine-status ${engineStatus?.live ? 'is-live' : 'is-fallback'}`}
+								>
+									<span aria-hidden="true" />
+									{engineStatus?.live
+										? 'Python Engine Live'
+										: (engineStatus?.status ?? 'جاري التحقق من مصدر التحليل')}
 								</div>
 								<ProfessionalStockChart candles={data.candles} />
 							</section>
