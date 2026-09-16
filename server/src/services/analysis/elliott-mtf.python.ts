@@ -35,6 +35,106 @@ function aggregate(candles: MtfCandle[], step: number): MtfCandle[] {
 	return result
 }
 
+function enrichFallback(result: Record<string, any>, timeframe: string) {
+	const pivots = Array.isArray(result.pivots) ? result.pivots : []
+	const current = result.current_wave ?? {}
+	const last = pivots.at(-1)
+	const previous = pivots.at(-2)
+	const currentPrice = Number(
+		current.current_price ?? last?.price ?? previous?.price ?? 0,
+	)
+	const direction = current.direction === 'down' ? 'down' : 'up'
+	const swing = Math.abs(
+		Number(last?.price ?? 0) - Number(previous?.price ?? 0),
+	)
+	const safeSwing =
+		Number.isFinite(swing) && swing > 0 ? swing : currentPrice * 0.02
+	const sign = direction === 'down' ? -1 : 1
+	const targets = {
+		target_1: {
+			price: Number((currentPrice + sign * safeSwing * 0.618).toFixed(2)),
+			fib_ratio: 0.618,
+			label: 'هدف 1 — امتداد Fibonacci 61.8%',
+		},
+		target_2: {
+			price: Number((currentPrice + sign * safeSwing).toFixed(2)),
+			fib_ratio: 1,
+			label: 'هدف 2 — امتداد Fibonacci 100%',
+		},
+		target_3: {
+			price: Number((currentPrice + sign * safeSwing * 1.618).toFixed(2)),
+			fib_ratio: 1.618,
+			label: 'هدف 3 — امتداد Fibonacci 161.8%',
+		},
+		based_on: `آخر تأرجح سعري (${timeframe})`,
+	}
+	const retracement =
+		safeSwing > 0 ? Math.min(1, Math.abs(safeSwing / currentPrice)) : 0
+	const relationships = {
+		wave2_retracement: {
+			value: Number((retracement * 100).toFixed(1)),
+			nearest_fib: 0.618,
+			expected_range: '50% - 61.8%',
+			valid: retracement >= 0.4 && retracement <= 0.7,
+			label: 'تصحيح الموجة 2',
+		},
+		wave3_extension: {
+			value: 1.618,
+			nearest_fib: 1.618,
+			expected_range: '1.618 - 2.618',
+			valid: false,
+			label: 'امتداد الموجة 3 — يحتاج تحققاً من عدّ الموجات',
+		},
+		wave4_retracement: {
+			value: 38.2,
+			nearest_fib: 0.382,
+			expected_range: '23.6% - 38.2%',
+			valid: false,
+			label: 'تصحيح الموجة 4 — يحتاج تحققاً من عدّ الموجات',
+		},
+	}
+	const invalidationLevel = Number(
+		(direction === 'up' ? previous?.price : previous?.price) ??
+			currentPrice * (direction === 'up' ? 0.97 : 1.03),
+	)
+	const baseConfidence = Number(current.confidence ?? result.confidence ?? 0.3)
+	const confidence = Math.min(0.82, Math.max(0.35, baseConfidence))
+	return {
+		...result,
+		current_wave: {
+			...current,
+			current_price: currentPrice,
+			direction,
+			confidence,
+		},
+		targets,
+		relationships,
+		invalidation: {
+			level: Number(invalidationLevel.toFixed(2)),
+			reason:
+				direction === 'up'
+					? 'يبطل السيناريو الصاعد عند كسر قاع التأرجح السابق بإغلاق مؤكد.'
+					: 'يبطل السيناريو الهابط عند تجاوز قمة التأرجح السابقة بإغلاق مؤكد.',
+			distance_pct: currentPrice
+				? Number(
+						(
+							(Math.abs(currentPrice - invalidationLevel) / currentPrice) *
+							100
+						).toFixed(2),
+					)
+				: null,
+		},
+		confidence,
+		confidence_percent: Number((confidence * 100).toFixed(1)),
+		confidence_label: 'درجة توافق الأدلة وليست احتمالاً مضموناً',
+		method: {
+			name: 'ZigZag + قواعد Elliott + Fibonacci',
+			status: 'educational_fallback',
+			note: 'الأهداف حسابية من آخر تأرجح سعري وتحتاج تحققاً من بيانات Python الاحترافية.',
+		},
+	}
+}
+
 export async function analyzeElliottMTF(
 	candles: MtfCandle[],
 	provided?: Record<string, MtfCandle[]>,
@@ -64,14 +164,15 @@ export async function analyzeElliottMTF(
 			Record<string, Record<string, unknown>>
 		>((frames, [timeframe, frameCandles]) => {
 			if (frameCandles.length < 30) return frames
-			const result = analyzeElliottFallback(
-				frameCandles.map((item) => item.close),
+			const result = enrichFallback(
+				analyzeElliottFallback(frameCandles.map((item) => item.close)),
+				timeframe,
 			)
 			const wave = result.current_wave?.wave ?? '?'
 			const direction =
 				wave === 'C' ? 'down' : (result.current_wave?.direction ?? 'unknown')
 			const targets = result.targets ?? {}
-			const lastPivot = result.pivots?.at(-1)?.price
+			const invalidation = result.invalidation ?? {}
 			frames[timeframe] = {
 				available: true,
 				timeframe,
@@ -94,6 +195,7 @@ export async function analyzeElliottMTF(
 				current_wave: wave,
 				direction,
 				confidence: result.confidence ?? 0,
+				confidence_percent: result.confidence_percent ?? 0,
 				wave_personality:
 					wave === 'C'
 						? 'موجة تصحيحية هابطة محتملة'
@@ -105,12 +207,9 @@ export async function analyzeElliottMTF(
 					condition: 'تحتاج بيانات Python متعددة الأطر',
 				},
 				targets,
-				invalidation_level: lastPivot
-					? {
-							level: lastPivot,
-							reason: 'يتغير التصنيف عند كسر المستوى بإغلاق مؤكد',
-						}
-					: {},
+				invalidation,
+				relationships: result.relationships ?? {},
+				method: result.method,
 			}
 			return frames
 		}, {})

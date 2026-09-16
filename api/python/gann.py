@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "server" / "python-services"))
 
 from _common import error, options, read_json, respond
-from services.gann import analyze_gann
+from services.gann_pro import GannPro
 
 
 class handler(BaseHTTPRequestHandler):
@@ -14,13 +14,9 @@ class handler(BaseHTTPRequestHandler):
         try:
             payload = read_json(self)
             candles = payload.get("candles", [])
-            if not isinstance(candles, list) or len(candles) < 3:
-                raise ValueError("candles must contain at least 3 items")
-            prices = [float(item["close"]) for item in candles]
-            dates = [str(item.get("date", "")) for item in candles]
-            if not all(dates):
-                dates = [f"2000-01-{(index % 28) + 1:02d}" for index in range(len(prices))]
-            result = analyze_gann(prices, dates)
+            if not isinstance(candles, list) or len(candles) < 50:
+                raise ValueError("candles must contain at least 50 items")
+            result = GannPro.analyze(candles)
             respond(self, 200, {"status": "success", "source": "python_vercel", "data": result})
         except Exception as exc:
             error(self, exc)

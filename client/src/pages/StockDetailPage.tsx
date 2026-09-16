@@ -34,8 +34,18 @@ type ElliottFrame = {
 	direction: string
 	confidence: number
 	alternate_count?: { wave?: string }
-	targets?: { target_1?: number }
+	targets?: {
+		target_1?: number | { price?: number }
+		target_2?: number | { price?: number }
+		target_3?: number | { price?: number }
+	}
 	invalidation_level?: { level?: number }
+	invalidation?: { level?: number; distance_pct?: number; reason?: string }
+	relationships?: Record<
+		string,
+		{ value?: number; ratio?: number; valid?: boolean }
+	>
+	confidence_percent?: number
 }
 
 type ElliottMtfData = {
@@ -358,12 +368,35 @@ export function StockDetailPage({
 														</small>
 														<small>
 															هدف 1:{' '}
-															{formatEnglishNumber(frame.targets?.target_1)} ·
-															إبطال:{' '}
 															{formatEnglishNumber(
-																frame.invalidation_level?.level,
+																typeof frame.targets?.target_1 === 'object'
+																	? frame.targets.target_1.price
+																	: frame.targets?.target_1,
+															)}{' '}
+															· هدف 2:{' '}
+															{formatEnglishNumber(
+																typeof frame.targets?.target_2 === 'object'
+																	? frame.targets.target_2.price
+																	: frame.targets?.target_2,
+															)}{' '}
+															· إبطال:{' '}
+															{formatEnglishNumber(
+																frame.invalidation?.level ??
+																	frame.invalidation_level?.level,
 															)}
 														</small>
+														{frame.relationships?.wave2_retracement ? (
+															<small>
+																Fibonacci 2:{' '}
+																{formatEnglishNumber(
+																	frame.relationships.wave2_retracement.value,
+																)}
+																% ·{' '}
+																{frame.relationships.wave2_retracement.valid
+																	? 'متوافق'
+																	: 'يحتاج تحقق'}
+															</small>
+														) : null}
 													</>
 												)}
 											</article>
