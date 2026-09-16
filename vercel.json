@@ -1,5 +1,4 @@
 {
-	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"version": 2,
 	"buildCommand": "npx prisma generate && npm run build",
 	"installCommand": "npm install --include=dev --fetch-retries=5 --fetch-retry-mintimeout=20000 --fetch-retry-maxtimeout=120000 && npm --prefix client install --include=dev --fetch-retries=5 --fetch-retry-mintimeout=20000 --fetch-retry-maxtimeout=120000",
@@ -7,10 +6,6 @@
 	"functions": {
 		"api/index.ts": {
 			"includeFiles": "server/data.json"
-		},
-		"api/python/*.py": {
-			"runtime": "python3.12",
-			"excludeFiles": "{**/*.test.py,**/test_*.py,**/__pycache__/**,**/.venv/**}"
 		}
 	},
 	"rewrites": [
