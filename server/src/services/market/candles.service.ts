@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma.js'
 import { resolveEgyptSymbol } from './twelve-data.adapter.js'
+import { qualityForSeries, makeDataQuality } from './data-quality.js'
 
 export type Candle = {
 	date: string
@@ -21,6 +22,7 @@ export type CandlesResponse = {
 	count: number
 	freshness: Freshness
 	delayedByMinutes: number | null
+	data_quality: ReturnType<typeof qualityForSeries>
 }
 type CacheEntry = { expires: number; value: CandlesResponse }
 const cache = new Map<string, CacheEntry>()
@@ -77,16 +79,21 @@ const response = (
 	interval: string,
 	candles: Candle[],
 	source: string,
-): CandlesResponse => ({
-	symbol,
-	market,
-	interval,
-	candles,
-	source,
-	fetched_at: new Date().toISOString(),
-	count: candles.length,
-	...freshnessFor(source, candles),
-})
+): CandlesResponse => {
+	const fetchedAt = new Date().toISOString()
+	const freshness = freshnessFor(source, candles)
+	return {
+		symbol,
+		market,
+		interval,
+		candles,
+		source,
+		fetched_at: fetchedAt,
+		count: candles.length,
+		...freshness,
+		data_quality: qualityForSeries(source, freshness.freshness, fetchedAt),
+	}
+}
 
 async function requestJson(url: string, init?: RequestInit) {
 	const result = await fetch(url, {
@@ -137,7 +144,15 @@ export class CandlesService {
 		const cacheKey = `candles:${market}:${resolved}:${interval}:${days}`
 		const cached = cache.get(cacheKey)
 		if (cached && cached.expires > Date.now())
-			return { ...cached.value, freshness: 'cached' }
+				return {
+					...cached.value,
+					freshness: 'cached',
+					data_quality: qualityForSeries(
+						cached.value.source,
+						'cached',
+						cached.value.fetched_at,
+					),
+				}
 		const sources: Array<() => Promise<CandlesResponse>> = [
 			() => this.fetchTwelveData(resolved, market, interval, days),
 			() => this.fetchSahmk(resolved, market, interval, days),
@@ -403,10 +418,17 @@ export class CandlesService {
 							? ('delayed' as Freshness)
 							: ('live' as Freshness),
 						updatedAt: data.updated_at ?? new Date().toISOString(),
-						...quoteMetadata(
-							data.is_delayed ? 'delayed' : 'live',
-							data.updated_at ?? new Date().toISOString(),
-						),
+							...quoteMetadata(
+								data.is_delayed ? 'delayed' : 'live',
+								data.updated_at ?? new Date().toISOString(),
+							),
+							data_quality: makeDataQuality({
+								status: data.is_delayed ? 'delayed' : 'live',
+								provider: 'SAHMK',
+								timestamp: data.updated_at ?? new Date().toISOString(),
+								thresholdSeconds: 60,
+								realtimeTick: !data.is_delayed,
+							}),
 					}
 			} catch (error) {
 				console.warn(
@@ -440,10 +462,17 @@ export class CandlesService {
 								? ('live' as Freshness)
 								: ('delayed' as Freshness),
 						updatedAt: data.datetime ?? new Date().toISOString(),
-						...quoteMetadata(
-							process.env.TWELVE_DATA_REALTIME === 'true' ? 'live' : 'delayed',
-							data.datetime ?? new Date().toISOString(),
-						),
+							...quoteMetadata(
+								process.env.TWELVE_DATA_REALTIME === 'true' ? 'live' : 'delayed',
+								data.datetime ?? new Date().toISOString(),
+							),
+							data_quality: makeDataQuality({
+								status: process.env.TWELVE_DATA_REALTIME === 'true' ? 'live' : 'delayed',
+								provider: 'Twelve Data',
+								timestamp: data.datetime ?? new Date().toISOString(),
+								thresholdSeconds: 300,
+								realtimeTick: process.env.TWELVE_DATA_REALTIME === 'true',
+							}),
 					}
 			} catch (error) {
 				console.warn(
@@ -466,7 +495,14 @@ export class CandlesService {
 						source: 'Polygon.io',
 						freshness: 'live' as Freshness,
 						updatedAt: new Date().toISOString(),
-						...quoteMetadata('live', new Date().toISOString()),
+							...quoteMetadata('live', new Date().toISOString()),
+							data_quality: makeDataQuality({
+								status: 'live',
+								provider: 'Polygon.io',
+								timestamp: new Date().toISOString(),
+								thresholdSeconds: 60,
+								realtimeTick: true,
+							}),
 					}
 			} catch (error) {
 				console.warn(
@@ -489,7 +525,8 @@ export class CandlesService {
 					source: candles.source,
 					freshness: candles.freshness,
 					updatedAt: candles.fetched_at,
-					...quoteMetadata(candles.freshness, candles.fetched_at),
+						...quoteMetadata(candles.freshness, candles.fetched_at),
+						data_quality: candles.data_quality,
 				}
 		} catch (error) {
 			console.warn(
@@ -505,6 +542,11 @@ export class CandlesService {
 			freshness: 'cached' as Freshness,
 			updatedAt: null,
 			...quoteMetadata('cached', null),
+			data_quality: makeDataQuality({
+				status: 'unavailable',
+				provider: 'unavailable',
+				warnings: ['تعذر الحصول على سعر من مزود موثوق'],
+			}),
 		}
 	}
 }

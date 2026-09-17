@@ -19,6 +19,12 @@ type Candles = {
 	candles: Candle[]
 	count: number
 	freshness?: 'live' | 'delayed' | 'cached'
+	data_quality?: {
+		status?: string
+		provider?: string
+		age_seconds?: number | null
+		warnings?: string[]
+	}
 }
 
 type Watchlist = { id: string; items: { symbol: string }[] }
@@ -283,8 +289,14 @@ export function StockDetailPage({
 						PDF
 					</a>
 				</div>
-			</header>
-			{loading && (
+				</header>
+				<section className="analysis-card data-quality-strip" aria-label="حالة جودة البيانات">
+					<div><span className="eyebrow">الكتالوج</span><strong>{displayCompanyName ? 'مؤكد' : 'قيد التحقق'}</strong><small>{displayCompanyName ?? normalized}</small></div>
+					<div><span className="eyebrow">السعر الحي</span><strong>{livePrice?.freshness === 'live' ? 'حي' : livePrice ? 'متأخر' : 'غير متاح'}</strong><small>{livePrice?.source ?? 'بانتظار المزود'}</small></div>
+					<div><span className="eyebrow">جودة الشموع</span><strong>{data?.data_quality?.status === 'live' ? 'لحظية' : data?.data_quality?.status === 'historical' ? 'تاريخية' : data ? 'متأخرة' : 'غير متاحة'}</strong><small>{data?.data_quality?.provider ?? 'بانتظار البيانات'}</small></div>
+					<div><span className="eyebrow">اعتمادية التحليل</span><strong>{engineStatus?.live ? 'محرك حي' : engineStatus ? 'احتياطي' : 'قيد التحقق'}</strong><small>{engineStatus?.status ?? 'لا نرفع الثقة قبل اكتمال المحركات'}</small></div>
+				</section>
+				{loading && (
 				<div className="stock-detail-skeleton">
 					<i />
 					<i />

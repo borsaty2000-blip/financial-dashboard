@@ -27,6 +27,7 @@ import { SentimentService } from '../services/analysis/sentiment.service.js'
 import { buildSmartSummary } from '../services/analysis/smartSummary.service.js'
 import { analyzeElliottMTF } from '../services/analysis/elliott-mtf.python.js'
 import { buildAdvancedAnalysis } from '../services/analysis/advanced-analysis.service.js'
+import { makeDataQuality } from '../services/market/data-quality.js'
 
 export const analysisRoutes = Router()
 analysisRoutes.use(analysisRateLimit)
@@ -97,11 +98,12 @@ analysisRoutes.get('/:symbol/advanced', async (request, response) => {
 			source: series.source,
 			fetchedAt: new Date().toISOString(),
 		})
-		return response.json({
-			status: 'success',
-			data: result,
-			decision: 'NO_TRADE_DECISION',
-		})
+			return response.json({
+				status: 'success',
+				data: result,
+				data_quality: series.data_quality,
+				decision: 'NO_TRADE_DECISION',
+			})
 	} catch {
 		return response.status(502).json({
 			status: 'error',
@@ -150,8 +152,13 @@ async function resolveSeries(request: Request) {
 			prices,
 			dates,
 			candles: [],
-			source: 'provided',
-			count: prices.length,
+				source: 'provided',
+				count: prices.length,
+				data_quality: makeDataQuality({
+					status: 'historical',
+					provider: 'request',
+					warnings: ['تم تمرير الأسعار مباشرة إلى محرك التحليل'],
+				}),
 		}
 	const candles = await CandlesService.getCandles(
 		request.params.symbol,
@@ -164,9 +171,10 @@ async function resolveSeries(request: Request) {
 		prices: candles.candles.map((candle) => candle.close),
 		dates: candles.candles.map((candle) => candle.date),
 		candles: candles.candles,
-		source: candles.source,
-		count: candles.count,
-	}
+			source: candles.source,
+			count: candles.count,
+			data_quality: candles.data_quality,
+		}
 }
 
 analysisRoutes.get('/:symbol/full', async (request, response) => {
@@ -304,13 +312,13 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 			market: queryMarket(request.query.market),
 			source: series.source,
 			candles_count: series.count,
-			data_quality: {
-				status: 'historical_or_delayed',
-				price_freshness: 'not_guaranteed_realtime',
-				decision: 'NO_TRADE_DECISION',
-				message:
-					'البيانات والتحليلات تعليمية؛ لا تُستخدم وحدها لاتخاذ قرار شراء أو بيع.',
-			},
+				data_quality: {
+					...series.data_quality,
+					warnings: [
+						...series.data_quality.warnings,
+						'البيانات والتحليلات تعليمية؛ لا تُستخدم وحدها لاتخاذ قرار شراء أو بيع.',
+					],
+				},
 			stages,
 			python_engine: {
 				live: engineStatuses.some((item) => item.status === 'python_live'),
@@ -438,6 +446,7 @@ analysisRoutes.get('/:symbol/brilliant-summary', async (request, response) => {
 			data_quality: {
 				source: series.source,
 				candles_count: series.count,
+				data_quality: series.data_quality,
 				decision: 'NO_TRADE_DECISION',
 			},
 		})
