@@ -26,6 +26,23 @@ type CacheEntry = { expires: number; value: CandlesResponse }
 const cache = new Map<string, CacheEntry>()
 const CACHE_TTL = 60_000
 
+const quoteMetadata = (freshness: Freshness, updatedAt: string | null) => {
+	const ageMinutes = updatedAt
+		? Math.max(
+				0,
+				Math.round((Date.now() - new Date(updatedAt).getTime()) / 60_000),
+			)
+		: null
+	const isLive = freshness === 'live' && (ageMinutes == null || ageMinutes <= 5)
+	return {
+		dataQuality: isLive ? ('live' as const) : ('delayed' as const),
+		delayMinutes: isLive ? 0 : (ageMinutes ?? 15),
+		warnings: isLive
+			? []
+			: ['السعر ليس بثاً لحظياً مؤكداً؛ استخدمه كبيان متأخر أو تاريخي.'],
+	}
+}
+
 const validCandle = (candle: Candle) =>
 	[candle.open, candle.high, candle.low, candle.close].every(
 		(value) => Number.isFinite(value) && value > 0,
@@ -386,6 +403,10 @@ export class CandlesService {
 							? ('delayed' as Freshness)
 							: ('live' as Freshness),
 						updatedAt: data.updated_at ?? new Date().toISOString(),
+						...quoteMetadata(
+							data.is_delayed ? 'delayed' : 'live',
+							data.updated_at ?? new Date().toISOString(),
+						),
 					}
 			} catch (error) {
 				console.warn(
@@ -419,6 +440,10 @@ export class CandlesService {
 								? ('live' as Freshness)
 								: ('delayed' as Freshness),
 						updatedAt: data.datetime ?? new Date().toISOString(),
+						...quoteMetadata(
+							process.env.TWELVE_DATA_REALTIME === 'true' ? 'live' : 'delayed',
+							data.datetime ?? new Date().toISOString(),
+						),
 					}
 			} catch (error) {
 				console.warn(
@@ -441,6 +466,7 @@ export class CandlesService {
 						source: 'Polygon.io',
 						freshness: 'live' as Freshness,
 						updatedAt: new Date().toISOString(),
+						...quoteMetadata('live', new Date().toISOString()),
 					}
 			} catch (error) {
 				console.warn(
@@ -463,6 +489,7 @@ export class CandlesService {
 					source: candles.source,
 					freshness: candles.freshness,
 					updatedAt: candles.fetched_at,
+					...quoteMetadata(candles.freshness, candles.fetched_at),
 				}
 		} catch (error) {
 			console.warn(
@@ -477,6 +504,7 @@ export class CandlesService {
 			source: 'unavailable',
 			freshness: 'cached' as Freshness,
 			updatedAt: null,
+			...quoteMetadata('cached', null),
 		}
 	}
 }

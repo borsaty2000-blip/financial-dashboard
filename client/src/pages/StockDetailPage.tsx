@@ -244,13 +244,26 @@ export function StockDetailPage({
 					</strong>
 					<b
 						className={
-							stats.changePercent != null && stats.changePercent >= 0
+							(livePrice?.changePercent ?? stats.changePercent) != null &&
+							(livePrice?.changePercent ?? stats.changePercent)! >= 0
 								? 'positive'
 								: 'negative'
 						}
 					>
-						{formatEnglishPercent(stats.changePercent)}
+						{formatEnglishPercent(
+							livePrice?.changePercent ?? stats.changePercent,
+						)}
 					</b>
+					<small
+						className="quote-freshness"
+						title={livePrice?.warnings?.join(' ')}
+					>
+						<span
+							className={`quote-status-dot ${livePrice?.freshness === 'live' ? 'is-live' : 'is-delayed'}`}
+						/>
+						{livePrice?.freshness === 'live' ? 'حي' : 'متأخر'} ·{' '}
+						{livePrice?.source ?? 'بيانات تاريخية'}
+					</small>
 				</div>
 				<div className="stock-header-actions">
 					<button className="secondary-button" onClick={listen}>

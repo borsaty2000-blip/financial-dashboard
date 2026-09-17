@@ -8470,3 +8470,11 @@ select:focus-visible {
 		height: 48px !important;
 	}
 }
+
+
+/* Quote provenance: never confuse delayed data with a live feed. */
+.quote-freshness { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; color: #6b7280; font-size: .72rem; white-space: nowrap; }
+.quote-status-dot { width: 7px; height: 7px; border-radius: 999px; background: #9ca3af; }
+.quote-status-dot.is-live { background: #16805c; box-shadow: 0 0 0 3px rgb(22 128 92 / 12%); }
+.quote-status-dot.is-delayed { background: #a66b00; }
+@media (max-width: 720px) { .quote-freshness { font-size: .65rem; } }
