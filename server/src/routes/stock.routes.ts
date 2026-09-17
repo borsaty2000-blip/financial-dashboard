@@ -5,6 +5,7 @@ import {
 	type CandleMarket,
 } from '../services/market/candles.service.js'
 import {
+	getEgyptCompanies,
 	getSaudiCompanies,
 	type TwelveCompany,
 } from '../services/market/twelve-data.adapter.js'
@@ -44,6 +45,11 @@ async function findCompany(identifier: string) {
 		const companies = await getSaudiCompanies().catch(() => [])
 		const match = companies.find((item) => item.symbol === normalized)
 		if (match) return companyPayload({ ...match, market: 'TASI' })
+	}
+	if (marketFor(normalized) === 'EGX') {
+		const companies = await getEgyptCompanies().catch(() => [])
+		const match = companies.find((item) => item.symbol === normalized)
+		if (match) return companyPayload({ ...match, market: 'EGX' })
 	}
 	return null
 }

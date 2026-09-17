@@ -74,7 +74,32 @@ export async function getTasiCompanies(
 			'/companies/',
 			search ? { search } : undefined,
 		)
-		return live('SAHMK', companies)
+		const catalog = await getSaudiCompanies().catch(() => [])
+		const providerRows = companies.filter(
+			(row): row is Record<string, unknown> =>
+				typeof row === 'object' && row !== null,
+		)
+		const providerBySymbol = new Map(
+			providerRows
+				.map((row) => [String(row.symbol ?? '').toUpperCase(), row] as const)
+				.filter(([symbol]) => Boolean(symbol)),
+		)
+		const merged = catalog.map((company) => {
+			const provider = providerBySymbol.get(company.symbol)
+			return provider
+				? { ...company, ...provider, symbol: company.symbol }
+				: company
+		})
+		const filtered = search
+			? merged.filter((company) => {
+					const row = company as Record<string, unknown>
+					const text = `${String(row.symbol ?? '')} ${String(row.name ?? row.name_ar ?? '')}`
+					return text.toLowerCase().includes(search.toLowerCase())
+				})
+			: merged
+		return catalog.length
+			? { ...delayed('mixed', filtered, 0), freshness: 'cached' }
+			: live('SAHMK', filtered)
 	} catch (sahmkError) {
 		try {
 			const companies = await getSaudiCompanies()

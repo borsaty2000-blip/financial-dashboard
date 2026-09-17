@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
 import { prisma } from '../../lib/prisma.js'
 
 export type TwelveCompany = {
@@ -28,6 +30,38 @@ type TwelveDirectoryResponse = {
 type CompanyCache = { expiresAt: number; companies: TwelveCompany[] }
 const directoryCache = new Map<string, CompanyCache>()
 const DIRECTORY_CACHE_TTL_MS = 24 * 60 * 60 * 1_000
+
+type CatalogRow = {
+	symbol: string
+	nameAr: string
+	market: string
+	currency?: string
+}
+
+async function readBundledCatalog(
+	market: 'EGX' | 'TASI',
+): Promise<TwelveCompany[]> {
+	const filename =
+		market === 'EGX' ? 'egx-companies.json' : 'tasi-companies.json'
+	const file = path.resolve(process.cwd(), 'prisma/data', filename)
+	const payload = JSON.parse(await readFile(file, 'utf8')) as {
+		items?: CatalogRow[]
+	}
+	const rows = Array.isArray(payload.items) ? payload.items : []
+	return rows
+		.filter((row) => row.market === market && row.symbol && row.nameAr)
+		.map((row) => ({
+			symbol: row.symbol.toUpperCase(),
+			displaySymbol: row.symbol.toUpperCase(),
+			name: row.nameAr,
+			currency: row.currency ?? (market === 'EGX' ? 'EGP' : 'SAR'),
+			exchange: market,
+			micCode: market === 'EGX' ? 'XCAI' : 'XSAU',
+			country: market === 'EGX' ? 'Egypt' : 'Saudi Arabia',
+			type: 'Common Stock',
+			figiCode: null,
+		}))
+}
 
 const egxAliases: Record<string, string[]> = {
 	COMI: ['commercial international bank'],
@@ -123,7 +157,11 @@ async function getEgyptCompaniesFromCatalog(): Promise<TwelveCompany[]> {
 			figiCode: null,
 		}))
 	}
-	return getCompaniesByExchange('XCAI')
+	try {
+		return await readBundledCatalog('EGX')
+	} catch {
+		return getCompaniesByExchange('XCAI')
+	}
 }
 
 export function getSaudiCompanies(): Promise<TwelveCompany[]> {
@@ -146,12 +184,29 @@ async function getSaudiCompaniesFromCatalog(): Promise<TwelveCompany[]> {
 			figiCode: null,
 		}))
 	}
-	return getCompaniesByExchange('XSAU')
+	try {
+		return await readBundledCatalog('TASI')
+	} catch {
+		return getCompaniesByExchange('XSAU')
+	}
 }
 
 export async function resolveEgyptSymbol(input: string): Promise<string> {
 	const normalized = input.trim().toUpperCase()
 	if (!normalized) throw new Error('Symbol is required')
+	const catalogMatch = await prisma.egxCompany
+		.findFirst({ where: { sourceCode: normalized } })
+		.catch(() => null)
+	if (catalogMatch?.symbol) return catalogMatch.symbol
+	if (/^EGS[A-Z0-9]+$/u.test(normalized)) {
+		try {
+			const external = await getCompaniesByExchange('XCAI')
+			const match = external.find((company) => company.symbol === normalized)
+			if (match) return match.displaySymbol ?? match.symbol
+		} catch {
+			// Continue with the canonical local directory below.
+		}
+	}
 	if (!process.env.TWELVE_DATA_API_KEY?.trim()) return normalized
 	const companies = await getEgyptCompanies()
 	const direct = companies.find((company) => company.symbol === normalized)

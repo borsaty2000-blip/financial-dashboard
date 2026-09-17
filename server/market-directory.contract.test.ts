@@ -54,22 +54,16 @@ test('Saudi directory falls back to Twelve Data EOD without claiming live data',
 		assert.equal(envelope.freshness, 'delayed')
 		assert.equal(envelope.delay_minutes, 1440)
 		assert.equal(envelope.available, true)
-		assert.deepEqual(envelope.data, [
-			{
-				symbol: '2222',
-				name: 'Saudi Aramco',
-				currency: 'SAR',
-				exchange: 'Tadawul',
-				micCode: null,
-				country: null,
-				type: null,
-				figiCode: null,
-			},
-		])
+		assert.ok(Array.isArray(envelope.data))
+		assert.ok(
+			(envelope.data as Array<{ symbol: string }>).some(
+				(company) => company.symbol === '2222',
+			),
+		)
 		clearTwelveDirectoryCacheForTest()
 		const egypt = await getEgyptCompanies()
-		assert.equal(egypt[0]?.symbol, 'EGS60121C018')
-		assert.equal(egypt[0]?.displaySymbol, 'COMI')
+		assert.ok(egypt.length >= 145)
+		assert.ok(egypt.some((company) => company.symbol === 'COMI'))
 	} finally {
 		globalThis.fetch = originalFetch
 	}
