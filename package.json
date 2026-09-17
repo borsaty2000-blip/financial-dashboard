@@ -10,7 +10,7 @@
 		"typecheck": "tsc --noEmit",
 		"lint": "npm --prefix client run lint",
 		"test": "npm --prefix client run test",
-		"test:server": "node --import tsx --test server/health.integration.test.ts server/analysis-fallback.test.ts server/indicators.advanced.test.ts server/security.contract.test.ts server/feature.contract.test.ts server/market-directory.contract.test.ts server/analysis-integrity.test.ts server/advanced-analysis.test.ts",
+		"test:server": "node --import tsx --test server/health.integration.test.ts server/analysis-fallback.test.ts server/indicators.advanced.test.ts server/security.contract.test.ts server/feature.contract.test.ts server/market-directory.contract.test.ts server/analysis-integrity.test.ts server/advanced-analysis.test.ts server/provider.service.test.ts",
 		"test:auth": "tsx --test server/auth.validator.test.ts",
 		"db:seed:egx": "tsx prisma/seed-egx.ts",
 		"db:seed:tasi": "tsx prisma/seed-tasi.ts",
