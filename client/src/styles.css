@@ -8446,12 +8446,12 @@ select:focus-visible {
 .engine-status.is-live > span {
 	background: #17a34a;
 }
-.engine-status.is-fallback {
+.engine-status.is-unavailable {
 	border-color: #e6d19b;
 	color: #765b1d;
 	direction: rtl;
 }
-.engine-status.is-fallback > span {
+.engine-status.is-unavailable > span {
 	background: #d39b25;
 }
 @media (max-width: 640px) {

@@ -343,7 +343,7 @@ export function StockDetailPage({
 									<span className="muted">شموع · حجم · RSI · MACD</span>
 								</div>
 								<div
-									className={`engine-status ${engineStatus?.live ? 'is-live' : 'is-fallback'}`}
+									className={`engine-status ${engineStatus?.live ? 'is-live' : 'is-unavailable'}`}
 								>
 									<span aria-hidden="true" />
 										{engineStatus?.live

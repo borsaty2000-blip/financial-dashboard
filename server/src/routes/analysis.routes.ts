@@ -353,9 +353,9 @@ analysisRoutes.get('/:symbol/full', async (request, response) => {
 			stages,
 			python_engine: {
 				live: engineStatuses.some((item) => item.status === 'python_live'),
-				status: engineStatuses.some((item) => item.status === 'python_live')
-					? 'Python Engine Live'
-					: 'الوضع الاحتياطي — البيانات قد تكون غير محدثة',
+					status: engineStatuses.some((item) => item.status === 'python_live')
+						? 'متاح'
+						: 'غير متاح لهذا الرمز',
 				engines: engineStatuses
 					.filter((item) => item.status === 'python_live')
 					.map((item) => item.name),

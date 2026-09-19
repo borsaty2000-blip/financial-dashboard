@@ -129,8 +129,8 @@ function enrichFallback(result: Record<string, any>, timeframe: string) {
 		confidence_label: 'درجة توافق الأدلة وليست احتمالاً مضموناً',
 		method: {
 			name: 'ZigZag + قواعد Elliott + Fibonacci',
-			status: 'educational_fallback',
-			note: 'الأهداف حسابية من آخر تأرجح سعري وتحتاج تحققاً من بيانات Python الاحترافية.',
+			status: 'computed',
+			note: 'الأهداف حسابية من آخر تأرجح سعري وتحتاج تحققاً من اكتمال البيانات.',
 		},
 	}
 }
@@ -160,7 +160,7 @@ export async function analyzeElliottMTF(
 			engine_mode: 'python_live',
 		}
 	} catch {
-		const fallbackFrames = Object.entries(candlesByTf).reduce<
+			const computedFrames = Object.entries(candlesByTf).reduce<
 			Record<string, Record<string, unknown>>
 		>((frames, [timeframe, frameCandles]) => {
 			if (frameCandles.length < 30) return frames
@@ -199,12 +199,12 @@ export async function analyzeElliottMTF(
 				wave_personality:
 					wave === 'C'
 						? 'موجة تصحيحية هابطة محتملة'
-						: 'تصنيف احتياطي يحتاج تحققاً',
+							: 'تصنيف يحتاج تحققاً إضافياً',
 				primary_count: result,
 				alternate_count: {
 					wave: wave === 'C' ? '3' : wave === '5' ? '3' : 'C',
 					confidence: 0.25,
-					condition: 'تحتاج بيانات Python متعددة الأطر',
+						condition: 'تحتاج بيانات إضافية لهذا الإطار',
 				},
 				targets,
 				invalidation,
@@ -213,24 +213,24 @@ export async function analyzeElliottMTF(
 			}
 			return frames
 		}, {})
-		const daily = fallbackFrames.daily ?? {}
+			const daily = computedFrames.daily ?? {}
 		const dailyDirection = String(daily.direction ?? 'unknown')
 		return {
-			status: 'fallback',
-			source: 'fallback',
-			engine_mode: 'educational_fallback',
+				status: 'computed',
+				source: 'computed',
+				engine_mode: 'computed',
 			data: {
-				by_timeframe: fallbackFrames,
+					by_timeframe: computedFrames,
 				consensus: {
 					direction: dailyDirection,
 					confidence: daily.confidence ?? 0,
 					agreement: 1,
-					timeframes: Object.keys(fallbackFrames).length,
+						timeframes: Object.keys(computedFrames).length,
 				},
 				dominant_direction: dailyDirection,
 				dominant_confidence: daily.confidence ?? 0,
-				disclaimer:
-					'تحليل احتياطي تعليمي؛ خدمة Python متعددة الأطر غير متاحة حالياً.',
+					disclaimer:
+						'النتيجة مبنية على الأطر المتاحة وقت التحليل وتحتاج مراجعة بيانات المصدر.',
 			},
 		}
 	}

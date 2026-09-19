@@ -56,3 +56,23 @@
 ## النشر
 
 تم تجهيز التغييرات للدفع إلى `origin/main`. لا يمكن اعتبار الإنتاج محدثاً إلا بعد أن ينجح Vercel في نشر commit الجديد؛ لذلك يجب فحص `/api/health` وملفي PDF على النطاق العام بعد اكتمال deployment.
+
+## مراجعة التقرير 27
+
+تمت مراجعة البنود مرة أخرى. لم توجد عبارات المستخدم المحظورة في مكونات التحليل أو الرسم. وُجد اسم CSS داخلي `is-fallback` فقط، وتم تغييره إلى `is-unavailable`؛ كما أن خصائص React العامة `fallback` في ErrorBoundary وSuspense ليست نصوصاً يراها المستخدم ولا يجوز حذفها لأنها جزء من عقود React.
+
+تم التحقق من `ProfessionalStockChart.tsx`: لا يوجد بانر للوضع الاحتياطي أو إشعار Python. الحالات الظاهرة في صفحة السهم تقتصر على حي/متأخر/تاريخي/غير متاح، وهي حالات جودة بيانات حقيقية وليست تفاصيل تنفيذ.
+
+اختبار API المحلي بعد المراجعة:
+
+- `GET /api/analysis/COMI/harmonic?market=EGX`: HTTP 200؛ `insufficient_data` عند عدم وجود خمس نقاط Pivot مؤكدة.
+- `GET /api/analysis/COMI/matrix?market=EGX`: HTTP 200؛ `alignment=mixed`.
+- `GET /api/market/candles/BTCUSDT?market=CRYPTO&days=250`: HTTP 200؛ 250 شمعة من Binance.
+- `GET /api/reports/stock/COMI/pdf?market=EGX&lang=ar`: HTTP 200؛ صفحة واحدة.
+- `GET /api/reports/stock/1010/pdf?market=TASI&lang=ar`: HTTP 200؛ صفحة واحدة.
+
+آخر فحص للإنتاج العام أعاد `403 Vercel Security Checkpoint`، لذلك لا يمكن تأكيد أن النسخة المنشورة التقطت commit المحلي حتى يتم رفع الحاجز أو السماح بالوصول. هذا عائق بيئة نشر وليس فشل اختبار محلي.
+
+## تدقيق API إضافي
+
+أُزيلت العبارات القديمة من عقد Elliott MTF ورسائل `python_engine.status`. القيم المتبقية التي تحتوي على `educational_fallback` في بعض خدمات التحليل هي حقول provenance داخلية لا تُعرض في واجهة المستخدم، وتُستخدم لعقود اختبارات المصدر؛ لم تُحذف حتى لا يُفقد التمييز التشغيلي بين نتيجة المزود والنتيجة المحسوبة. واجهة المستخدم لا تقرأ هذه القيمة لعرضها، وتعرض بدلاً منها «متاح» أو «غير متاح لهذا الرمز».
