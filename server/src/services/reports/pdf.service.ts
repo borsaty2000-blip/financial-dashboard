@@ -2,6 +2,8 @@ import PDFDocument from 'pdfkit'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import reshaper from 'arabic-persian-reshaper'
+import bidiFactory from 'bidi-js'
 import { CandlesService } from '../market/candles.service.js'
 import { getPortfolioValue } from '../trading.service.js'
 import { buildWeeklyDigest } from './weekly.service.js'
@@ -23,6 +25,13 @@ const font = findAsset('Cairo-Regular.ttf') ?? findAsset('NotoSansArabic-Regular
 const boldFont = findAsset('Cairo-Bold.ttf') ?? findAsset('NotoSansArabic-Bold.ttf') ?? font
 const latinFont = findAsset('DejaVuSans.ttf') ?? font
 const latinBoldFont = ['/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', latinFont ?? ''].find(fs.existsSync) ?? latinFont
+const bidi = bidiFactory()
+
+function shapeArabic(value: string) {
+	if (!/[\u0600-\u06ff]/.test(value)) return value
+	const shaped = reshaper.ArabicShaper.convertArabic(value)
+	return bidi.getReorderedString(shaped, bidi.getEmbeddingLevels(shaped, 'rtl'))
+}
 
 function documentBuffer(write: (doc: PDFKit.PDFDocument) => void) {
 	return new Promise<Buffer>((resolve, reject) => {
@@ -43,7 +52,7 @@ function text(doc: PDFKit.PDFDocument, value: unknown, x: number, y: number, wid
 	const arabic = /[\u0600-\u06ff]/.test(content)
 	const mixedWithLatin = /[A-Za-z]/.test(content)
 	const selectedFont = mixedWithLatin || !arabic ? (bold && latinBoldFont ? latinBoldFont : latinFont ?? 'Helvetica') : (bold && boldFont ? boldFont : font ?? 'Helvetica')
-	doc.font(selectedFont).fontSize(size).fillColor(color).text(content, x, y, { width, align: 'right', lineGap: 0 })
+	doc.font(selectedFont).fontSize(size).fillColor(color).text(arabic ? shapeArabic(content) : content, x, y, { width, align: 'right', lineGap: 0 })
 }
 function value(input: unknown, digits = 2) {
 	return typeof input === 'number' && Number.isFinite(input) ? input.toLocaleString('en-US', { maximumFractionDigits: digits }) : '—'
