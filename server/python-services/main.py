@@ -6,6 +6,7 @@ import io
 from pydantic import BaseModel, Field
 
 from services.elliott_wave import analyze_elliott_wave
+from services.elliott_pro import analyze as analyze_elliott_pro
 from services.elliott_mtf import analyze_elliott_mtf
 from services.gann import analyze_gann
 from services.statistical import calculate_statistics
@@ -87,7 +88,15 @@ async def health() -> dict[str, str]:
 @app.post("/analyze/elliott")
 async def elliott_endpoint(data: PriceData) -> dict:
     try:
-        return {"status": "success", "data": analyze_elliott_wave(prepare_prices(data.prices), data.order)}
+        prices = prepare_prices(data.prices)
+        candles = [{"open": price, "high": price, "low": price, "close": price, "volume": 0} for price in prices]
+        result = analyze_elliott_pro(candles)
+        if not result.get("available"):
+            result = analyze_elliott_wave(prices, data.order)
+            result["engine_mode"] = "educational_fallback"
+        else:
+            result["engine_mode"] = "elliott_pro"
+        return {"status": "success", "data": result}
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
     except Exception as error:

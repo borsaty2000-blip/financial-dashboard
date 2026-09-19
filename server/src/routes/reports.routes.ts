@@ -30,8 +30,13 @@ async function sendPdf(
 reportsRoutes.get('/stock/:symbol/pdf', (request, response) =>
 	sendPdf(
 		response,
-		stockReport(request.params.symbol),
-		`borsaty-${request.params.symbol}-analysis.pdf`,
+		stockReport(
+			request.params.symbol,
+			request.query.market === 'TASI' || request.query.market === 'GLOBAL'
+				? request.query.market
+				: 'EGX',
+		),
+		`${request.params.symbol.toUpperCase()}-Analysis-${new Date().toISOString().slice(0, 10)}.pdf`,
 	),
 )
 reportsRoutes.get('/portfolio/pdf', requireAuth, (request, response) =>

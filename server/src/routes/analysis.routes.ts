@@ -28,6 +28,11 @@ import { buildSmartSummary } from '../services/analysis/smartSummary.service.js'
 import { analyzeElliottMTF } from '../services/analysis/elliott-mtf.python.js'
 import { buildAdvancedAnalysis } from '../services/analysis/advanced-analysis.service.js'
 import { makeDataQuality } from '../services/market/data-quality.js'
+import {
+	analyzeHarmonic,
+	buildDecisionSupport,
+	calculateConfluence,
+} from '../services/analysis/confluence.service.js'
 
 export const analysisRoutes = Router()
 analysisRoutes.use(analysisRateLimit)
@@ -175,6 +180,32 @@ async function resolveSeries(request: Request) {
 			count: candles.count,
 			data_quality: candles.data_quality,
 		}
+}
+
+async function resolveAnalysisSeries(request: Request) {
+	const body = request.body as { prices?: unknown; candles?: unknown } | undefined
+	if (Array.isArray(body?.candles) && body.candles.length) {
+		const candles = body.candles as Array<Candle & { date?: string }>
+		return {
+			symbol: request.params.symbol.toUpperCase(),
+			prices: candles.map((candle) => Number(candle.close)).filter(Number.isFinite),
+			dates: candles.map((candle) => candle.date ?? new Date().toISOString()),
+			candles,
+			source: 'request',
+			count: candles.length,
+			data_quality: makeDataQuality({ status: 'historical', provider: 'request', warnings: ['تم تمرير الشموع مباشرة إلى التحليل'] }),
+		}
+	}
+	if (Array.isArray(body?.prices) && body.prices.length) {
+		const prices = body.prices.map(Number).filter((price) => Number.isFinite(price) && price > 0)
+		const candles = prices.map((close) => ({ close, open: close, high: close, low: close, volume: 0, date: new Date().toISOString() })) as Array<Candle & { date: string }>
+		return {
+			symbol: request.params.symbol.toUpperCase(), prices, dates: candles.map((candle) => candle.date), candles,
+			source: 'request', count: prices.length,
+			data_quality: makeDataQuality({ status: 'historical', provider: 'request', warnings: ['تم تمرير الأسعار مباشرة؛ لا تتوفر بيانات OHLCV كاملة'] }),
+		}
+	}
+	return resolveSeries(request)
 }
 
 analysisRoutes.get('/:symbol/full', async (request, response) => {
@@ -743,5 +774,74 @@ analysisRoutes.get('/:symbol/anomalies', async (request, response) => {
 			message:
 				error instanceof Error ? error.message : 'Anomaly service unavailable',
 		})
+	}
+})
+
+analysisRoutes.post('/:symbol/elliott-mtf', async (request, response) => {
+	try {
+		const series = await resolveAnalysisSeries(request)
+		if (series.candles.length < 60)
+			return response.status(422).json({ status: 'insufficient_data', message: 'يلزم 60 شمعة على الأقل للتحليل متعدد الأطر', data_quality: series.data_quality })
+		const complete = series.candles.map((candle) => ({
+			open: Number(candle.open ?? candle.close), high: Number(candle.high ?? candle.close),
+			low: Number(candle.low ?? candle.close), close: Number(candle.close), volume: Number(candle.volume ?? 0),
+		}))
+		const result = await analyzeElliottMTF(complete, { daily: complete })
+		return response.json({ status: 'success', data: result, source: series.source, candles_count: series.count, data_quality: series.data_quality })
+	} catch {
+		return response.status(502).json({ status: 'error', message: 'تعذر تنفيذ Elliott متعدد الأطر' })
+	}
+})
+
+analysisRoutes.post('/:symbol/gann', async (request, response) => {
+	try {
+		const series = await resolveAnalysisSeries(request)
+		if (series.prices.length < 50)
+			return response.status(422).json({ status: 'insufficient_data', message: 'يلزم 50 شمعة لتحليل Gann الكامل', data_quality: series.data_quality })
+		const result = await analyzeGann(series.prices, series.dates)
+		return response.json({ status: 'success', data: result, source: series.source, candles_count: series.count, data_quality: series.data_quality })
+	} catch {
+		return response.status(502).json({ status: 'error', message: 'تعذر تنفيذ Gann' })
+	}
+})
+
+analysisRoutes.post('/:symbol/harmonic', async (request, response) => {
+	try {
+		const series = await resolveAnalysisSeries(request)
+		const complete = series.candles.map((candle) => ({ open: Number(candle.open ?? candle.close), high: Number(candle.high ?? candle.close), low: Number(candle.low ?? candle.close), close: Number(candle.close), volume: Number(candle.volume ?? 0) }))
+		const data = analyzeHarmonic(complete)
+		return response.json({ status: data.status, data, source: series.source, candles_count: series.count, data_quality: series.data_quality })
+	} catch {
+		return response.status(502).json({ status: 'error', message: 'تعذر تنفيذ Harmonic' })
+	}
+})
+
+analysisRoutes.post('/:symbol/confluence', async (request, response) => {
+	try {
+		const series = await resolveAnalysisSeries(request)
+		if (series.candles.length < 30)
+			return response.status(422).json({ status: 'insufficient_data', message: 'يلزم 30 شمعة لحساب Confluence', data_quality: series.data_quality })
+		const [elliott, gann] = await Promise.all([analyzeElliott(series.prices), analyzeGann(series.prices, series.dates)])
+		const complete = series.candles.map((candle) => ({ open: Number(candle.open ?? candle.close), high: Number(candle.high ?? candle.close), low: Number(candle.low ?? candle.close), close: Number(candle.close), volume: Number(candle.volume ?? 0) }))
+		const harmonic = analyzeHarmonic(complete) as Record<string, unknown>
+		const indicators = calculateIndicatorSnapshot(series.symbol, series.candles)
+		const data = calculateConfluence({ candles: complete, elliott: elliott as Record<string, unknown>, gann: gann as Record<string, unknown>, indicators: indicators as Record<string, unknown>, harmonic })
+		return response.json({ status: 'success', data, source: series.source, candles_count: series.count, data_quality: series.data_quality })
+	} catch {
+		return response.status(502).json({ status: 'error', message: 'تعذر حساب Confluence' })
+	}
+})
+
+analysisRoutes.post('/:symbol/recommendation', async (request, response) => {
+	try {
+		const series = await resolveAnalysisSeries(request)
+		const complete = series.candles.map((candle) => ({ open: Number(candle.open ?? candle.close), high: Number(candle.high ?? candle.close), low: Number(candle.low ?? candle.close), close: Number(candle.close), volume: Number(candle.volume ?? 0) }))
+		const harmonic = analyzeHarmonic(complete) as Record<string, unknown>
+		const [elliott, gann] = await Promise.all([analyzeElliott(series.prices), analyzeGann(series.prices, series.dates)])
+		const confluence = calculateConfluence({ candles: complete, elliott: elliott as Record<string, unknown>, gann: gann as Record<string, unknown>, indicators: calculateIndicatorSnapshot(series.symbol, series.candles) as Record<string, unknown>, harmonic })
+		const data = buildDecisionSupport(Number(confluence.bullish_confluence), complete)
+		return response.json({ status: 'success', data: { ...data, confluence }, source: series.source, candles_count: series.count, data_quality: series.data_quality })
+	} catch {
+		return response.status(502).json({ status: 'error', message: 'تعذر بناء Decision Support' })
 	}
 })

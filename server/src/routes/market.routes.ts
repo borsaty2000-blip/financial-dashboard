@@ -165,3 +165,17 @@ marketRoutes.get('/tasi/companies', async (request, response) => {
 		),
 	)
 })
+
+marketRoutes.get('/equities', async (request, response) => {
+	const market = request.query.market === 'TASI' ? 'TASI' : 'EGX'
+	try {
+		const companies = market === 'TASI' ? await getSaudiCompanies() : await getEgyptCompanies()
+		return response.json({
+			status: 'success', market, count: companies.length,
+			items: companies.map((company) => ({ symbol: company.symbol, nameAr: company.name, name: company.name, currency: company.currency, market })),
+			data_quality: { status: 'historical', provider: 'database-catalog-or-bundled-catalog', timestamp: new Date().toISOString(), is_delayed: false, warnings: ['كتالوج الرموز ليس سعراً لحظياً'] },
+		})
+	} catch (error) {
+		return response.status(503).json({ status: 'unavailable', market, count: 0, items: [], error: error instanceof Error ? error.message : 'Equity catalog unavailable' })
+	}
+})
