@@ -463,6 +463,29 @@ model MarketCandle {
   @@map("market_candles")
 }
 
+model Signal {
+  id          String   @id @default(cuid())
+  symbol      String
+  market      String
+  timeframe   String
+  signalType  String
+  entryPrice  Float
+  stopLoss    Float
+  target1     Float?
+  target2     Float?
+  target3     Float?
+  confluence  Int
+  reason      String
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now())
+  resolvedAt  DateTime?
+  outcome     String?
+  pnlPercent  Float?
+
+  @@index([symbol, status, createdAt])
+  @@map("signals")
+}
+
 model EgxCompany {
   id         String   @id @default(uuid())
   sourceCode String   @unique

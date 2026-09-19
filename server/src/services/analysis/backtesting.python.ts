@@ -9,6 +9,7 @@ export async function runBacktest(
 	prices: number[],
 	lookback: number,
 	horizon: number,
+	options: { commission?: number; slippage?: number } = {},
 ) {
 	try {
 		const response = await fetch(`${pythonServiceUrl}/backtest/${strategy}`, {
@@ -17,7 +18,9 @@ export async function runBacktest(
 			body: JSON.stringify({
 				prices,
 				lookback,
-				horizon,
+					horizon,
+					commission: options.commission ?? 0,
+					slippage: options.slippage ?? 0,
 				strategy: strategy === 'indicators' ? 'rsi_macd' : strategy,
 			}),
 			signal: AbortSignal.timeout(5000),
@@ -27,7 +30,7 @@ export async function runBacktest(
 			throw new Error(
 				`Python backtest service ${response.status}: ${JSON.stringify(body)}`,
 			)
-		return body
+		return body?.data ?? body
 	} catch {
 		return backtestFallback(strategy, prices, lookback, horizon)
 	}

@@ -845,3 +845,32 @@ analysisRoutes.post('/:symbol/recommendation', async (request, response) => {
 		return response.status(502).json({ status: 'error', message: 'تعذر بناء Decision Support' })
 	}
 })
+
+analysisRoutes.get('/:symbol/matrix', async (request, response) => {
+	try {
+		const market = queryMarket(request.query.market)
+		const timeframes = [
+			['1m', '1m'], ['5m', '5m'], ['15m', '15m'], ['30m', '30m'],
+			['1h', '1h'], ['4h', '4h'], ['1d', '1d'], ['1w', '1w'], ['1M', '1M'],
+		] as const
+		const fetched = await Promise.all(timeframes.map(async ([label, interval]) => {
+			const candles = await CandlesService.getCandles(request.params.symbol, market, interval, interval === '1d' ? 250 : 120).catch(() => null)
+			if (!candles || candles.candles.length < 20)
+				return [label, { status: 'unavailable', candles_count: candles?.count ?? 0, data_quality: candles?.data_quality ?? null }] as const
+			const snapshot = calculateIndicatorSnapshot(request.params.symbol.toUpperCase(), candles.candles)
+			const rsi = snapshot.rsi.value
+			const trend = snapshot.macd.signal === 'bullish' ? 'up' : snapshot.macd.signal === 'bearish' ? 'down' : 'neutral'
+			const signal = snapshot.recommendation === 'BUY' ? 'BUY' : snapshot.recommendation === 'SELL' ? 'SELL' : 'NEUTRAL'
+			return [label, { status: 'available', trend, signal, rsi, confidence: rsi == null ? null : Number((Math.min(1, Math.max(0, 1 - Math.abs(50 - rsi) / 50))).toFixed(2)), candles_count: candles.count, source: candles.source, data_quality: candles.data_quality }] as const
+		}))
+		const matrix = Object.fromEntries(fetched) as Record<string, { status: string; signal?: string }>
+		const available = Object.values(matrix).filter((item) => item.status === 'available')
+		const buy = available.filter((item) => item.signal === 'BUY').length
+		const sell = available.filter((item) => item.signal === 'SELL').length
+		const neutral = available.length - buy - sell
+		const alignment = buy > sell * 2 ? 'strong_bullish' : sell > buy * 2 ? 'strong_bearish' : 'mixed'
+		return response.json({ symbol: request.params.symbol.toUpperCase(), market, matrix, alignment, alignment_score: available.length ? Number((Math.max(buy, sell) / available.length).toFixed(2)) : null, consensus: { buy, neutral, sell, overall: buy > sell ? 'BUY' : sell > buy ? 'SELL' : 'NEUTRAL' }, disclaimer: 'المصفوفة وصف لحالة المؤشرات المتاحة وليست توصية استثمارية.' })
+	} catch {
+		return response.status(502).json({ status: 'error', message: 'تعذر بناء مصفوفة الأطر الزمنية' })
+	}
+})

@@ -1,6 +1,8 @@
 import { prisma } from '../../lib/prisma.js'
 import { resolveEgyptSymbol } from './twelve-data.adapter.js'
 import { qualityForSeries, makeDataQuality } from './data-quality.js'
+import { fetchBinanceCandles } from './binance.adapter.js'
+import { fetchYahooCandles } from './yahoo-candles.adapter.js'
 
 export type Candle = {
 	date: string
@@ -10,7 +12,7 @@ export type Candle = {
 	close: number
 	volume: number
 }
-export type CandleMarket = 'EGX' | 'TASI' | 'GLOBAL'
+export type CandleMarket = 'EGX' | 'TASI' | 'GLOBAL' | 'CRYPTO' | 'COMMODITIES'
 export type Freshness = 'live' | 'delayed' | 'cached'
 export type CandlesResponse = {
 	symbol: string
@@ -143,17 +145,40 @@ export class CandlesService {
 			market === 'EGX' ? await resolveEgyptSymbol(normalized) : normalized
 		const cacheKey = `candles:${market}:${resolved}:${interval}:${days}`
 		const cached = cache.get(cacheKey)
-		if (cached && cached.expires > Date.now())
-				return {
+			if (cached && cached.expires > Date.now())
+					return {
 					...cached.value,
 					freshness: 'cached',
 					data_quality: qualityForSeries(
 						cached.value.source,
 						'cached',
 						cached.value.fetched_at,
-					),
+						),
+					}
+			if (market === 'CRYPTO') {
+				try {
+					const value = response(resolved, market, interval, await fetchBinanceCandles(resolved, interval, days), 'Binance')
+					if (value.candles.length) {
+						cache.set(cacheKey, { value, expires: Date.now() + CACHE_TTL })
+						return value
+					}
+				} catch (error) {
+					console.warn('Binance candles failed:', error instanceof Error ? error.message : error)
 				}
-		const sources: Array<() => Promise<CandlesResponse>> = [
+			}
+			if (market === 'COMMODITIES') {
+				const yahooSymbols: Record<string, string> = { XAUUSD: 'GC=F', XAGUSD: 'SI=F', WTI: 'CL=F', BRENT: 'BZ=F' }
+				try {
+					const value = response(resolved, market, interval, await fetchYahooCandles(yahooSymbols[resolved] ?? resolved, interval, days), 'Yahoo Finance')
+					if (value.candles.length) {
+						cache.set(cacheKey, { value, expires: Date.now() + CACHE_TTL })
+						return value
+					}
+				} catch (error) {
+					console.warn('Commodity candles failed:', error instanceof Error ? error.message : error)
+				}
+			}
+			const sources: Array<() => Promise<CandlesResponse>> = [
 			() => this.fetchTwelveData(resolved, market, interval, days),
 			() => this.fetchSahmk(resolved, market, interval, days),
 			() => this.fetchPolygon(resolved, market, days),

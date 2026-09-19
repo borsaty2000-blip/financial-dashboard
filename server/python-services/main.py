@@ -55,6 +55,8 @@ class BacktestData(BaseModel):
     lookback: int = Field(default=30, ge=5, le=365)
     horizon: int = Field(default=7, ge=1, le=90)
     strategy: str = "rsi_macd"
+    commission: float = Field(default=0.0, ge=0, le=0.1)
+    slippage: float = Field(default=0.0, ge=0, le=0.1)
 
 
 class CandlestickData(BaseModel):
@@ -191,7 +193,7 @@ async def anomaly_endpoint(data: AnomalyData) -> dict:
 @app.post("/backtest/elliott")
 async def backtest_elliott_endpoint(data: BacktestData) -> dict:
     try:
-        return {"status": "success", "data": backtest_elliott(prepare_prices(data.prices), data.lookback, data.horizon)}
+        return {"status": "success", "data": backtest_elliott(prepare_prices(data.prices), data.lookback, data.horizon, data.commission, data.slippage)}
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
 
@@ -199,7 +201,7 @@ async def backtest_elliott_endpoint(data: BacktestData) -> dict:
 @app.post("/backtest/gann")
 async def backtest_gann_endpoint(data: BacktestData) -> dict:
     try:
-        return {"status": "success", "data": backtest_gann(prepare_prices(data.prices), data.lookback, data.horizon)}
+        return {"status": "success", "data": backtest_gann(prepare_prices(data.prices), data.lookback, data.horizon, data.commission, data.slippage)}
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
 
@@ -207,7 +209,7 @@ async def backtest_gann_endpoint(data: BacktestData) -> dict:
 @app.post("/backtest/indicators")
 async def backtest_indicators_endpoint(data: BacktestData) -> dict:
     try:
-        return {"status": "success", "data": backtest_indicators(prepare_prices(data.prices), data.strategy, data.lookback, data.horizon)}
+        return {"status": "success", "data": backtest_indicators(prepare_prices(data.prices), data.strategy, data.lookback, data.horizon, data.commission, data.slippage)}
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
 

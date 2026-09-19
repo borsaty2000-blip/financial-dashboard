@@ -70,6 +70,7 @@ import { liveMarketRoutes } from './src/routes/live-market.routes.js'
 import { aiRoutes } from './src/routes/ai.routes.js'
 import { heatmapRoutes } from './src/routes/heatmap.routes.js'
 import { providerRoutes } from './src/routes/provider.routes.js'
+import { signalsRoutes } from './src/routes/signals.routes.js'
 
 initializeOptionalSentry()
 const app = express()
@@ -172,6 +173,7 @@ app.use('/api/analysis', analysisRoutes)
 app.use('/api/shariah', shariahRoutes)
 app.use('/api/tradingview/webhook', tradingViewRoutes)
 app.use('/api/backtest', backtestRoutes)
+app.use('/api', signalsRoutes)
 app.use('/api/trading', tradingRoutes)
 app.use('/api/search', searchRoutes)
 app.use('/api/comparison', comparisonRoutes)

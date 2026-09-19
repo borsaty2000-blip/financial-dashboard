@@ -73,17 +73,21 @@ marketRoutes.get('/fundamentals/:symbol', async (request, response) => {
 
 marketRoutes.get('/quote/:symbol', async (request, response) => {
 	const market: CandleMarket =
-		request.query.market === 'TASI' || request.query.market === 'GLOBAL'
-			? request.query.market
-			: 'EGX'
+			request.query.market === 'TASI' || request.query.market === 'GLOBAL'
+				? request.query.market
+				: request.query.market === 'CRYPTO' || request.query.market === 'COMMODITIES'
+					? request.query.market
+				: 'EGX'
 	response.json(await CandlesService.getQuote(request.params.symbol, market))
 })
 
 marketRoutes.get('/candles/:symbol', async (request, response) => {
 	const market: CandleMarket =
-		request.query.market === 'TASI' || request.query.market === 'GLOBAL'
-			? request.query.market
-			: 'EGX'
+			request.query.market === 'TASI' || request.query.market === 'GLOBAL'
+				? request.query.market
+				: request.query.market === 'CRYPTO' || request.query.market === 'COMMODITIES'
+					? request.query.market
+				: 'EGX'
 	const days = Math.min(Math.max(Number(request.query.days ?? 120), 30), 500)
 	response.json(
 		await CandlesService.getCandles(
