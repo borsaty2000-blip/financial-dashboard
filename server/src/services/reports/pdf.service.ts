@@ -11,10 +11,13 @@ const font = [
 	'/usr/share/fonts/truetype/noto/NotoSansArabic-Regular.ttf',
 	'/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
 ].find(fs.existsSync)
+const boldFont = ['/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf', font ?? ''].find(fs.existsSync) ?? font
+const latinFont = ['/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', font ?? ''].find(fs.existsSync) ?? font
+const latinBoldFont = ['/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', latinFont ?? ''].find(fs.existsSync) ?? latinFont
 
 function documentBuffer(write: (doc: PDFKit.PDFDocument) => void) {
 	return new Promise<Buffer>((resolve, reject) => {
-		const doc = new PDFDocument({ margin: 48, autoFirstPage: true })
+		const doc = new PDFDocument({ size: 'A4', layout: 'landscape', margin: 0, autoFirstPage: true })
 		if (font) doc.font(font)
 		const chunks: Buffer[] = []
 		doc.on('data', (chunk) => chunks.push(chunk))
@@ -25,112 +28,116 @@ function documentBuffer(write: (doc: PDFKit.PDFDocument) => void) {
 	})
 }
 
-function value(input: unknown) {
-	return typeof input === 'number' && Number.isFinite(input)
-		? input.toLocaleString('en-US', { maximumFractionDigits: 2 })
-		: '—'
+const colors = { ink: '#171b20', muted: '#6a6d78', line: '#e0e3eb', green: '#089981', red: '#f23645', panel: '#f7f8fa', navy: '#202a35' }
+function text(doc: PDFKit.PDFDocument, value: unknown, x: number, y: number, width: number, size = 10, color = colors.ink, bold = false) {
+	const content = String(value ?? '—')
+	const arabic = /[\u0600-\u06ff]/.test(content)
+	const mixedWithLatin = /[A-Za-z]/.test(content)
+	const selectedFont = mixedWithLatin || !arabic ? (bold && latinBoldFont ? latinBoldFont : latinFont ?? 'Helvetica') : (bold && boldFont ? boldFont : font ?? 'Helvetica')
+	doc.font(selectedFont).fontSize(size).fillColor(color).text(content, x, y, { width, align: 'right', lineGap: 0 })
 }
-
-function rtl(doc: PDFKit.PDFDocument, text: string, size = 11) {
-	doc.fontSize(size).text(text, { align: 'right' })
+function value(input: unknown, digits = 2) {
+	return typeof input === 'number' && Number.isFinite(input) ? input.toLocaleString('en-US', { maximumFractionDigits: digits }) : '—'
 }
-
-function page(doc: PDFKit.PDFDocument, number: number, title: string) {
-	if (number > 1) doc.addPage()
-	rtl(doc, `BorsatyAI — ${title}`, 20)
-	rtl(doc, `صفحة ${number} من 11`, 9)
-	doc.moveDown()
+function card(doc: PDFKit.PDFDocument, x: number, y: number, width: number, height: number, title: string) {
+	doc.roundedRect(x, y, width, height, 8).fillColor(colors.panel).fill()
+	text(doc, title, x + 12, y + 10, width - 24, 12, colors.ink, true)
+	doc.strokeColor(colors.line).lineWidth(0.6).roundedRect(x, y, width, height, 8).stroke()
+}
+function metric(doc: PDFKit.PDFDocument, label: string, valueText: unknown, x: number, y: number, width: number, color = colors.ink) {
+	text(doc, label, x, y, width, 8, colors.muted)
+	text(doc, valueText, x, y + 13, width, 12, color, true)
 }
 
 export async function stockReport(symbol: string, market: 'EGX' | 'TASI' | 'GLOBAL' = 'EGX') {
 	const candles = await CandlesService.getCandles(symbol.toUpperCase(), market, '1d', 250)
 	const latest = candles.candles.at(-1)
 	const previous = candles.candles.at(-2)
-	const change = latest && previous ? ((latest.close - previous.close) / previous.close) * 100 : null
+	const change = latest && previous && previous.close ? ((latest.close - previous.close) / previous.close) * 100 : null
 	const prices = candles.candles.map((candle) => candle.close)
 	const dates = candles.candles.map((candle) => candle.date)
 	const [elliott, gann] = await Promise.all([
-		prices.length >= 3 ? analyzeElliott(prices) : Promise.resolve({ status: 'unavailable' }),
-		prices.length >= 3 ? analyzeGann(prices, dates) : Promise.resolve({ status: 'unavailable' }),
+		prices.length >= 30 ? analyzeElliott(prices) : Promise.resolve({ status: 'unavailable' }),
+		prices.length >= 30 ? analyzeGann(prices, dates) : Promise.resolve({ status: 'unavailable' }),
 	])
+	const elliottData = ((elliott as Record<string, any>).data ?? elliott) as Record<string, any>
+	const gannData = ((gann as Record<string, any>).data ?? gann) as Record<string, any>
 	const indicators = calculateIndicatorSnapshot(symbol.toUpperCase(), candles.candles)
+	const targets = elliottData?.targets ?? {}
+	const currentWave = elliottData?.current_wave?.label ?? elliottData?.current_wave?.number ?? 'غير متاحة'
+	const direction = elliottData?.current_wave?.direction === 'up' ? 'صاعد' : elliottData?.current_wave?.direction === 'down' ? 'هابط' : 'غير حاسم'
+	const quality = candles.data_quality
+	const width = 841.89
+	const height = 595.28
+	const margin = 28
 	return documentBuffer((doc) => {
-		page(doc, 1, 'تقرير التحليل العربي')
-		rtl(doc, `السهم: ${symbol.toUpperCase()} — السوق: ${market}`, 16)
-		rtl(doc, `السعر الأخير: ${value(latest?.close)} | التغير: ${value(change)}%`)
-		rtl(doc, 'تقرير تحليلي تعليمي — ليس توصية استثمارية.', 10)
+		doc.rect(0, 0, width, height).fillColor(colors.navy).fill()
+		doc.rect(0, 0, width, 7).fillColor(colors.green).fill()
+		text(doc, 'borsatyai.com', margin, 22, 160, 10, '#dfe5ec', true)
+		text(doc, `تقرير التحليل الموحد · ${new Date().toISOString().slice(0, 10)}`, 330, 22, width - margin - 330, 9, '#dfe5ec')
 
-		page(doc, 2, 'الخلاصة التنفيذية')
-		rtl(doc, `البيانات المتاحة: ${candles.candles.length} شمعة.`)
-		rtl(doc, `التحليل Elliott: ${String((elliott as Record<string, unknown>).status ?? 'متاح')}`)
-		rtl(doc, `التحليل Gann: ${String((gann as Record<string, unknown>).status ?? 'متاح')}`)
-		rtl(doc, 'لا يتم إصدار أمر شراء أو بيع؛ القرار مسؤولية المستخدم بعد المراجعة.', 10)
+		const contentTop = 54
+		const contentHeight = height - 86
+		doc.roundedRect(margin, contentTop, width - margin * 2, contentHeight, 12).fillColor('#ffffff').fill()
+		text(doc, symbol.toUpperCase(), margin + 18, contentTop + 16, 180, 22, colors.ink, true)
+		text(doc, `${market === 'TASI' ? 'السوق السعودي · SAR' : market === 'GLOBAL' ? 'السوق العالمي · USD' : 'السوق المصري · EGP'}`, margin + 18, contentTop + 44, 240, 10, colors.muted)
+		text(doc, value(latest?.close), width - margin - 220, contentTop + 16, 200, 24, colors.ink, true)
+		text(doc, `${change == null ? '—' : `${change >= 0 ? '+' : ''}${value(change)}%`}`, width - margin - 220, contentTop + 48, 200, 12, change != null && change >= 0 ? colors.green : colors.red, true)
+		text(doc, `المصدر: ${quality.provider ?? candles.source} · الحالة: ${quality.status === 'live' ? 'لحظية' : quality.status === 'historical' ? 'تاريخية' : 'متأخرة'}`, margin + 18, contentTop + 70, width - margin * 2 - 36, 9, colors.muted)
+		doc.strokeColor(colors.line).lineWidth(0.8).moveTo(margin + 16, contentTop + 88).lineTo(width - margin - 16, contentTop + 88).stroke()
 
-		page(doc, 3, 'الأطر الزمنية')
-		for (const timeframe of ['1m', '5m', '15m', '1h', '4h', '1d', '1w', '1M', 'Quarterly', 'Yearly'])
-			rtl(doc, `${timeframe}: لا تُعرض نتيجة غير مدعومة ببيانات هذا الإطار.`, 10)
+		const innerY = contentTop + 104
+		const gap = 12
+		const col = (width - margin * 2 - 32 - gap * 2) / 3
+		card(doc, margin + 16, innerY, col, 130, 'الملخص الفني')
+		metric(doc, 'الاتجاه', direction, margin + 30, innerY + 38, col - 28, direction === 'صاعد' ? colors.green : direction === 'هابط' ? colors.red : colors.muted)
+		metric(doc, 'الموجة الحالية', currentWave, margin + 30, innerY + 82, col - 28)
+		metric(doc, 'الإجماع', indicators.recommendation === 'BUY' ? 'شراء' : indicators.recommendation === 'SELL' ? 'بيع' : 'محايد', margin + col / 2, innerY + 38, col / 2 - 22, indicators.recommendation === 'BUY' ? colors.green : indicators.recommendation === 'SELL' ? colors.red : colors.muted)
+		metric(doc, 'RSI', value(indicators.rsi?.value), margin + col / 2, innerY + 82, col / 2 - 22)
 
-		page(doc, 4, 'Elliott Wave')
-		const elliottData = (elliott as Record<string, any>).data ?? elliott
-		rtl(doc, `الموجة الحالية: ${String(elliottData?.current_wave?.label ?? 'غير متاحة')}`)
-		rtl(doc, `الثقة: ${value(elliottData?.confidence_percent ?? elliottData?.confidence)}`)
-		rtl(doc, `الأهداف: ${JSON.stringify(elliottData?.targets ?? {})}`)
-		rtl(doc, `الإبطال: ${JSON.stringify(elliottData?.invalidation ?? {})}`)
+		const x2 = margin + 16 + col + gap
+		card(doc, x2, innerY, col, 130, 'موجات Elliott وGann')
+		metric(doc, 'الثقة', elliottData?.confidence_percent == null ? '—' : `${value(elliottData.confidence_percent, 0)}%`, x2 + 14, innerY + 38, col - 28)
+		metric(doc, 'الإبطال', value(elliottData?.invalidation?.level), x2 + 14, innerY + 82, col - 28, colors.red)
+		metric(doc, 'دعم Gann', value(gannData?.support_resistance?.support ?? gannData?.square_of_nine?.support), x2 + col / 2, innerY + 38, col / 2 - 22, colors.green)
+		metric(doc, 'مقاومة Gann', value(gannData?.support_resistance?.resistance ?? gannData?.square_of_nine?.resistance), x2 + col / 2, innerY + 82, col / 2 - 22, colors.red)
 
-		page(doc, 5, 'Gann Analysis')
-		const gannData = (gann as Record<string, any>).data ?? gann
-		rtl(doc, `الاتجاه: ${String(gannData?.trend ?? 'غير متاح')}`)
-		rtl(doc, `النطاق: ${value(gannData?.range)}`)
-		rtl(doc, `الزوايا: ${JSON.stringify(gannData?.angles ?? {})}`)
-		rtl(doc, `Square of Nine: ${JSON.stringify(gannData?.square_of_nine ?? {})}`)
+		const x3 = x2 + col + gap
+		card(doc, x3, innerY, col, 130, 'الأهداف والمخاطر')
+		metric(doc, 'الهدف 1', value(targets.target_1?.price), x3 + 14, innerY + 38, col - 28, colors.green)
+		metric(doc, 'الهدف 2', value(targets.target_2?.price), x3 + 14, innerY + 82, col - 28, colors.green)
+		metric(doc, 'الهدف 3', value(targets.target_3?.price), x3 + col / 2, innerY + 38, col / 2 - 22, colors.green)
+		metric(doc, 'عدد الشموع', candles.count, x3 + col / 2, innerY + 82, col / 2 - 22)
 
-		page(doc, 6, 'Fibonacci')
-		rtl(doc, 'يتم عرض علاقات Fibonacci فقط عندما تتوفر نقاط تأرجح مؤكدة.')
-		rtl(doc, `علاقات Elliott: ${JSON.stringify(elliottData?.relationships ?? {})}`)
+		const lowerY = innerY + 144
+		card(doc, margin + 16, lowerY, width - margin * 2 - 32, 78, 'الأطر الزمنية وجودة البيانات')
+		const labels = ['5 دقائق', '15 دقيقة', '1 ساعة', 'يومي', 'أسبوعي']
+		labels.forEach((label, index) => metric(doc, label, index === 3 ? (indicators.recommendation === 'BUY' ? 'شراء' : indicators.recommendation === 'SELL' ? 'بيع' : 'محايد') : 'غير متاح', margin + 32 + index * 145, lowerY + 32, 120, index === 3 && indicators.recommendation === 'BUY' ? colors.green : colors.muted))
+		text(doc, `وقت الجلب: ${candles.fetched_at} · عمر البيانات: ${quality.age_seconds == null ? 'غير معروف' : `${value(quality.age_seconds, 0)} ثانية`}`, margin + 30, lowerY + 61, width - margin * 2 - 60, 8, colors.muted)
 
-		page(doc, 7, 'Harmonic + Classical')
-		rtl(doc, 'لم يتم تضمين نموذج Harmonic غير مؤكد في التقرير.')
-		rtl(doc, 'النماذج الكلاسيكية تحتاج نقاط OHLC مؤكدة ولا تُستبدل بتخمينات.')
-
-		page(doc, 8, 'المؤشرات الفنية')
-		rtl(doc, JSON.stringify(indicators))
-
-		page(doc, 9, 'الدعم والمقاومة')
-		rtl(doc, `أعلى سعر في العينة: ${value(Math.max(...candles.candles.map((candle) => candle.high)))}`)
-		rtl(doc, `أدنى سعر في العينة: ${value(Math.min(...candles.candles.map((candle) => candle.low)))}`)
-		rtl(doc, `آخر إغلاق: ${value(latest?.close)}`)
-
-		page(doc, 10, 'الحجم وقوة المشترين')
-		rtl(doc, `الحجم الأخير: ${value(latest?.volume)}`)
-		rtl(doc, 'لا يتم اشتقاق قوة المشترين من بيانات غير متاحة أو من دفتر أوامر غير موفر.', 10)
-
-		page(doc, 11, 'جودة البيانات والإخلاء')
-		rtl(doc, `المزود: ${candles.source}`)
-		rtl(doc, `وقت جلب السلسلة: ${candles.fetched_at}`)
-		rtl(doc, `حالة الجودة: ${candles.data_quality.status}`)
-		rtl(doc, `عمر البيانات بالثواني: ${value(candles.data_quality.age_seconds)}`)
-		rtl(doc, 'لا تُصنّف البيانات المتأخرة على أنها لحظية. التقرير تعليمي وليس نصيحة مالية أو ضماناً للنتيجة.', 10)
+		const footerY = lowerY + 92
+		text(doc, 'إخلاء المسؤولية: تقرير تعليمي وتحليلي فقط، وليس توصية شراء أو بيع أو ضماناً للنتيجة.', margin + 18, footerY, width - margin * 2 - 36, 9, colors.muted)
+		text(doc, 'القرار النهائي مسؤولية المستخدم بعد مراجعة البيانات والمخاطر ومصدرها.', margin + 18, footerY + 16, width - margin * 2 - 36, 9, colors.muted)
 	})
 }
 
 export async function portfolioReport(userId: string) {
 	const portfolio = await getPortfolioValue(userId)
 	return documentBuffer((doc) => {
-		rtl(doc, 'BorsatyAI — تقرير المحفظة', 20)
-		rtl(doc, `القيمة الإجمالية: ${value(portfolio?.totalValue)}`)
-		rtl(doc, `النقد: ${value(portfolio?.balance)}`)
-		rtl(doc, `الربح والخسارة: ${value(portfolio?.pnl)}%`)
-		rtl(doc, 'تقرير محاكاة تعليمية — ليس نصيحة استثمارية.', 10)
+		text(doc, 'borsatyai.com — تقرير المحفظة', 40, 40, 760, 20, colors.ink, true)
+		text(doc, `القيمة الإجمالية: ${value(portfolio?.totalValue)}`, 40, 100, 760, 14)
+		text(doc, `النقد: ${value(portfolio?.balance)}`, 40, 130, 760, 14)
+		text(doc, `الربح والخسارة: ${value(portfolio?.pnl)}%`, 40, 160, 760, 14)
+		text(doc, 'تقرير محاكاة تعليمية — ليس نصيحة مالية.', 40, 220, 760, 10, colors.muted)
 	})
 }
 
 export async function weeklyReport(userId: string) {
 	const digest = await buildWeeklyDigest(userId)
 	return documentBuffer((doc) => {
-		rtl(doc, 'BorsatyAI — الملخص الأسبوعي', 20)
-		rtl(doc, `الفترة: ${digest.period}`)
-		rtl(doc, `الفرص: ${digest.opportunities.length}`)
-		rtl(doc, `المخاطر: ${digest.risks.length}`)
-		rtl(doc, digest.disclaimer, 10)
+		text(doc, 'borsatyai.com — التقرير الأسبوعي', 40, 40, 760, 20, colors.ink, true)
+		text(doc, `الفترة: ${digest.period}`, 40, 100, 760, 14)
+		text(doc, `الفرص: ${digest.opportunities.length} · المخاطر: ${digest.risks.length}`, 40, 130, 760, 14)
+		text(doc, digest.disclaimer, 40, 200, 760, 10, colors.muted)
 	})
 }

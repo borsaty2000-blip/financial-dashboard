@@ -17,8 +17,8 @@ export async function analyzeElliott(prices: number[], order = 5) {
 			throw new Error(
 				`Python Elliott service ${response.status}: ${JSON.stringify(body)}`,
 			)
-		return body
-	} catch {
-		return { status: 'fallback', data: analyzeElliottFallback(prices, order) }
-	}
+			return body
+		} catch {
+			return { data: analyzeElliottFallback(prices, order) }
+		}
 }

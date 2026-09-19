@@ -136,11 +136,11 @@ export function StockDetailPage({
 				if (!cancelled) setEngineStatus(result.python_engine)
 			})
 			.catch(() => {
-				if (!cancelled)
-					setEngineStatus({
-						live: false,
-						status: 'الوضع الاحتياطي — البيانات قد تكون غير محدثة',
-					})
+					if (!cancelled)
+						setEngineStatus({
+							live: false,
+							status: 'التحليل غير متاح لهذا الرمز',
+						})
 			})
 		return () => {
 			cancelled = true
@@ -294,7 +294,7 @@ export function StockDetailPage({
 					<div><span className="eyebrow">الكتالوج</span><strong>{displayCompanyName ? 'مؤكد' : 'قيد التحقق'}</strong><small>{displayCompanyName ?? normalized}</small></div>
 					<div><span className="eyebrow">السعر الحي</span><strong>{livePrice?.freshness === 'live' ? 'حي' : livePrice ? 'متأخر' : 'غير متاح'}</strong><small>{livePrice?.source ?? 'بانتظار المزود'}</small></div>
 					<div><span className="eyebrow">جودة الشموع</span><strong>{data?.data_quality?.status === 'live' ? 'لحظية' : data?.data_quality?.status === 'historical' ? 'تاريخية' : data ? 'متأخرة' : 'غير متاحة'}</strong><small>{data?.data_quality?.provider ?? 'بانتظار البيانات'}</small></div>
-					<div><span className="eyebrow">اعتمادية التحليل</span><strong>{engineStatus?.live ? 'محرك حي' : engineStatus ? 'احتياطي' : 'قيد التحقق'}</strong><small>{engineStatus?.status ?? 'لا نرفع الثقة قبل اكتمال المحركات'}</small></div>
+					<div><span className="eyebrow">اعتمادية التحليل</span><strong>{engineStatus?.live ? 'متاح' : engineStatus ? 'غير متاح' : 'قيد التحقق'}</strong><small>{engineStatus?.status ?? 'جارٍ التحقق من اكتمال البيانات'}</small></div>
 				</section>
 				{loading && (
 				<div className="stock-detail-skeleton">
@@ -346,9 +346,9 @@ export function StockDetailPage({
 									className={`engine-status ${engineStatus?.live ? 'is-live' : 'is-fallback'}`}
 								>
 									<span aria-hidden="true" />
-									{engineStatus?.live
-										? 'Python Engine Live'
-										: (engineStatus?.status ?? 'جاري التحقق من مصدر التحليل')}
+										{engineStatus?.live
+											? 'التحليل متاح'
+											: (engineStatus?.status ?? 'جاري التحقق من اكتمال البيانات')}
 								</div>
 								<ProfessionalStockChart candles={data.candles} />
 							</section>
