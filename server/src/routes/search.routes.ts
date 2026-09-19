@@ -4,6 +4,7 @@ import { CandlesService } from '../services/market/candles.service.js'
 const catalog = [
 	['COMI', 'البنك التجاري الدولي', 'EGX'],
 	['ABUK', 'أبو قير للأسمدة', 'EGX'],
+	['AFDI', 'الأهلي للتنمية والاستثمار', 'EGX'],
 	['ETEL', 'المصرية للاتصالات', 'EGX'],
 	['SWDY', 'السويدي إليكتريك', 'EGX'],
 	['TMGH', 'طلعت مصطفى', 'EGX'],

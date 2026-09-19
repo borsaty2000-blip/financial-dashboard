@@ -144,8 +144,7 @@ async function getEgyptCompaniesFromCatalog(): Promise<TwelveCompany[]> {
 	const catalog = await prisma.egxCompany
 		.findMany({ where: { market: 'EGX' }, orderBy: { symbol: 'asc' } })
 		.catch(() => [])
-	if (catalog.length) {
-		return catalog.map((company) => ({
+	const fromDatabase = catalog.map((company) => ({
 			symbol: company.symbol,
 			displaySymbol: company.symbol,
 			name: company.nameAr,
@@ -155,7 +154,15 @@ async function getEgyptCompaniesFromCatalog(): Promise<TwelveCompany[]> {
 			country: 'Egypt',
 			type: 'Common Stock',
 			figiCode: null,
-		}))
+	}))
+	try {
+		const bundled = await readBundledCatalog('EGX')
+		const known = new Set(fromDatabase.map((company) => company.symbol))
+		return [...fromDatabase, ...bundled.filter((company) => !known.has(company.symbol))].sort(
+			(a, b) => a.symbol.localeCompare(b.symbol),
+		)
+	} catch {
+		if (fromDatabase.length) return fromDatabase
 	}
 	try {
 		return await readBundledCatalog('EGX')

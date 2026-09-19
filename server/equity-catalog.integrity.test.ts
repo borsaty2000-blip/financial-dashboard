@@ -21,7 +21,7 @@ test('equity catalogs contain complete unique EGX and TASI reference sets', asyn
 		load('egx-companies.json'),
 		load('tasi-companies.json'),
 	])
-	assert.equal(egx.items.length, 145)
+		assert.equal(egx.items.length, 146)
 	assert.equal(tasi.items.length, 419)
 	for (const [market, catalog] of [
 		['EGX', egx],
@@ -37,7 +37,8 @@ test('equity catalogs contain complete unique EGX and TASI reference sets', asyn
 		assert.ok(catalog.items.every((item) => item.symbol && item.nameAr))
 	}
 	assert.ok(egx.items.some((item) => item.symbol === 'COMI'))
-	assert.ok(egx.items.some((item) => item.symbol === 'IEEC'))
+		assert.ok(egx.items.some((item) => item.symbol === 'IEEC'))
+		assert.ok(egx.items.some((item) => item.symbol === 'AFDI'))
 	assert.ok(tasi.items.some((item) => item.symbol === '1010'))
 	assert.ok(tasi.items.some((item) => item.symbol === '2222'))
 })
