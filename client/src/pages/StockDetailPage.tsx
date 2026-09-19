@@ -204,7 +204,7 @@ export function StockDetailPage({
 				return
 			}
 		} catch {
-			/* Browser speech is the intentional fallback. */
+				/* Browser speech is the intentional local alternative. */
 		}
 		if ('speechSynthesis' in window) {
 			window.speechSynthesis.cancel()

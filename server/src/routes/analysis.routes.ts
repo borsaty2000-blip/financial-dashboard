@@ -874,3 +874,14 @@ analysisRoutes.get('/:symbol/matrix', async (request, response) => {
 		return response.status(502).json({ status: 'error', message: 'تعذر بناء مصفوفة الأطر الزمنية' })
 	}
 })
+
+analysisRoutes.get('/:symbol/harmonic', async (request, response) => {
+	try {
+		const series = await resolveAnalysisSeries(request)
+		const complete = series.candles.map((candle) => ({ open: Number(candle.open ?? candle.close), high: Number(candle.high ?? candle.close), low: Number(candle.low ?? candle.close), close: Number(candle.close), volume: Number(candle.volume ?? 0) }))
+		const data = analyzeHarmonic(complete)
+		return response.json({ status: data.status, data, source: series.source, candles_count: series.count, data_quality: series.data_quality })
+	} catch {
+		return response.status(502).json({ status: 'error', message: 'تعذر تنفيذ Harmonic' })
+	}
+})

@@ -29,7 +29,7 @@ export async function analyzeGann(prices: number[], dates: string[]) {
 							}
 						: { prices, dates },
 				),
-				signal: AbortSignal.timeout(5000),
+				signal: AbortSignal.timeout(15000),
 			},
 		)
 		const body = await response.json().catch(() => ({}))
@@ -42,7 +42,11 @@ export async function analyzeGann(prices: number[], dates: string[]) {
 				source: body?.source ?? 'python_vercel',
 				engine_mode: 'python_live',
 			}
-		} catch {
+		} catch (error) {
+			console.error('[analysis] Gann provider unavailable', {
+				error: error instanceof Error ? error.message : String(error),
+				prices_count: prices.length,
+			})
 			return { data: analyzeGannFallback(prices, dates) }
 		}
 }
