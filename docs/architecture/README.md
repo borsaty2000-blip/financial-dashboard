@@ -65,4 +65,4 @@ flowchart LR
 - قاعدة البيانات المحلية في جلسة التطوير تحتوي على `DATABASE_URL` غير صالح؛ هذا يمنع migration runtime لكنه لا يمنع validation باستخدام رابط PostgreSQL صالح.
 - بعض مزودي البيانات الخارجية قد يفرضون rate limits؛ يلزم cache وcircuit breaker قبل اعتمادهم في production.
 - Vercel Serverless ليس مناسباً للـWebSocket طويل العمر؛ يفضل تشغيل Socket.io على خدمة Node دائمة أو مزود realtime مستقل.
-- trigger deploy
+trigger vercel deploy
