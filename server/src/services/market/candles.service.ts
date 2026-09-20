@@ -179,8 +179,13 @@ export class CandlesService {
 				}
 			}
 			const sources: Array<() => Promise<CandlesResponse>> = [
-			() => this.fetchTwelveData(resolved, market, interval, days),
-			() => this.fetchSahmk(resolved, market, interval, days),
+				...(market === 'TASI'
+					? [() => this.fetchSahmk(resolved, market, interval, days)]
+					: []),
+				() => this.fetchTwelveData(resolved, market, interval, days),
+				...(market !== 'TASI'
+					? [() => this.fetchSahmk(resolved, market, interval, days)]
+					: []),
 			() => this.fetchPolygon(resolved, market, days),
 			() => this.fetchYahoo(resolved, market, interval, days),
 			() => this.fetchStooq(resolved, market, interval, days),

@@ -5,7 +5,10 @@
 	"outputDirectory": "client/dist",
 	"functions": {
 		"api/index.ts": {
-			"includeFiles": ["server/data.json", "server/assets/fonts/**"]
+			"includeFiles": "server/**"
+		},
+		"api/python/**/*.py": {
+			"includeFiles": "server/python-services/**"
 		}
 	},
 	"rewrites": [

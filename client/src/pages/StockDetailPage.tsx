@@ -260,15 +260,15 @@ export function StockDetailPage({
 							livePrice?.changePercent ?? stats.changePercent,
 						)}
 					</b>
-					<small
-						className="quote-freshness"
-						title={livePrice?.warnings?.join(' ')}
-					>
+						<small
+							className="quote-freshness"
+							title={livePrice?.warnings?.join(' ')}
+						>
 						<span
 							className={`quote-status-dot ${livePrice?.freshness === 'live' ? 'is-live' : 'is-delayed'}`}
 						/>
-						{livePrice?.freshness === 'live' ? 'حي' : 'متأخر'} ·{' '}
-						{livePrice?.source ?? 'بيانات تاريخية'}
+							{livePrice?.freshness === 'live' ? 'حي' : 'متأخر'} ·{' '}
+							{livePrice?.source ?? 'بيانات تاريخية'}
 					</small>
 				</div>
 				<div className="stock-header-actions">
@@ -290,11 +290,10 @@ export function StockDetailPage({
 					</a>
 				</div>
 				</header>
-				<section className="analysis-card data-quality-strip" aria-label="حالة جودة البيانات">
-					<div><span className="eyebrow">الكتالوج</span><strong>{displayCompanyName ? 'مؤكد' : 'قيد التحقق'}</strong><small>{displayCompanyName ?? normalized}</small></div>
-					<div><span className="eyebrow">السعر الحي</span><strong>{livePrice?.freshness === 'live' ? 'حي' : livePrice ? 'متأخر' : 'غير متاح'}</strong><small>{livePrice?.source ?? 'بانتظار المزود'}</small></div>
-					<div><span className="eyebrow">جودة الشموع</span><strong>{data?.data_quality?.status === 'live' ? 'لحظية' : data?.data_quality?.status === 'historical' ? 'تاريخية' : data ? 'متأخرة' : 'غير متاحة'}</strong><small>{data?.data_quality?.provider ?? 'بانتظار البيانات'}</small></div>
-					<div><span className="eyebrow">اعتمادية التحليل</span><strong>{engineStatus?.live ? 'متاح' : engineStatus ? 'غير متاح' : 'قيد التحقق'}</strong><small>{engineStatus?.status ?? 'جارٍ التحقق من اكتمال البيانات'}</small></div>
+				<section className="analysis-card data-quality-strip" aria-label="بيانات السعر">
+					<div><span className="eyebrow">السعر</span><strong>{formatEnglishNumber(livePrice?.price ?? stats.last?.close)}</strong><small>{livePrice?.freshness === 'live' ? 'حي' : 'متأخر'}</small></div>
+					<div><span className="eyebrow">آخر إغلاق</span><strong>{formatEnglishNumber(stats.last?.close)}</strong><small>{stats.last?.date ?? 'آخر جلسة'}</small></div>
+					<div><span className="eyebrow">المصدر</span><strong>{livePrice?.source ?? data?.data_quality?.provider ?? 'بيانات السوق'}</strong><small>بيانات السوق المتاحة</small></div>
 				</section>
 				{loading && (
 				<div className="stock-detail-skeleton">
@@ -307,10 +306,7 @@ export function StockDetailPage({
 			{!loading && !data && (
 				<section className="analysis-empty-panel stock-empty-panel">
 					<strong>بيانات السهم غير متاحة حالياً</strong>
-					<p>
-						لم تُرجع مصادر الشموع بيانات موثوقة لهذا الرمز. لن نعرض أرقاماً
-						تجريبية.
-					</p>
+						<p>لم تُرجع مصادر الشموع بيانات مؤكدة لهذا الرمز.</p>
 				</section>
 			)}
 			{data && !loading && (
@@ -342,13 +338,13 @@ export function StockDetailPage({
 									</div>
 									<span className="muted">شموع · حجم · RSI · MACD</span>
 								</div>
-								<div
-									className={`engine-status ${engineStatus?.live ? 'is-live' : 'is-unavailable'}`}
-								>
-									<span aria-hidden="true" />
-										{engineStatus?.live
-											? 'التحليل متاح'
-											: (engineStatus?.status ?? 'جاري التحقق من اكتمال البيانات')}
+															<div
+																className={`engine-status ${engineStatus?.live ? 'is-live' : 'is-unavailable'}`}
+															>
+																<span aria-hidden="true" />
+																	{engineStatus?.live
+																	? 'التحليل متاح'
+																	: 'التحليل غير متاح لهذا الرمز'}
 								</div>
 								<ProfessionalStockChart candles={data.candles} />
 							</section>
@@ -374,8 +370,8 @@ export function StockDetailPage({
 										([key, frame]) => (
 											<article key={key} className="elliott-mtf-card">
 												<span>{frame.timeframe_ar}</span>
-												{frame.available === false ? (
-													<strong>غير متاح: {frame.availability_reason}</strong>
+													{frame.available === false ? (
+															<strong>التحليل غير متاح لهذا الرمز</strong>
 												) : (
 													<>
 														<strong>
@@ -387,10 +383,7 @@ export function StockDetailPage({
 																	: 'جانبي'}
 														</strong>
 														<small>{frame.wave_personality}</small>
-														<small>
-															الثقة {formatEnglishPercent(frame.confidence)} ·
-															البديل {frame.alternate_count?.wave ?? '—'}
-														</small>
+															<small>الثقة {formatEnglishPercent(frame.confidence)}</small>
 														<small>
 															هدف 1:{' '}
 															{formatEnglishNumber(
@@ -410,16 +403,14 @@ export function StockDetailPage({
 																	frame.invalidation_level?.level,
 															)}
 														</small>
-														{frame.relationships?.wave2_retracement ? (
+											{frame.relationships?.wave2_retracement?.valid ? (
 															<small>
 																Fibonacci 2:{' '}
 																{formatEnglishNumber(
 																	frame.relationships.wave2_retracement.value,
 																)}
 																% ·{' '}
-																{frame.relationships.wave2_retracement.valid
-																	? 'متوافق'
-																	: 'يحتاج تحقق'}
+																					متوافق
 															</small>
 														) : null}
 													</>
