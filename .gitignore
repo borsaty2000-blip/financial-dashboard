@@ -24,3 +24,5 @@ server/uploads/
 
 __pycache__/
 *.py[cod]
+.vercel
+.env*
