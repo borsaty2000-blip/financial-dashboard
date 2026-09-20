@@ -3,16 +3,11 @@
 	"buildCommand": "npx prisma generate && npm run build",
 	"installCommand": "npm install --include=dev --fetch-retries=5 --fetch-retry-mintimeout=20000 --fetch-retry-maxtimeout=120000 && npm --prefix client install --include=dev --fetch-retries=5 --fetch-retry-mintimeout=20000 --fetch-retry-maxtimeout=120000",
 	"outputDirectory": "client/dist",
-	"builds": [
-		{ "src": "api/index.ts", "use": "@vercel/node" },
-		{ "src": "api/python/*.py", "use": "@vercel/python" }
-	],
 	"functions": {
 		"api/index.ts": {
 			"includeFiles": "server/**"
 		},
 		"api/python/*.py": {
-			"runtime": "python3.11",
 			"includeFiles": "server/python-services/**"
 		}
 	},
