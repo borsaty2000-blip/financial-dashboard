@@ -232,3 +232,4 @@ Vercel CLI 59.23.2 (Node.js 22.13.0)
 - **لم يتم تنفيذ redeploy أو promote أو rollback.**
 - **لم يتم تعديل Environment Variables أو Secrets.**
 - الإصلاحات الحالية موجودة محلياً فقط وتنتظر قرار المستخدم قبل أي commit أو push.
+
