@@ -1,17 +1,30 @@
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler
-
-from _common import options, respond
+import json
 
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        respond(self, 200, {
-            "status": "ok",
-            "service": "borsaty-python",
-            "runtime": "vercel-python-serverless",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        })
+        body = json.dumps(
+            {
+                "status": "ok",
+                "service": "borsatyai-python",
+                "runtime": "vercel-python-serverless",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            },
+            ensure_ascii=False,
+        ).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+        self.wfile.write(body)
 
     def do_OPTIONS(self):
-        options(self)
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
