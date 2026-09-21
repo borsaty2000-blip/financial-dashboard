@@ -31,6 +31,7 @@ import { PortfolioPage } from './pages/PortfolioPage'
 import { ComparisonPage } from './pages/ComparisonPage'
 import GlobalSearch from './components/GlobalSearch'
 import ErrorBoundary from './components/ErrorBoundary'
+import { StockErrorBoundary } from './components/StockErrorBoundary'
 import MobileChrome from './components/MobileChrome'
 import { StockDetailPage } from './pages/StockDetailPage'
 import { SimulatorPage } from './pages/SimulatorPage'
@@ -337,10 +338,12 @@ function RoutedApp() {
 		const [symbol, query = ''] = path.slice('/stock/'.length).split('?')
 		const params = new URLSearchParams(query)
 		const name = params.get('name') ?? undefined
-		const market = params.get('market') === 'TASI' ? 'TASI' : undefined
-		return (
-			<StockDetailPage symbol={symbol} companyName={name} market={market} />
-		)
+			const market = params.get('market') === 'TASI' ? 'TASI' : undefined
+			return (
+				<StockErrorBoundary>
+					<StockDetailPage symbol={symbol} companyName={name} market={market} />
+				</StockErrorBoundary>
+			)
 	}
 	if (
 		path === '/dashboard' ||

@@ -74,7 +74,7 @@ export function StockDetailPage({
 	companyName?: string
 	market?: 'EGX' | 'TASI'
 }) {
-	const normalized = symbol.toUpperCase()
+	const normalized = String(symbol ?? '').trim().toUpperCase() || 'UNKNOWN'
 	const market =
 		marketOverride ?? (/^\d{4,5}$/u.test(normalized) ? 'TASI' : 'EGX')
 	const [data, setData] = useState<Candles | null>(null)
@@ -98,9 +98,23 @@ export function StockDetailPage({
 			`/api/market/candles/${normalized}?market=${market}&days=250`,
 			{ signal: controller.signal },
 		)
-			.then((result) => {
-				if (!cancelled) setData(result)
-			})
+				.then((result) => {
+					if (!cancelled) {
+						const candles = Array.isArray(result?.candles)
+							? result.candles.filter(
+									(candle) =>
+										candle &&
+										Number.isFinite(candle.open) &&
+										Number.isFinite(candle.high) &&
+										Number.isFinite(candle.low) &&
+										Number.isFinite(candle.close) &&
+										Number.isFinite(candle.volume) &&
+										Boolean(candle.date),
+								  )
+							: []
+						setData({ ...result, candles, count: candles.length })
+					}
+				})
 			.catch(() => {
 				if (!cancelled) setMessage('لا تتوفر بيانات تاريخية حالياً')
 			})

@@ -183,6 +183,24 @@ export default function ProfessionalStockChart({
 	gannOneByOne?: Point[]
 }) {
 	const containerRef = useRef<HTMLDivElement>(null)
+	const safeCandles = useMemo(() => {
+		if (!Array.isArray(candles)) return []
+		const unique = new Map<string, Candle>()
+		for (const candle of candles) {
+			if (
+				!candle ||
+				!candle.date ||
+				![candle.open, candle.high, candle.low, candle.close, candle.volume].every(
+					Number.isFinite,
+				)
+			)
+				continue
+			const high = Math.max(candle.open, candle.high, candle.low, candle.close)
+			const low = Math.min(candle.open, candle.high, candle.low, candle.close)
+			unique.set(String(candle.date), { ...candle, high, low })
+		}
+		return [...unique.values()].sort((a, b) => a.date.localeCompare(b.date))
+	}, [candles])
 	const [visibility, setVisibility] = useState<Visibility>({
 		volume: true,
 		sma20: true,
@@ -192,7 +210,7 @@ export default function ProfessionalStockChart({
 		fibonacci: false,
 		levels: false,
 	})
-	const closes = useMemo(() => candles.map((candle) => candle.close), [candles])
+	const closes = useMemo(() => safeCandles.map((candle) => candle.close), [safeCandles])
 	const rsiValues = useMemo(() => calculateRSI(closes), [closes])
 	const macdValues = useMemo(() => calculateMACD(closes), [closes])
 
@@ -200,7 +218,7 @@ export default function ProfessionalStockChart({
 		setVisibility((current) => ({ ...current, [key]: !current[key] }))
 
 	useEffect(() => {
-		if (!containerRef.current || candles.length < 2) return
+			if (!containerRef.current || safeCandles.length < 2) return
 		let chart: IChartApi | null = null
 		const container = containerRef.current
 		const isMobile = window.matchMedia('(max-width: 767px)').matches
@@ -232,7 +250,7 @@ export default function ProfessionalStockChart({
 			},
 			handleScale: { mouseWheel: false, pinch: true },
 		})
-		const candleData: CandlestickData[] = candles.map((candle) => ({
+			const candleData: CandlestickData[] = safeCandles.map((candle) => ({
 			time: candle.date,
 			open: candle.open,
 			high: candle.high,
@@ -257,15 +275,15 @@ export default function ProfessionalStockChart({
 					priceScaleId: 'volume',
 					priceFormat: { type: 'volume' },
 				})
-				.setData(
-					candles.map((candle) => ({
+					.setData(
+						safeCandles.map((candle) => ({
 						time: candle.date,
 						value: candle.volume,
 						color: candle.close >= candle.open ? '#166534aa' : '#991b1baa',
 					})),
 				)
 		}
-		const times = candles.map((candle) => candle.date as Time)
+			const times = safeCandles.map((candle) => candle.date as Time)
 		const addLine = (
 			values: number[],
 			color: string,
@@ -311,27 +329,27 @@ export default function ProfessionalStockChart({
 			)
 		}
 		if (visibility.levels) {
-			const recent = candles.slice(-60)
+				const recent = safeCandles.slice(-60)
 			const support = Math.min(...recent.map((candle) => candle.low))
 			const resistance = Math.max(...recent.map((candle) => candle.high))
 			addLine(
-				candles.map(() => support),
+					safeCandles.map(() => support),
 				'#34d399',
 				1,
 			)
 			addLine(
-				candles.map(() => resistance),
+					safeCandles.map(() => resistance),
 				'#f87171',
 				1,
 			)
 		}
 		if (visibility.fibonacci) {
-			const recent = candles.slice(-120)
+				const recent = safeCandles.slice(-120)
 			const low = Math.min(...recent.map((candle) => candle.low))
 			const high = Math.max(...recent.map((candle) => candle.high))
 			for (const ratio of [0.236, 0.382, 0.5, 0.618, 0.786])
 				addLine(
-					candles.map(() => high - (high - low) * ratio),
+						safeCandles.map(() => high - (high - low) * ratio),
 					'#a78bfa88',
 					1,
 				)
@@ -358,7 +376,7 @@ export default function ProfessionalStockChart({
 			chart?.remove()
 			chart = null
 		}
-	}, [candles, closes, elliottWave, gannOneByOne, visibility])
+	}, [safeCandles, closes, elliottWave, gannOneByOne, visibility])
 
 	const controls: Array<[keyof Visibility, string]> = [
 		['volume', 'الحجم'],

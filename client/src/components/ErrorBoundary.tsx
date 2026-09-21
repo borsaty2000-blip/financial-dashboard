@@ -9,7 +9,7 @@ export default class ErrorBoundary extends Component<Props, State> {
 		return { hasError: true, message: error.message }
 	}
 	componentDidCatch(error: Error, info: ErrorInfo) {
-		console.error('Borsaty UI error', error, info)
+		if (import.meta.env.DEV) console.error('Borsaty UI error', error, info)
 	}
 	render() {
 		if (!this.state.hasError) return this.props.children
