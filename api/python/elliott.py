@@ -7,7 +7,9 @@ class handler(BaseHTTPRequestHandler):
             import sys
             from pathlib import Path
 
-            sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "server" / "python-services"))
+            file_path = Path(__file__).resolve()
+            sys.path.insert(0, str(file_path.parents[0]))
+            sys.path.insert(0, str(file_path.parents[2] / "server" / "python-services"))
             from _common import read_json, respond
             from services.elliott_pro import ElliottPro
 

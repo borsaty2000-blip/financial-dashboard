@@ -70,14 +70,15 @@ analysisRoutes.get('/:symbol/elliott-mtf', async (request, response) => {
 				volume: candle.volume,
 			}))
 		const result = await analyzeElliottMTF(dailyCandles, candlesByTf)
-		return response.json({
-			...result,
-			symbol: series.symbol,
-			market: queryMarket(request.query.market),
-			source: series.source,
-			candles_count: series.count,
-			decision: 'NO_TRADE_DECISION',
-		})
+			return response.json({
+				...result,
+				symbol: series.symbol,
+				market: queryMarket(request.query.market),
+				source: result?.source ?? series.source,
+				data_source: series.source,
+				candles_count: series.count,
+				decision: 'NO_TRADE_DECISION',
+			})
 	} catch {
 		return response.status(502).json({
 			status: 'error',

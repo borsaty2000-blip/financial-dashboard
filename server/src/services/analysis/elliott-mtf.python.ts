@@ -10,9 +10,11 @@ type MtfCandle = {
 
 const pythonServiceUrl = (
 	process.env.PYTHON_SERVICE_URL ??
-	(process.env.NODE_ENV === 'production'
-		? 'https://www.borsatyai.com/api/python'
-		: 'http://127.0.0.1:8001')
+	(process.env.VERCEL_URL
+		? `https://${process.env.VERCEL_URL}/api/python`
+		: process.env.NODE_ENV === 'production'
+			? 'https://www.borsatyai.com/api/python'
+			: 'http://127.0.0.1:8001')
 ).replace(/\/$/, '')
 
 const elliottPath = pythonServiceUrl.endsWith('/api/python')
