@@ -345,7 +345,16 @@ export class CandlesService {
 		days: number,
 	) {
 		const suffix = market === 'EGX' ? '.CA' : market === 'TASI' ? '.SR' : ''
-		const range = interval === '1wk' ? '5y' : interval === '1mo' ? '10y' : '1y'
+		const range =
+			interval === '1wk'
+				? '5y'
+				: interval === '1mo'
+					? '10y'
+					: days > 365
+						? '5y'
+						: days > 180
+							? '2y'
+							: '1y'
 		const data = await requestJson(
 			`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(`${symbol}${suffix}`)}?interval=${interval === '1d' ? '1d' : interval}&range=${range}`,
 		)
