@@ -9,7 +9,6 @@
       "includeFiles": "server/**"
     },
     "api/python/*.py": {
-      "runtime": "python3.11",
       "includeFiles": "server/python-services/**"
     }
   },
