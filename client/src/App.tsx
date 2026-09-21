@@ -32,8 +32,10 @@ import { ComparisonPage } from './pages/ComparisonPage'
 import GlobalSearch from './components/GlobalSearch'
 import ErrorBoundary from './components/ErrorBoundary'
 import { StockErrorBoundary } from './components/StockErrorBoundary'
+import { StockSectionBoundary } from './components/StockSectionBoundary'
 import MobileChrome from './components/MobileChrome'
 import { StockDetailPage } from './pages/StockDetailPage'
+import { StockTestPage } from './pages/StockTestPage'
 import { SimulatorPage } from './pages/SimulatorPage'
 import { ShariahPage } from './pages/ShariahPage'
 import { SmartPortfolioPage } from './pages/SmartPortfolioPage'
@@ -333,15 +335,19 @@ function RoutedApp() {
 				<WeeklyReportPage />
 			</ProtectedRoute>
 		)
-	if (path === '/stock') return <NotFoundPage />
-	if (path.startsWith('/stock/')) {
+		if (path === '/stock') return <NotFoundPage />
+		if (path.startsWith('/stock-test/'))
+			return <StockTestPage symbol={path.slice('/stock-test/'.length)} />
+		if (path.startsWith('/stock/')) {
 		const [symbol, query = ''] = path.slice('/stock/'.length).split('?')
 		const params = new URLSearchParams(query)
 		const name = params.get('name') ?? undefined
 			const market = params.get('market') === 'TASI' ? 'TASI' : undefined
 			return (
 				<StockErrorBoundary>
-					<StockDetailPage symbol={symbol} companyName={name} market={market} />
+					<StockSectionBoundary label="صفحة السهم">
+						<StockDetailPage symbol={symbol} companyName={name} market={market} />
+					</StockSectionBoundary>
 				</StockErrorBoundary>
 			)
 	}

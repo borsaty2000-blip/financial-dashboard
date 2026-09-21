@@ -11,6 +11,12 @@ export class StockErrorBoundary extends Component<Props, State> {
 	}
 
 	componentDidCatch(error: Error, info: ErrorInfo) {
+		window.__lastStockError = {
+			message: error.message,
+			stack: error.stack,
+			componentStack: info.componentStack ?? undefined,
+			section: 'صفحة السهم',
+		}
 		if (import.meta.env.DEV) console.error('[StockErrorBoundary]', error, info)
 	}
 

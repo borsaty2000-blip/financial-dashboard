@@ -44,7 +44,19 @@ export function BrilliantSummary({
 			{ suppressToast: true },
 		)
 			.then((result) => {
-				if (active) setSummary(result.data)
+				const value = result?.data
+				if (
+					active &&
+					value &&
+					value.verdict &&
+					Array.isArray(value.keyPoints) &&
+					value.scenario &&
+					Array.isArray(value.risks) &&
+					Array.isArray(value.watch) &&
+					value.counts
+				)
+					setSummary(value)
+				else if (active) setSummary(null)
 			})
 			.catch(() => {
 				if (active) setSummary(null)
@@ -64,7 +76,12 @@ export function BrilliantSummary({
 				<div />
 			</section>
 		)
-	if (!summary)
+		if (
+			!summary ||
+			!summary.verdict ||
+			!summary.scenario ||
+			!summary.counts
+		)
 		return (
 			<section className="brilliant-summary brilliant-summary--empty">
 				<strong>الملخص الموحد غير متاح حالياً</strong>

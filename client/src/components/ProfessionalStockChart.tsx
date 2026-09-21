@@ -190,6 +190,8 @@ export default function ProfessionalStockChart({
 			if (
 				!candle ||
 				!candle.date ||
+				!/^\d{4}-\d{2}-\d{2}$/u.test(String(candle.date)) ||
+				!Number.isFinite(Date.parse(String(candle.date))) ||
 				![candle.open, candle.high, candle.low, candle.close, candle.volume].every(
 					Number.isFinite,
 				)
@@ -387,6 +389,12 @@ export default function ProfessionalStockChart({
 		['fibonacci', 'Fibonacci'],
 		['levels', 'دعم/مقاومة'],
 	]
+	if (safeCandles.length < 2)
+		return (
+			<div className="professional-stock-chart professional-stock-chart--empty">
+				<div className="analysis-empty-panel">لا تتوفر بيانات كافية للرسم</div>
+			</div>
+		)
 	return (
 		<div className="professional-stock-chart">
 			<div

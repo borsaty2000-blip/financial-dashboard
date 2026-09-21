@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { api } from '../lib/api'
 import { useLivePrice } from '../hooks/useLivePrice'
 import ProfessionalStockChart from '../components/ProfessionalStockChart'
+import { StockSectionBoundary } from '../components/StockSectionBoundary'
 import { BrilliantSummary } from '../components/Analysis/BrilliantSummary'
 import { formatEnglishNumber, formatEnglishPercent } from '../lib/format'
 
@@ -360,10 +361,13 @@ export function StockDetailPage({
 																	? 'التحليل متاح'
 																	: 'التحليل غير متاح لهذا الرمز'}
 								</div>
-								<ProfessionalStockChart candles={data.candles} />
+									<StockSectionBoundary label="الرسم السعري">
+										<ProfessionalStockChart candles={data.candles} />
+									</StockSectionBoundary>
 							</section>
-							<section
-								className="analysis-card elliott-mtf-panel"
+				<StockSectionBoundary label="تحليل Elliott">
+				<section
+					className="analysis-card elliott-mtf-panel"
 								aria-label="تحليل Elliott متعدد الأطر"
 							>
 								<div className="panel-title">
@@ -436,12 +440,15 @@ export function StockDetailPage({
 								<p className="analysis-disclaimer">
 									{elliottMtf?.disclaimer ??
 										'التحليل متعدد الأطر احتمالي وتعليمي، وليس توصية شراء أو بيع.'}
-								</p>
-							</section>
+					</p>
+				</section>
+				</StockSectionBoundary>
 						</>
 					) : (
 						<section className="decision-tab-content">
-							<BrilliantSummary symbol={normalized} market={market} />
+								<StockSectionBoundary label="الملخص الموحد">
+									<BrilliantSummary symbol={normalized} market={market} />
+								</StockSectionBoundary>
 							<div className="analysis-card decision-boundary-card">
 								<h2>حدود القرار</h2>
 								<p>
