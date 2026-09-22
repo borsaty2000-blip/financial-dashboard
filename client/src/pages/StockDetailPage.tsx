@@ -82,6 +82,7 @@ export function StockDetailPage({
 	const [resolvedCompanyName, setResolvedCompanyName] = useState<string>()
 	const [message, setMessage] = useState('')
 	const [loading, setLoading] = useState(true)
+	const [retryKey, setRetryKey] = useState(0)
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [activeTab, setActiveTab] = useState<'technical' | 'decision'>(
 		'technical',
@@ -99,10 +100,14 @@ export function StockDetailPage({
 			`/api/market/candles/${normalized}?market=${market}&days=250`,
 			{ signal: controller.signal },
 		)
-				.then((result) => {
-					if (!cancelled) {
-						const candles = Array.isArray(result?.candles)
-							? result.candles.filter(
+					.then((result) => {
+						if (!cancelled) {
+							const payload =
+								Array.isArray(result?.candles)
+									? result
+									: (result as Candles & { data?: Candles })?.data ?? result
+							const candles = Array.isArray(payload?.candles)
+								? payload.candles.filter(
 									(candle) =>
 										candle &&
 										Number.isFinite(candle.open) &&
@@ -113,7 +118,7 @@ export function StockDetailPage({
 										Boolean(candle.date),
 								  )
 							: []
-						setData({ ...result, candles, count: candles.length })
+							setData({ ...payload, candles, count: candles.length })
 					}
 				})
 			.catch(() => {
@@ -162,7 +167,7 @@ export function StockDetailPage({
 			controller.abort()
 			window.clearTimeout(timeout)
 		}
-	}, [market, normalized])
+		}, [market, normalized, retryKey])
 
 	const stats = useMemo(() => {
 		const candles = data?.candles ?? []
@@ -254,15 +259,15 @@ export function StockDetailPage({
 						{market === 'TASI' ? 'السعودية · SAR' : 'مصر · EGP'}
 					</span>
 					<h1>
-						{displayCompanyName ?? normalized}
-						<small className="stock-symbol-label">{normalized}</small>
+						<span className="stock-company-name">{displayCompanyName ?? 'اسم الشركة غير متاح'}</span>
+						<small className="stock-symbol-label" dir="ltr">{normalized}</small>
 					</h1>
 				</div>
 				<div className="stock-header-quote" aria-label="السعر والتغير">
 					<span>السعر الحالي</span>
-					<strong>
-						{formatEnglishNumber(livePrice?.price ?? stats.last?.close)}
-					</strong>
+						<strong>
+							{formatEnglishNumber(livePrice?.price ?? stats.last?.close) ?? 'غير متاح'}
+						</strong>
 					<b
 						className={
 							(livePrice?.changePercent ?? stats.changePercent) != null &&
@@ -318,12 +323,15 @@ export function StockDetailPage({
 				</div>
 			)}
 			{message && <div className="analysis-error">{message}</div>}
-			{!loading && !data && (
-				<section className="analysis-empty-panel stock-empty-panel">
-					<strong>بيانات السهم غير متاحة حالياً</strong>
-						<p>لم تُرجع مصادر الشموع بيانات مؤكدة لهذا الرمز.</p>
-				</section>
-			)}
+		{!loading && !data && (
+					<section className="analysis-empty-panel stock-empty-panel">
+						<strong>تعذر تحميل بيانات هذا السهم</strong>
+						<p>تحقق من الاتصال أو أعد المحاولة. سيبقى اسم الشركة والرمز محفوظين.</p>
+						<button className="primary-button" type="button" onClick={() => { setMessage(''); setLoading(true); setRetryKey((key) => key + 1) }}>
+							إعادة تحميل البيانات
+						</button>
+					</section>
+				)}
 			{data && !loading && (
 				<div className="stock-analysis-single-page">
 					<nav className="analysis-tabs" aria-label="أقسام تحليل السهم">
