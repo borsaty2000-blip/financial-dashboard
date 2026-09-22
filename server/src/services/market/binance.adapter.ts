@@ -2,11 +2,28 @@ import type { Candle } from './candles.service.js'
 
 export async function fetchBinanceCandles(symbol: string, interval = '1d', limit = 250): Promise<Candle[]> {
 	const normalized = symbol.replace('/', '').toUpperCase()
-	const url = `https://api.binance.com/api/v3/klines?symbol=${encodeURIComponent(normalized)}&interval=${encodeURIComponent(interval)}&limit=${Math.min(Math.max(limit, 1), 1000)}`
-	const result = await fetch(url, { signal: AbortSignal.timeout(10_000), headers: { accept: 'application/json' } })
-	if (!result.ok) throw new Error(`Binance HTTP ${result.status}`)
-	const data = (await result.json()) as unknown
-	if (!Array.isArray(data)) throw new Error('Binance returned invalid candles')
+	const query = `symbol=${encodeURIComponent(normalized)}&interval=${encodeURIComponent(interval)}&limit=${Math.min(Math.max(limit, 1), 1000)}`
+	const hosts = ['api.binance.com', 'api1.binance.com', 'api2.binance.com', 'api3.binance.com']
+	let data: unknown
+	let lastError = 'Binance candles unavailable'
+	for (const host of hosts) {
+		try {
+			const result = await fetch(`https://${host}/api/v3/klines?${query}`, {
+				signal: AbortSignal.timeout(10_000),
+				headers: { accept: 'application/json' },
+			})
+			if (!result.ok) {
+				lastError = `Binance HTTP ${result.status}`
+				continue
+			}
+			data = await result.json()
+			if (Array.isArray(data)) break
+			lastError = 'Binance returned invalid candles'
+		} catch (error) {
+			lastError = error instanceof Error ? error.message : String(error)
+		}
+	}
+	if (!Array.isArray(data)) throw new Error(lastError)
 	return data.map((row) => {
 		if (!Array.isArray(row) || row.length < 6) throw new Error('Binance candle row invalid')
 		return {
