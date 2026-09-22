@@ -19,3 +19,14 @@ def test_elliott_validation_is_explicit(swing_candles):
     result = ElliottPro.analyze(swing_candles)
     assert "validation" in result
     assert result["validation"]["total_rules"] >= 0
+
+
+def test_elliott_invalidation_is_on_correct_side(swing_candles):
+    result = ElliottPro.analyze(swing_candles)
+    if result["available"]:
+        price = result["current_wave"]["current_price"]
+        level = result["invalidation"]["level"]
+        if result["current_wave"]["direction"] == "up":
+            assert level < price
+        else:
+            assert level > price

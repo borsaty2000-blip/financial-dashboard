@@ -51,6 +51,7 @@ class ElliottPro:
         targets = cls._targets(waves, current, closes[-1])
         invalidation = cls._invalidation(waves, current, closes[-1])
         confidence = cls._confidence(validation, relationships)
+        quality = "validated" if validation.get("valid") else "needs_confirmation"
         return {
             "available": True,
             "method": "ZigZag + Elliott rules + Fibonacci relationships",
@@ -63,6 +64,8 @@ class ElliottPro:
             "personality": cls.LABELS.get(current["number"], ("غير محددة", "بيانات غير كافية"))[1],
             "targets": targets,
             "invalidation": invalidation,
+            "analysis_quality": quality,
+            "quality_label": "عدّ متحقق بالقواعد" if quality == "validated" else "سيناريو يحتاج تأكيداً سعرياً",
             "alternatives": cls._alternatives(current, invalidation),
             "confidence": confidence / 100,
             "confidence_percent": confidence,
@@ -151,7 +154,13 @@ class ElliottPro:
 
     @staticmethod
     def _invalidation(waves: List[Wave], current: Dict[str, Any], price: float) -> Dict[str, Any]:
-        level = waves[-2].start_price if len(waves) > 1 else waves[-1].start_price
+        points = [point for wave in waves for point in (wave.start_price, wave.end_price)]
+        if current.get("direction") == "up":
+            supports = [point for point in points if point < price]
+            level = max(supports) if supports else price * 0.97
+        else:
+            resistances = [point for point in points if point > price]
+            level = min(resistances) if resistances else price * 1.03
         return {"level": round(level, 2), "reason": "يبطل السيناريو عند كسر المستوى بإغلاق مؤكد وتأكيد حجم التداول.", "distance_pct": round(abs(price - level) / price * 100, 2)}
 
     @staticmethod

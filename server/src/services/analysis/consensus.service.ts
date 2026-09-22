@@ -46,8 +46,8 @@ function scoreElliott(result: any): number {
 function scoreGann(result: any): number {
 	const data = result?.data
 	if (!data) return 50
-	const one = Number(data.angles?.['1x1']?.value)
-	const current = Number(data.high ?? 0)
+	const one = Number(data.angles?.['1x1']?.price)
+	const current = Number(data.current_price ?? 0)
 	if (!Number.isFinite(one) || !Number.isFinite(current) || one === 0) return 50
 	return clamp(50 + (current >= one ? 15 : -15))
 }
