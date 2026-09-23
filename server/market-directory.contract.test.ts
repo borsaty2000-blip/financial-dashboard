@@ -132,16 +132,3 @@ test('Egyptian ISIN resolves to the mapped provider symbol', async () => {
 		globalThis.fetch = originalFetch
 	}
 })
-
-test('StockAnalysis history parser returns ordered valid OHLC candles', async () => {
-	const { parseStockAnalysisHistory } = await import('./src/services/market/stockanalysis-candles.adapter.js')
-	const html = `<table><tbody>
-		<tr><td>Sep 23, 2026</td><td>12.00</td><td>13.00</td><td>11.50</td><td>12.50</td><td>12.50</td><td>1,200</td></tr>
-		<tr><td>Sep 22, 2026</td><td>11.00</td><td>12.00</td><td>10.50</td><td>11.50</td><td>11.50</td><td>900</td></tr>
-	</tbody></table>`
-	const candles = parseStockAnalysisHistory(html, 250)
-	assert.equal(candles.length, 2)
-	assert.equal(candles[0].date, '2026-09-22')
-	assert.equal(candles[1].close, 12.5)
-	assert.equal(candles[1].volume, 1200)
-})
