@@ -3,6 +3,7 @@ import { resolveEgyptSymbol } from './twelve-data.adapter.js'
 import { qualityForSeries, makeDataQuality } from './data-quality.js'
 import { fetchBinanceCandles } from './binance.adapter.js'
 import { fetchYahooCandles } from './yahoo-candles.adapter.js'
+import { fetchStockAnalysisCandles, STOCK_ANALYSIS_PROVIDER } from './stockanalysis-candles.adapter.js'
 
 export type Candle = {
 	date: string
@@ -187,10 +188,19 @@ export class CandlesService {
 					? [() => this.fetchSahmk(resolved, market, interval, days)]
 					: []),
 			() => this.fetchPolygon(resolved, market, days),
-			() => this.fetchYahoo(resolved, market, interval, days),
-			() => this.fetchStooq(resolved, market, interval, days),
-			() => this.fetchFinnhub(resolved, market, days),
-		]
+				() => this.fetchYahoo(resolved, market, interval, days),
+				() => this.fetchStooq(resolved, market, interval, days),
+				() => this.fetchFinnhub(resolved, market, days),
+				...(market === 'EGX' && interval === '1d'
+					? [async () => response(
+							resolved,
+							market,
+							interval,
+							(await fetchStockAnalysisCandles(resolved, days)).filter(validCandle),
+							STOCK_ANALYSIS_PROVIDER,
+						)]
+					: []),
+			]
 		for (const fetcher of sources) {
 			try {
 				const value = await fetcher()
