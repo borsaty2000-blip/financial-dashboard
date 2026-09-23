@@ -778,6 +778,52 @@ analysisRoutes.get('/:symbol/anomalies', async (request, response) => {
 	}
 })
 
+async function calculateConfluenceForSeries(series: Awaited<ReturnType<typeof resolveSeries>>) {
+	if (series.candles.length < 30)
+		return {
+			status: 'insufficient_data',
+			message: 'يلزم 30 شمعة لحساب توافق الأدلة',
+			data_quality: series.data_quality,
+		}
+	const complete = series.candles.map((candle) => ({
+		open: Number(candle.open ?? candle.close),
+		high: Number(candle.high ?? candle.close),
+		low: Number(candle.low ?? candle.close),
+		close: Number(candle.close),
+		volume: Number(candle.volume ?? 0),
+	}))
+	const [elliott, gann] = await Promise.all([
+		analyzeElliott(series.prices),
+		analyzeGann(series.prices, series.dates),
+	])
+	const harmonic = analyzeHarmonic(complete) as Record<string, unknown>
+	const indicators = calculateIndicatorSnapshot(series.symbol, series.candles)
+	return calculateConfluence({
+		candles: complete,
+		elliott: elliott as Record<string, unknown>,
+		gann: gann as Record<string, unknown>,
+		indicators: indicators as Record<string, unknown>,
+		harmonic,
+	})
+}
+
+async function calculateRecommendationForSeries(series: Awaited<ReturnType<typeof resolveSeries>>) {
+	const confluence = await calculateConfluenceForSeries(series)
+	if (!('bullish_confluence' in confluence))
+		return confluence
+	const complete = series.candles.map((candle) => ({
+		open: Number(candle.open ?? candle.close),
+		high: Number(candle.high ?? candle.close),
+		low: Number(candle.low ?? candle.close),
+		close: Number(candle.close),
+		volume: Number(candle.volume ?? 0),
+	}))
+	return {
+		...buildDecisionSupport(Number(confluence.bullish_confluence), complete),
+		confluence,
+	}
+}
+
 analysisRoutes.post('/:symbol/elliott-mtf', async (request, response) => {
 	try {
 		const series = await resolveAnalysisSeries(request)
@@ -814,6 +860,38 @@ analysisRoutes.post('/:symbol/harmonic', async (request, response) => {
 		return response.json({ status: data.status, data, source: series.source, candles_count: series.count, data_quality: series.data_quality })
 	} catch {
 		return response.status(502).json({ status: 'error', message: 'تعذر تنفيذ Harmonic' })
+	}
+})
+
+analysisRoutes.get('/:symbol/confluence', async (request, response) => {
+	try {
+		const series = await resolveSeries(request)
+		const data = await calculateConfluenceForSeries(series)
+		return response.json({
+			status: 'bullish_confluence' in data ? 'success' : data.status,
+			data,
+			source: series.source,
+			candles_count: series.count,
+			data_quality: series.data_quality,
+		})
+	} catch {
+		return response.status(502).json({ status: 'error', message: 'تعذر حساب توافق الأدلة' })
+	}
+})
+
+analysisRoutes.get('/:symbol/recommendation', async (request, response) => {
+	try {
+		const series = await resolveSeries(request)
+		const data = await calculateRecommendationForSeries(series)
+		return response.json({
+			status: 'recommendation' in data ? 'success' : data.status,
+			data,
+			source: series.source,
+			candles_count: series.count,
+			data_quality: series.data_quality,
+		})
+	} catch {
+		return response.status(502).json({ status: 'error', message: 'تعذر بناء السيناريو التحليلي' })
 	}
 })
 

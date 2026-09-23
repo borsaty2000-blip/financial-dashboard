@@ -66,6 +66,20 @@ type EngineStatus = {
 	python_engine?: { live?: boolean; status?: string; engines?: string[] }
 }
 
+type FullAnalysis = {
+	data?: {
+		confluence?: { bullish_confluence?: number; bearish_confluence?: number }
+		recommendation?: {
+			recommendation?: {
+				condition?: string
+				stop_loss?: number | null
+				targets?: Array<{ price?: number }>
+			}
+		}
+		harmonic?: { status?: string; pattern?: string | null }
+	}
+}
+
 export function StockDetailPage({
 	symbol,
 	companyName,
@@ -90,6 +104,7 @@ export function StockDetailPage({
 	const [elliottMtf, setElliottMtf] = useState<ElliottMtfData>()
 	const [engineStatus, setEngineStatus] =
 		useState<EngineStatus['python_engine']>()
+	const [fullAnalysis, setFullAnalysis] = useState<FullAnalysis>()
 	const livePrice = useLivePrice(normalized, market)
 
 	useEffect(() => {
@@ -153,7 +168,10 @@ export function StockDetailPage({
 			{ suppressToast: true },
 		)
 			.then((result) => {
-				if (!cancelled) setEngineStatus(result.python_engine)
+				if (!cancelled) {
+					setEngineStatus(result.python_engine)
+					setFullAnalysis(result as FullAnalysis)
+				}
 			})
 			.catch(() => {
 					if (!cancelled)
@@ -454,6 +472,13 @@ export function StockDetailPage({
 						</>
 					) : (
 						<section className="decision-tab-content">
+							{fullAnalysis?.data?.confluence && (
+								<section className="analysis-card decision-evidence-card" aria-label="توافق الأدلة والسيناريو">
+									<div className="panel-title"><div><span className="eyebrow">توافق الأدلة</span><h2>القراءة المجمعة للسهم</h2></div><strong>{formatEnglishNumber(fullAnalysis.data.confluence.bullish_confluence)} / 100</strong></div>
+									<p>{fullAnalysis.data.recommendation?.recommendation?.condition ?? 'تُعرض النتيجة بعد اجتماع المؤشرات والموجات ومستويات السعر.'}</p>
+									<div className="decision-boundary-grid"><strong>نموذج هارموني: {fullAnalysis.data.harmonic?.pattern ?? 'لا يوجد نموذج مؤكد'}</strong><strong>وقف السيناريو: {formatEnglishNumber(fullAnalysis.data.recommendation?.recommendation?.stop_loss)}</strong><strong>الهدف الأول: {formatEnglishNumber(fullAnalysis.data.recommendation?.recommendation?.targets?.[0]?.price)}</strong></div>
+								</section>
+							)}
 								<StockSectionBoundary label="الملخص الموحد">
 									<BrilliantSummary symbol={normalized} market={market} />
 								</StockSectionBoundary>
