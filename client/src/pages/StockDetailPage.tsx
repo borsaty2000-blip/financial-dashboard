@@ -479,11 +479,20 @@ export function StockDetailPage({
 											<strong>المحور: {formatEnglishNumber(gann.support_resistance?.pivot)}</strong>
 											<strong>المقاومة: {formatEnglishNumber(gann.support_resistance?.resistance ?? gann.square_of_nine?.resistance)}</strong>
 										</div>
-										<div className="gann-angle-grid" aria-label="زوايا Gann">
-											{Object.entries(gann.angles ?? {}).map(([angle, value]) => (
-																<span key={angle}><b dir="ltr">{angle}</b><strong>{value.price == null ? '—' : value.price.toFixed(2)}</strong><small>{value.status ?? ''}</small></span>
-											))}
-										</div>
+										<table className="gann-angles-table">
+											<thead>
+												<tr><th>الزاوية</th><th>السعر</th><th>العلاقة</th></tr>
+											</thead>
+											<tbody>
+												{Object.entries(gann.angles ?? {}).map(([key, angle]) => (
+													<tr key={key}>
+														<td className="angle-name" dir="ltr">{key}</td>
+														<td className="angle-price mono">{angle.price == null ? '—' : angle.price.toFixed(2)}</td>
+														<td className={angle.status === 'أعلى' ? 'up' : 'down'}>{angle.status || '—'}</td>
+													</tr>
+												))}
+											</tbody>
+										</table>
 										<div className="decision-boundary-grid">
 											<strong>مربع التسعة — دعم: {formatEnglishNumber(gann.square_of_nine?.support)}</strong>
 											<strong>مربع التسعة — مقاومة: {formatEnglishNumber(gann.square_of_nine?.resistance)}</strong>
