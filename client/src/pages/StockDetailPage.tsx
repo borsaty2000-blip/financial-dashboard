@@ -107,7 +107,6 @@ export function StockDetailPage({
 		'technical',
 	)
 	const [elliottMtf, setElliottMtf] = useState<ElliottMtfData>()
-	const [elliottError, setElliottError] = useState('')
 	const [gann, setGann] = useState<GannAnalysis>()
 	const [gannError, setGannError] = useState('')
 	const [confluence, setConfluence] = useState<ConfluenceAnalysis>()
@@ -122,7 +121,6 @@ export function StockDetailPage({
 			setElliottMtf(stockAnalysis.data.elliott.data as ElliottMtfData | undefined)
 			setGann(stockAnalysis.data.gann.data as GannAnalysis | undefined)
 			setConfluence(stockAnalysis.data.confluence.data as ConfluenceAnalysis | undefined)
-			setElliottError(stockAnalysis.data.elliott.error ?? '')
 			setGannError(stockAnalysis.data.gann.error ?? '')
 			setConfluenceError(stockAnalysis.data.confluence.error ?? '')
 			setEngineStatus({
@@ -395,7 +393,7 @@ export function StockDetailPage({
 										<ProfessionalStockChart candles={data.candles} />
 									</StockSectionBoundary>
 							</section>
-				<StockSectionBoundary label="تحليل Elliott">
+					{stockAnalysis.data?.elliott.available && elliottMtf && <StockSectionBoundary label="تحليل Elliott">
 				<section
 					className="analysis-card elliott-mtf-panel"
 								aria-label="تحليل Elliott متعدد الأطر"
@@ -414,14 +412,11 @@ export function StockDetailPage({
 									</strong>
 								</div>
 									<div className="elliott-mtf-grid">
-									{Object.entries(elliottMtf?.by_timeframe ?? {}).map(
+										{Object.entries(elliottMtf.by_timeframe ?? {}).filter(([, frame]) => frame.available !== false).map(
 										([key, frame]) => (
 											<article key={key} className="elliott-mtf-card">
 												<span>{frame.timeframe_ar}</span>
-													{frame.available === false ? (
-									<strong>لا تتوفر قراءة موثوقة لهذا الرمز حالياً</strong>
-												) : (
-													<>
+																<>
 														<strong>
 															الموجة {frame.current_wave} ·{' '}
 															{frame.direction === 'up'
@@ -461,24 +456,16 @@ export function StockDetailPage({
 																					متوافق
 															</small>
 														) : null}
-													</>
-												)}
+																</>
 											</article>
 										),
 									)}
 									</div>
-									{elliottError && !elliottMtf && (
-										<div className="analysis-error" role="alert">
-											تعذر تحميل تحليل Elliott: {elliottError}
-											<button className="link-button" type="button" onClick={() => setRetryKey((key) => key + 1)}>إعادة المحاولة</button>
-										</div>
-									)}
-									<p className="analysis-disclaimer">
-									{elliottMtf?.disclaimer ??
-										'التحليل متعدد الأطر احتمالي وتعليمي، وليس توصية شراء أو بيع.'}
-					</p>
-					</section>
-					</StockSectionBoundary>
+										<p className="analysis-disclaimer">
+										إخلاء مسؤولية: هذه مخرجات تحليلية احتمالية وليست توصية شراء أو بيع.
+						</p>
+						</section>
+						</StockSectionBoundary>}
 					<StockSectionBoundary label="تحليل Gann">
 						<section className="analysis-card gann-analysis-panel" aria-label="تحليل Gann">
 							<div className="panel-title">
@@ -494,7 +481,7 @@ export function StockDetailPage({
 										</div>
 										<div className="gann-angle-grid" aria-label="زوايا Gann">
 											{Object.entries(gann.angles ?? {}).map(([angle, value]) => (
-												<span key={angle}><b dir="ltr">{angle}</b><strong>{formatEnglishNumber(value.price)}</strong><small>{value.status ?? ''}</small></span>
+																<span key={angle}><b dir="ltr">{angle}</b><strong>{value.price == null ? '—' : value.price.toFixed(2)}</strong><small>{value.status ?? ''}</small></span>
 											))}
 										</div>
 										<div className="decision-boundary-grid">
@@ -509,13 +496,13 @@ export function StockDetailPage({
 							) : gannError ? (
 								<div className="analysis-error" role="alert">تعذر تحميل تحليل Gann: {gannError}<button className="link-button" type="button" onClick={() => setRetryKey((key) => key + 1)}>إعادة المحاولة</button></div>
 							) : <p>جاري تحميل الزوايا والمستويات الزمنية...</p>}
-							<p className="analysis-disclaimer">{gann?.disclaimer ?? 'مستويات Gann احتمالية وتحتاج إلى تأكيد بالسعر والحجم.'}</p>
+								<p className="analysis-disclaimer">إخلاء مسؤولية: هذه مستويات احتمالية وليست توصية شراء أو بيع.</p>
 						</section>
 					</StockSectionBoundary>
 							</>
 						) : (
 							<section className="decision-tab-content">
-								{confluence && (
+									{stockAnalysis.data?.confluence.available && confluence && (
 									<section className="analysis-card decision-evidence-card" aria-label="توافق الأدلة والسيناريو">
 										<div className="panel-title"><div><span className="eyebrow">توافق الأدلة</span><h2>القراءة المجمعة للسهم</h2></div><strong>{formatEnglishNumber(confluence.bullish_confluence)} / 100</strong></div>
 										<p>{confluence.supporting_evidence?.join(' · ') ?? 'تم جمع المؤشرات والموجات ومستويات السعر.'}</p>
