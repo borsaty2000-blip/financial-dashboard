@@ -1,5 +1,5 @@
 const API_URL = import.meta.env.VITE_API_URL ?? ''
-const DEFAULT_TIMEOUT_MS = 15_000
+const DEFAULT_TIMEOUT_MS = 20_000
 
 type ApiOptions = RequestInit & { suppressToast?: boolean }
 
