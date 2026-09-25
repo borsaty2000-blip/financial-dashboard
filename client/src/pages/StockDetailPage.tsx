@@ -5,6 +5,7 @@ import ProfessionalStockChart from '../components/ProfessionalStockChart'
 import { StockSectionBoundary } from '../components/StockSectionBoundary'
 import { BrilliantSummary } from '../components/Analysis/BrilliantSummary'
 import { formatEnglishNumber, formatEnglishPercent } from '../lib/format'
+import { useStockAnalysis } from '../hooks/useStockAnalysis'
 
 type Candle = {
 	date: string
@@ -64,7 +65,8 @@ type ElliottMtfData = {
 
 type GannAnalysis = {
 	angles?: Record<string, { price?: number; status?: string }>
-	square_of_nine?: { support?: number; resistance?: number; strong_support?: number; strong_resistance?: number }
+	square_of_nine?: { support?: number; resistance?: number; strong_support?: number; strong_resistance?: number; levels?: Record<string, number> }
+	time_cycles?: Array<{ days?: number; date?: string; name?: string }>
 	support_resistance?: { support?: number; pivot?: number; resistance?: number }
 	trend?: string
 	disclaimer?: string
@@ -109,10 +111,29 @@ export function StockDetailPage({
 	const [gann, setGann] = useState<GannAnalysis>()
 	const [gannError, setGannError] = useState('')
 	const [confluence, setConfluence] = useState<ConfluenceAnalysis>()
-	const [confluenceError, setConfluenceError] = useState('')
-	const [engineStatus, setEngineStatus] =
-		useState<EngineStatus['python_engine']>()
-	const livePrice = useLivePrice(normalized, market)
+		const [confluenceError, setConfluenceError] = useState('')
+		const [engineStatus, setEngineStatus] =
+			useState<EngineStatus['python_engine']>()
+		const livePrice = useLivePrice(normalized, market)
+		const stockAnalysis = useStockAnalysis(normalized, market)
+
+		useEffect(() => {
+			if (!stockAnalysis.data) return
+			setElliottMtf(stockAnalysis.data.elliott.data as ElliottMtfData | undefined)
+			setGann(stockAnalysis.data.gann.data as GannAnalysis | undefined)
+			setConfluence(stockAnalysis.data.confluence.data as ConfluenceAnalysis | undefined)
+			setElliottError(stockAnalysis.data.elliott.error ?? '')
+			setGannError(stockAnalysis.data.gann.error ?? '')
+			setConfluenceError(stockAnalysis.data.confluence.error ?? '')
+			setEngineStatus({
+				live: stockAnalysis.data.integrity.score >= 80,
+				status: stockAnalysis.data.integrity.score >= 80 ? 'التحليل متاح' : 'لا تتوفر قراءة موثوقة لهذا الرمز حالياً',
+				engines: [
+					...(stockAnalysis.data.elliott.available ? ['Elliott'] : []),
+					...(stockAnalysis.data.gann.available ? ['Gann'] : []),
+				],
+			})
+		}, [stockAnalysis.data])
 
 	useEffect(() => {
 		const controller = new AbortController()
@@ -162,66 +183,7 @@ export function StockDetailPage({
 					setResolvedCompanyName(result.nameAr)
 			})
 			.catch(() => undefined)
-		void api<{ data?: ElliottMtfData }>(
-			`/api/analysis/${normalized}/elliott-mtf?market=${market}`,
-			{ suppressToast: true },
-		)
-			.then((result) => {
-				if (!cancelled) {
-					const payload = (result.data ?? result) as ElliottMtfData
-					setElliottMtf(payload)
-					setElliottError('')
-				}
-			})
-			.catch((error: unknown) => {
-				if (!cancelled)
-					setElliottError(error instanceof Error ? error.message : 'تعذر تحميل تحليل Elliott')
-			})
-		void api<{ data?: GannAnalysis }>(
-			`/api/analysis/${normalized}/gann?market=${market}`,
-			{ suppressToast: true },
-		)
-			.then((result) => {
-				if (!cancelled) {
-					setGann((result.data ?? result) as GannAnalysis)
-					setGannError('')
-				}
-			})
-			.catch((error: unknown) => {
-				if (!cancelled)
-					setGannError(error instanceof Error ? error.message : 'تعذر تحميل تحليل Gann')
-			})
-		void api<{ data?: ConfluenceAnalysis }>(
-			`/api/analysis/${normalized}/confluence?market=${market}`,
-			{ suppressToast: true },
-		)
-			.then((result) => {
-				if (!cancelled) {
-					setConfluence((result.data ?? result) as ConfluenceAnalysis)
-					setConfluenceError('')
-				}
-			})
-			.catch((error: unknown) => {
-				if (!cancelled)
-					setConfluenceError(error instanceof Error ? error.message : 'تعذر تحميل توافق الأدلة')
-			})
-		void api<EngineStatus>(
-			`/api/analysis/${normalized}/full?market=${market}`,
-			{ suppressToast: true },
-		)
-			.then((result) => {
-				if (!cancelled) {
-					setEngineStatus(result.python_engine)
-				}
-			})
-			.catch(() => {
-					if (!cancelled)
-						setEngineStatus({
-							live: false,
-							status: 'لا تتوفر قراءة موثوقة لهذا الرمز حالياً',
-						})
-			})
-		return () => {
+			return () => {
 			cancelled = true
 			controller.abort()
 			window.clearTimeout(timeout)
@@ -241,11 +203,12 @@ export function StockDetailPage({
 		}
 	}, [data])
 
-	const displayCompanyName =
-		resolvedCompanyName ??
-		(companyName && companyName.toUpperCase() !== normalized
-			? companyName
-			: undefined)
+		const displayCompanyName =
+			resolvedCompanyName ??
+			(companyName && companyName.toUpperCase() !== normalized
+				? companyName
+				: undefined)
+		const recommendation = stockAnalysis.data?.recommendation.data?.recommendation ?? stockAnalysis.data?.recommendation.data
 
 	const addToWatchlist = async () => {
 		try {
@@ -522,12 +485,27 @@ export function StockDetailPage({
 								<div><span className="eyebrow">الزوايا والدورات · {normalized}</span><h2>تحليل Gann السعري والزمني</h2></div>
 								<strong>{gann?.trend ?? 'قيد التحميل'}</strong>
 							</div>
-							{gann ? (
-								<div className="decision-boundary-grid">
-									<strong>الدعم: {formatEnglishNumber(gann.support_resistance?.support ?? gann.square_of_nine?.support)}</strong>
-									<strong>المحور: {formatEnglishNumber(gann.support_resistance?.pivot)}</strong>
-									<strong>المقاومة: {formatEnglishNumber(gann.support_resistance?.resistance ?? gann.square_of_nine?.resistance)}</strong>
-								</div>
+								{gann ? (
+									<>
+										<div className="decision-boundary-grid">
+											<strong>الدعم: {formatEnglishNumber(gann.support_resistance?.support ?? gann.square_of_nine?.support)}</strong>
+											<strong>المحور: {formatEnglishNumber(gann.support_resistance?.pivot)}</strong>
+											<strong>المقاومة: {formatEnglishNumber(gann.support_resistance?.resistance ?? gann.square_of_nine?.resistance)}</strong>
+										</div>
+										<div className="gann-angle-grid" aria-label="زوايا Gann">
+											{Object.entries(gann.angles ?? {}).map(([angle, value]) => (
+												<span key={angle}><b dir="ltr">{angle}</b><strong>{formatEnglishNumber(value.price)}</strong><small>{value.status ?? ''}</small></span>
+											))}
+										</div>
+										<div className="decision-boundary-grid">
+											<strong>مربع التسعة — دعم: {formatEnglishNumber(gann.square_of_nine?.support)}</strong>
+											<strong>مربع التسعة — مقاومة: {formatEnglishNumber(gann.square_of_nine?.resistance)}</strong>
+											<strong>المستويات: {Object.keys(gann.square_of_nine?.levels ?? {}).length}</strong>
+										</div>
+										<div className="gann-cycles" aria-label="الدورات الزمنية">
+											{(gann.time_cycles ?? []).map((cycle) => <span key={`${cycle.days}-${cycle.date}`}>{cycle.name ?? `${cycle.days} يوم`} · {cycle.date}</span>)}
+										</div>
+									</>
 							) : gannError ? (
 								<div className="analysis-error" role="alert">تعذر تحميل تحليل Gann: {gannError}<button className="link-button" type="button" onClick={() => setRetryKey((key) => key + 1)}>إعادة المحاولة</button></div>
 							) : <p>جاري تحميل الزوايا والمستويات الزمنية...</p>}
@@ -544,8 +522,22 @@ export function StockDetailPage({
 										<div className="decision-boundary-grid"><strong>التعارضات: {confluence.contradicting_evidence?.length ?? 0}</strong><strong>البيانات الناقصة: {confluence.missing_data?.length ?? 0}</strong><strong>الاتجاه المقابل: {formatEnglishNumber(confluence.bearish_confluence)} / 100</strong></div>
 									</section>
 								)}
-								{confluenceError && !confluence && <div className="analysis-error" role="alert">تعذر تحميل توافق الأدلة: {confluenceError}<button className="link-button" type="button" onClick={() => setRetryKey((key) => key + 1)}>إعادة المحاولة</button></div>}
-								<StockSectionBoundary label="الملخص الموحد">
+									{confluenceError && !confluence && <div className="analysis-error" role="alert">تعذر تحميل توافق الأدلة: {confluenceError}<button className="link-button" type="button" onClick={() => setRetryKey((key) => key + 1)}>إعادة المحاولة</button></div>}
+									{stockAnalysis.data?.recommendation.available && recommendation && (
+										<section className="analysis-card recommendation-card" aria-label="التوصية المشروطة">
+											<div className="panel-title"><div><span className="eyebrow">مخرجات Orchestrator</span><h2>القرار المشروط</h2></div><strong>{recommendation.type ?? 'سيناريو مراقبة'}</strong></div>
+											<p>{recommendation.condition ?? 'تُراجع الإشارة عند تحقق شروط السعر والحجم.'}</p>
+											<div className="decision-boundary-grid">
+												<strong>منطقة الدخول: {Array.isArray(recommendation.entry_zone) ? recommendation.entry_zone.map((value: number) => formatEnglishNumber(value)).join(' – ') : formatEnglishNumber(recommendation.entry)}</strong>
+												<strong>وقف الخسارة: {formatEnglishNumber(recommendation.stop_loss)}</strong>
+												<strong>المخاطرة/العائد: {formatEnglishNumber(recommendation.risk_reward)}</strong>
+											</div>
+											<div className="decision-boundary-grid">
+												{(recommendation.targets ?? []).map((target: { price?: number }, index: number) => <strong key={`${target.price}-${index}`}>الهدف {index + 1}: {formatEnglishNumber(target.price)}</strong>)}
+											</div>
+										</section>
+									)}
+									<StockSectionBoundary label="الملخص الموحد">
 									<BrilliantSummary symbol={normalized} market={market} />
 								</StockSectionBoundary>
 							<div className="analysis-card decision-boundary-card">
