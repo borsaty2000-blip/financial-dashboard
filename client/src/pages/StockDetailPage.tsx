@@ -36,11 +36,17 @@ type CompanyResponse = { nameAr?: string }
 type ElliottFrame = {
 	available?: boolean
 	availability_reason?: string
-	timeframe_ar: string
-	current_wave: string
-	wave_personality: string
-	direction: string
-	confidence: number
+	timeframe_ar?: string
+	current_wave?: {
+		number?: string
+		direction?: string
+		current_price?: number
+		label?: string
+		next_expected?: string
+	} | string | null
+	wave_personality?: string
+	direction?: string
+	confidence?: number
 	alternate_count?: { wave?: string }
 	targets?: {
 		target_1?: number | { price?: number }
@@ -418,7 +424,9 @@ export function StockDetailPage({
 												<span>{frame.timeframe_ar}</span>
 																<>
 														<strong>
-															الموجة {frame.current_wave} ·{' '}
+																	الموجة {typeof frame.current_wave === 'object' && frame.current_wave !== null
+																		? frame.current_wave.label ?? frame.current_wave.number ?? '—'
+																		: frame.current_wave ?? '—'} ·{' '}
 															{frame.direction === 'up'
 																? 'صاعد'
 																: frame.direction === 'down'

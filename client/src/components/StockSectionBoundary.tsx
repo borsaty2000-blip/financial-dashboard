@@ -36,8 +36,11 @@ export class StockSectionBoundary extends Component<Props, State> {
 		if (this.state.hasError) {
 			return (
 				<section className="analysis-card error-section" role="status">
-					<strong>{this.props.label} غير متاح حالياً</strong>
-					<p>يمكن متابعة بقية بيانات السهم دون فقدان الصفحة.</p>
+					<strong>تعذر عرض هذا القسم. جاري إعادة المحاولة...</strong>
+					<p>{this.props.label}</p>
+					<button className="link-button" type="button" onClick={() => this.setState({ hasError: false })}>
+						إعادة المحاولة
+					</button>
 				</section>
 			)
 		}
