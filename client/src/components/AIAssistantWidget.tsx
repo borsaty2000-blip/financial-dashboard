@@ -71,7 +71,7 @@ export default function AIAssistantWidget() {
 					<header>
 						<div>
 							<strong>مساعد borsatyai</strong>
-							<small>شات ذكي عام · تحليل تعليمي بلا تنفيذ صفقات</small>
+							<small>شات ذكي عام · معلومات السوق دون تنفيذ صفقات</small>
 						</div>
 						<button aria-label="إغلاق" onClick={() => setOpen(false)}>
 							×

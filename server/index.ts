@@ -71,6 +71,7 @@ import { aiRoutes } from './src/routes/ai.routes.js'
 import { heatmapRoutes } from './src/routes/heatmap.routes.js'
 import { providerRoutes } from './src/routes/provider.routes.js'
 import { signalsRoutes } from './src/routes/signals.routes.js'
+import { analysisHealthRoutes } from './src/routes/analysis-health.routes.js'
 
 initializeOptionalSentry()
 const app = express()
@@ -151,6 +152,7 @@ app.get('/api/financial-report', (_request, response) =>
 app.get('/api/health', (_request, response) =>
 	response.json({ ok: true, service: 'financial-dashboard-api' }),
 )
+app.use('/api/health', analysisHealthRoutes)
 app.use('/api', openApiRoutes)
 app.use('/api/v1/market', liveMarketRoutes)
 app.use('/api/v1/market', heatmapRoutes)

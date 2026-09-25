@@ -9,6 +9,7 @@ import {
 	getSaudiCompanies,
 	type TwelveCompany,
 } from '../services/market/twelve-data.adapter.js'
+import { AnalysisOrchestrator } from '../services/analysis/orchestrator.js'
 
 export const stockRoutes = Router()
 
@@ -53,6 +54,32 @@ async function findCompany(identifier: string) {
 	}
 	return null
 }
+
+stockRoutes.get('/:symbol/full', async (request, response) => {
+	const symbol = request.params.symbol.trim().toUpperCase()
+	const market = (request.query.market === 'TASI' ? 'TASI' : marketFor(symbol)) as CandleMarket
+	try {
+		const result = await AnalysisOrchestrator.analyze(symbol, market)
+		if (result.candles.count < 30)
+			return response.status(404).json({ status: 'unavailable', symbol, market, integrity: result.integrity, candles: result.candles })
+		return response.json({
+			status: 'success',
+			symbol,
+			market,
+			price: result.indicators.data?.current_price ?? null,
+			integrity: result.integrity,
+			candles: result.candles,
+			elliott: result.elliott,
+			gann: result.gann,
+			harmonic: result.harmonic,
+			confluence: result.confluence,
+			recommendation: result.recommendation,
+			latency_ms: result.latency_ms,
+		})
+	} catch {
+		return response.status(502).json({ status: 'error', symbol, message: 'تعذر إكمال التحليل الموحد حالياً' })
+	}
+})
 
 stockRoutes.get('/:identifier', async (request, response) => {
 	const identifier = request.params.identifier.trim().toUpperCase()

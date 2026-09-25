@@ -1204,12 +1204,12 @@ export function AnalysisOverviewPage({
 		<div className="borsaty-public-page" dir="rtl">
 			<PublicHeader live={null} news={[]} />
 			<main className="borsaty-analysis-overview">
-				<span className="borsaty-kicker">تحليل تعليمي</span>
+					<span className="borsaty-kicker">تحليل متقدم</span>
 				<h1>{isElliott ? 'تحليل Elliott Wave' : 'تحليل Gann'}</h1>
 				<p>
 					{isElliott
 						? 'استكشف هيكل الموجات والسيناريو التحليلي مع درجة ثقة، دون تحويله إلى أمر تداول.'
-						: 'راجع الزوايا ومستويات الدعم والمقاومة والدورات الزمنية ضمن تحليل تعليمي.'}
+							: 'راجع الزوايا ومستويات الدعم والمقاومة والدورات الزمنية ضمن قراءة متقدمة.'}
 				</p>
 				<div className="borsaty-symbol-search">
 					<label htmlFor="analysis-symbol">رمز السهم</label>

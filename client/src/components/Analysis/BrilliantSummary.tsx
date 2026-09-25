@@ -84,7 +84,7 @@ export function BrilliantSummary({
 		)
 		return (
 			<section className="brilliant-summary brilliant-summary--empty">
-				<strong>الملخص الموحد غير متاح حالياً</strong>
+					<strong>لا تتوفر قراءة مكتملة حالياً</strong>
 				<p>
 					لن نعرض حكماً ناقصاً أو أرقاماً مختلقة. أعد المحاولة عند توفر الشموع
 					الكافية.

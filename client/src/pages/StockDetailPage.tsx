@@ -218,7 +218,7 @@ export function StockDetailPage({
 					if (!cancelled)
 						setEngineStatus({
 							live: false,
-							status: 'التحليل غير متاح لهذا الرمز',
+							status: 'لا تتوفر قراءة موثوقة لهذا الرمز حالياً',
 						})
 			})
 		return () => {
@@ -426,7 +426,7 @@ export function StockDetailPage({
 																<span aria-hidden="true" />
 																	{engineStatus?.live
 																	? 'التحليل متاح'
-																	: 'التحليل غير متاح لهذا الرمز'}
+													: 'لا تتوفر قراءة موثوقة لهذا الرمز حالياً'}
 								</div>
 									<StockSectionBoundary label="الرسم السعري">
 										<ProfessionalStockChart candles={data.candles} />
@@ -456,7 +456,7 @@ export function StockDetailPage({
 											<article key={key} className="elliott-mtf-card">
 												<span>{frame.timeframe_ar}</span>
 													{frame.available === false ? (
-															<strong>التحليل غير متاح لهذا الرمز</strong>
+									<strong>لا تتوفر قراءة موثوقة لهذا الرمز حالياً</strong>
 												) : (
 													<>
 														<strong>
