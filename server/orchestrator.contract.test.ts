@@ -28,6 +28,6 @@ test('Confluence score stays bounded and exposes missing evidence', () => {
 	const candles = Array.from({ length: 40 }, (_, index) => candle(`2026-01-${String(index + 1).padStart(2, '0')}`, 100 + index))
 	const result = calculateConfluence({ candles, elliott: null, gann: null, indicators: null, harmonic: { status: 'insufficient_data' } })
 	assert.ok(result.bullish_confluence >= 0 && result.bullish_confluence <= 100)
-	assert.equal(result.bearish_confluence + result.bullish_confluence, 100)
-	assert.ok(result.missing_data.includes('gann'))
+	assert.ok(Math.abs(result.bearish_confluence + result.bullish_confluence + result.neutral - 100) < 0.01)
+	assert.ok(result.missing_data.some(item => item.startsWith('Gann:')))
 })

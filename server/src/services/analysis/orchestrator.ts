@@ -78,7 +78,7 @@ export class AnalysisOrchestrator {
 		const harmonicPromise = timed(Promise.resolve(analyzeHarmonic(candles)), 10000, asRecord)
 		const indicatorsPromise = timed(Promise.resolve(calculateIndicatorSnapshot(normalized, candles)), 10000, asRecord)
 		const [elliott, gann, harmonic, indicators] = await Promise.all([elliottPromise, gannPromise, harmonicPromise, indicatorsPromise])
-		const confluenceData = calculateConfluence({ candles, elliott: elliott.data, gann: gann.data, indicators: indicators.data, harmonic: harmonic.data ?? { status: 'insufficient_data' } })
+		const confluenceData = calculateConfluence({ symbol: normalized, candles, elliott: elliott.data, gann: gann.data, indicators: indicators.data, harmonic: harmonic.data ?? { status: 'insufficient_data' } })
 		const confluence: Engine<Record<string, unknown>> = { available: true, data: confluenceData as unknown as Record<string, unknown>, latency_ms: 0 }
 		const recommendationData = buildDecisionSupport(Number(confluenceData.bullish_confluence), candles)
 		const recommendation: Engine<Record<string, unknown>> = { available: true, data: recommendationData as unknown as Record<string, unknown>, latency_ms: 0 }

@@ -1,138 +1,44 @@
-type Candle = {
-	open: number
-	high: number
-	low: number
-	close: number
-	volume: number
-	date?: string
-}
+import { analyzeFibonacci, type FibonacciAnalysis } from './fibonacci.service.js'
+import { analyzeMarketRegime, type RegimeAnalysis } from './market-regime.service.js'
+import { analyzeSupportResistance, type SupportResistanceAnalysis } from './support-resistance.service.js'
+import type { ClassicalAnalysis } from './classical-patterns.service.js'
 
+type Candle = { open: number; high: number; low: number; close: number; volume: number; date?: string; timestamp?: string | number }
 type Pivot = { index: number; price: number; type: 'high' | 'low' }
+type Signal = 'BUY' | 'SELL' | 'NEUTRAL'
+type SchoolInput = Record<string, unknown> | null | undefined
 
-function pivots(candles: Candle[], lookback = 3): Pivot[] {
-	const result: Pivot[] = []
-	for (let i = lookback; i < candles.length - lookback; i += 1) {
-		const candle = candles[i]
-		const window = candles.slice(i - lookback, i + lookback + 1)
-		if (candle.high >= Math.max(...window.map((item) => item.high)))
-			result.push({ index: i, price: candle.high, type: 'high' })
-		if (candle.low <= Math.min(...window.map((item) => item.low)))
-			result.push({ index: i, price: candle.low, type: 'low' })
-	}
-	return result
-		.sort((a, b) => a.index - b.index)
-		.filter((item, index, all) => index === 0 || item.type !== all[index - 1].type)
-}
-
-const ratio = (a: number, b: number) => (Math.abs(b) > 0 ? Math.abs(a / b) : null)
-const near = (actual: number | null, expected: number, tolerance = 0.08) =>
-	actual != null && Math.abs(actual - expected) <= tolerance
+type School = { name: string; nameEn: string; score: number | null; weight: number; regime_weight: number; adjusted_weight: number; signal: Signal | 'UNAVAILABLE'; reason: string; source: string }
+const SCHOOL_WEIGHTS: Record<string, number> = { Trend: 12, Momentum: 10, Volume: 8, 'Market Structure': 10, 'Support/Resistance': 8, Fibonacci: 7, 'Elliott Wave': 10, Gann: 5, Harmonic: 4, 'Classical Patterns': 6, Wyckoff: 5, VSA: 4, Volatility: 3, Divergence: 5, 'Market Regime': 3 }
+const SCHOOL_LABELS: Record<string, [string, string]> = { Trend: ['الاتجاه', 'Trend'], Momentum: ['الزخم', 'Momentum'], Volume: ['الحجم', 'Volume'], 'Market Structure': ['بنية السوق', 'Market Structure'], 'Support/Resistance': ['الدعم والمقاومة', 'Support/Resistance'], Fibonacci: ['فيبوناتشي', 'Fibonacci'], 'Elliott Wave': ['موجات إليوت', 'Elliott Wave'], Gann: ['جان', 'Gann'], Harmonic: ['الهارمونيك', 'Harmonic'], 'Classical Patterns': ['الأنماط الكلاسيكية', 'Classical Patterns'], Wyckoff: ['Wyckoff', 'Wyckoff'], VSA: ['VSA', 'VSA'], Volatility: ['التقلب', 'Volatility'], Divergence: ['الاختلافات', 'Divergence'], 'Market Regime': ['بيئة السوق', 'Market Regime'] }
+const round = (value: number, digits = 2) => Number.isFinite(value) ? Number(value.toFixed(digits)) : null
+const clamp = (value: number) => Math.max(0, Math.min(100, value))
+const ratio = (a: number, b: number) => Math.abs(b) > 0 ? Math.abs(a / b) : null
+const near = (actual: number | null, expected: number, tolerance = 0.08) => actual != null && Math.abs(actual - expected) <= tolerance
+const pivots = (candles: Candle[], lookback = 3): Pivot[] => { const result: Pivot[] = []; for (let i = lookback; i < candles.length - lookback; i++) { const candle = candles[i], window = candles.slice(i - lookback, i + lookback + 1); if (candle.high >= Math.max(...window.map(item => item.high))) result.push({ index: i, price: candle.high, type: 'high' }); if (candle.low <= Math.min(...window.map(item => item.low))) result.push({ index: i, price: candle.low, type: 'low' }) } return result.sort((a, b) => a.index - b.index).filter((item, index, all) => index === 0 || item.type !== all[index - 1].type) }
 
 export function analyzeHarmonic(candles: Candle[]) {
-	const points = pivots(candles).slice(-5)
-	if (points.length < 5)
-		return {
-			status: 'insufficient_data',
-			pattern: null,
-			missing: ['confirmed_pivots_xabcd'],
-			pivots_count: points.length,
-		}
-	const [x, a, b, c, d] = points
-	const xa = a.price - x.price
-	const ab = b.price - a.price
-	const bc = c.price - b.price
-	const cd = d.price - c.price
-	const ratios = {
-		AB_XA: ratio(ab, xa),
-		BC_AB: ratio(bc, ab),
-		CD_BC: ratio(cd, bc),
-	}
-	const candidates = [
-		{ name: 'Gartley', score: Number(near(ratios.AB_XA, 0.618)) + Number(near(ratios.BC_AB, 0.618, 0.25)) + Number(near(ratios.CD_BC, 1.272, 0.35)) },
-		{ name: 'Bat', score: Number(near(ratios.AB_XA, 0.5, 0.12)) + Number(near(ratios.BC_AB, 0.5, 0.25)) + Number(near(ratios.CD_BC, 1.618, 0.4)) },
-		{ name: 'Butterfly', score: Number(near(ratios.AB_XA, 0.786, 0.12)) + Number(near(ratios.BC_AB, 0.5, 0.25)) + Number(near(ratios.CD_BC, 1.618, 0.4)) },
-		{ name: 'ABCD', score: Number(near(ratios.BC_AB, 0.618, 0.25)) + Number(near(ratios.CD_BC, 1, 0.2)) },
-	]
-	const best = candidates.sort((left, right) => right.score - left.score)[0]
-	if (!best || best.score < 2)
-		return { status: 'insufficient_data', pattern: null, missing: ['confirmed_fibonacci_relationships'], points: { X: x.price, A: a.price, B: b.price, C: c.price, D: d.price }, fibonacci_ratios: ratios }
-	const current = candles.at(-1)?.close ?? d.price
-	const direction = d.price > c.price ? 'up' : 'down'
-	const stop = direction === 'up' ? Math.min(d.price, c.price) : Math.max(d.price, c.price)
-	const range = Math.abs(a.price - x.price)
-	return {
-		status: 'success',
-		pattern: best.name,
-		points: { X: x.price, A: a.price, B: b.price, C: c.price, D: d.price },
-		PRZ: [Math.min(d.price, d.price + range * 0.03), Math.max(d.price, d.price + range * 0.03)],
-		entry_zone: [Math.min(d.price, d.price + range * 0.03), Math.max(d.price, d.price + range * 0.03)],
-		stop,
-		targets: [0.382, 0.618, 1].map((extension) => Number((d.price + (direction === 'up' ? 1 : -1) * range * extension).toFixed(2))),
-		fibonacci_ratios: ratios,
-		validation: 'confirmed',
-		current_price: current,
-	}
+	const points = pivots(candles).slice(-5); if (points.length < 5) return { status: 'insufficient_data', pattern: null, missing: ['confirmed_pivots_xabcd'], pivots_count: points.length }
+	const [x, a, b, c, d] = points, xa = a.price - x.price, ab = b.price - a.price, bc = c.price - b.price, cd = d.price - c.price, ratios = { AB_XA: ratio(ab, xa), BC_AB: ratio(bc, ab), CD_BC: ratio(cd, bc) }, candidates = [{ name: 'Gartley', score: Number(near(ratios.AB_XA, 0.618)) + Number(near(ratios.BC_AB, 0.618, 0.25)) + Number(near(ratios.CD_BC, 1.272, 0.35)) }, { name: 'Bat', score: Number(near(ratios.AB_XA, 0.5, 0.12)) + Number(near(ratios.BC_AB, 0.5, 0.25)) + Number(near(ratios.CD_BC, 1.618, 0.4)) }, { name: 'Butterfly', score: Number(near(ratios.AB_XA, 0.786, 0.12)) + Number(near(ratios.BC_AB, 0.5, 0.25)) + Number(near(ratios.CD_BC, 1.618, 0.4)) }, { name: 'ABCD', score: Number(near(ratios.BC_AB, 0.618, 0.25)) + Number(near(ratios.CD_BC, 1, 0.2)) }], best = candidates.sort((left, right) => right.score - left.score)[0]
+	if (!best || best.score < 2) return { status: 'insufficient_data', pattern: null, missing: ['confirmed_fibonacci_relationships'], points: { X: x.price, A: a.price, B: b.price, C: c.price, D: d.price }, fibonacci_ratios: ratios }
+	const current = candles.at(-1)?.close ?? d.price, direction = d.price > c.price ? 'up' : 'down', stop = direction === 'up' ? Math.min(d.price, c.price) : Math.max(d.price, c.price), range = Math.abs(a.price - x.price), entry = [Math.min(d.price, d.price + range * 0.03), Math.max(d.price, d.price + range * 0.03)]
+	return { status: 'success', pattern: best.name, points: { X: x.price, A: a.price, B: b.price, C: c.price, D: d.price }, PRZ: entry, entry_zone: entry, stop, targets: [0.382, 0.618, 1].map(extension => Number((d.price + (direction === 'up' ? 1 : -1) * range * extension).toFixed(2))), fibonacci_ratios: ratios, validation: 'confirmed', current_price: current }
 }
 
-export function calculateConfluence(input: {
-	candles: Candle[]
-	elliott: Record<string, unknown> | null
-	gann: Record<string, unknown> | null
-	indicators: Record<string, unknown> | null
-	harmonic: Record<string, unknown>
-}) {
-	const latest = input.candles.at(-1)
-	const previous = input.candles.at(-2)
-	const change = latest && previous ? ((latest.close - previous.close) / previous.close) * 100 : null
-	const rsi = Number((input.indicators?.rsi as Record<string, unknown> | undefined)?.value)
-	const components = {
-		trend: { score: change == null ? 5 : change > 0 ? 8 : change < 0 ? 3 : 5, weight: 14 },
-		market_structure: { score: input.elliott?.available === false ? 5 : 7, weight: 14 },
-		volume: { score: latest?.volume && latest.volume > 0 ? 6 : 5, weight: 10 },
-		momentum: { score: Number.isFinite(rsi) ? rsi > 50 && rsi < 70 ? 8 : rsi < 30 ? 7 : 4 : 5, weight: 10 },
-		volatility: { score: 5, weight: 5 },
-		support_resistance: { score: input.gann ? 7 : 5, weight: 10 },
-		fibonacci: { score: input.elliott?.relationships ? 7 : 5, weight: 10 },
-		elliott_wave: { score: input.elliott?.available === false ? 5 : 7, weight: 10 },
-		gann: { score: input.gann ? 6 : 5, weight: 5 },
-		harmonic_pattern: { score: input.harmonic.status === 'success' ? 8 : 5, weight: 4 },
-		classical_pattern: { score: 5, weight: 4 },
-		divergence: { score: 5, weight: 4 },
-	}
-	const entries = Object.entries(components)
-	const bullish = entries.reduce((sum, [, item]) => sum + (item.score * item.weight) / 10, 0)
-	const score = Math.round(Math.max(0, Math.min(100, bullish)))
-	return {
-		bullish_confluence: score,
-		bearish_confluence: 100 - score,
-		neutral: score >= 45 && score <= 55 ? 100 : 0,
-		components: Object.fromEntries(entries.map(([name, item]) => [name, { ...item, contribution: Number(((item.score * item.weight) / 10).toFixed(2)) }])),
-		supporting_evidence: [change != null && change > 0 ? 'السعر الأخير أعلى من الإغلاق السابق' : null, input.harmonic.status === 'success' ? `نموذج ${String(input.harmonic.pattern)} مستوفٍ للنسب` : null].filter(Boolean),
-		contradicting_evidence: [Number.isFinite(rsi) && rsi > 70 ? 'RSI في منطقة تشبع شرائي' : null, Number.isFinite(rsi) && rsi < 30 ? 'RSI في منطقة تشبع بيعي' : null].filter(Boolean),
-		missing_data: [!latest?.volume ? 'volume' : null, !input.gann ? 'gann' : null, input.harmonic.status !== 'success' ? 'confirmed_harmonic_pattern' : null].filter(Boolean),
-		disclaimer: 'درجة توافق الأدلة وليست احتمال ربح أو توصية استثمارية.',
-	}
+function numberAt(input: SchoolInput, keys: string[]) { for (const key of keys) { const value = input?.[key]; if (typeof value === 'number' && Number.isFinite(value)) return value; if (value && typeof value === 'object' && typeof (value as Record<string, unknown>).value === 'number') return Number((value as Record<string, unknown>).value) } return null }
+function scoreFromDirection(input: SchoolInput, bullishKeys: string[], bearishKeys: string[]) { const direction = String(input?.direction ?? input?.trend ?? input?.signal ?? '').toLowerCase(); if (bullishKeys.some(key => direction.includes(key))) return 75; if (bearishKeys.some(key => direction.includes(key))) return 25; return null }
+function regimeMultiplier(regime: RegimeAnalysis | null, school: string) { const map: Record<string, string[]> = { Trend: ['trend'], Momentum: ['momentum'], Volume: ['volume'], 'Market Structure': ['trend'], 'Support/Resistance': ['mean_reversion'], Fibonacci: ['mean_reversion'], 'Elliott Wave': ['trend'], Gann: ['trend'], Harmonic: ['pattern'], 'Classical Patterns': ['pattern'], Wyckoff: ['wyckoff'], VSA: ['vsa'], Volatility: ['volatility'], Divergence: ['oscillators'], 'Market Regime': ['trend'] }; const names = map[school] ?? []; const weights = regime?.regime_weights ?? {}; return names.reduce((value, name) => value * (typeof weights[name] === 'number' ? weights[name] : 1), 1) }
+function evidenceFor(school: School, bullish: boolean) { if (school.score == null) return null; const mark = bullish ? '✓' : '✗'; return `${mark} ${school.name}: ${school.reason}` }
+function school(name: string, score: number | null, reason: string, source: string, regime: RegimeAnalysis | null): School { const [nameAr, nameEn] = SCHOOL_LABELS[name]; const weight = SCHOOL_WEIGHTS[name]; const regimeWeight = regimeMultiplier(regime, name); const adjusted = score == null ? 0 : weight * regimeWeight; const signal: School['signal'] = score == null ? 'UNAVAILABLE' : score >= 60 ? 'BUY' : score <= 40 ? 'SELL' : 'NEUTRAL'; return { name: nameAr, nameEn, score: score == null ? null : clamp(round(score, 1)!), weight, regime_weight: round(regimeWeight, 2) ?? 1, adjusted_weight: round(adjusted, 2) ?? 0, signal, reason, source } }
+function weightedVerdict(score: number) { return score >= 75 ? 'STRONG_BUY' : score >= 60 ? 'BUY' : score >= 45 ? 'NEUTRAL' : score >= 30 ? 'SELL' : 'STRONG_SELL' }
+function verdictAr(verdict: string) { return verdict === 'STRONG_BUY' ? 'شراء قوي' : verdict === 'BUY' ? 'شراء' : verdict === 'SELL' ? 'بيع' : verdict === 'STRONG_SELL' ? 'بيع قوي' : 'محايد' }
+
+export function calculateConfluence(input: { symbol?: string; candles: Candle[]; elliott: SchoolInput; gann: SchoolInput; indicators: SchoolInput; harmonic: Record<string, unknown>; supportResistance?: SupportResistanceAnalysis | null; fibonacci?: FibonacciAnalysis | null; regime?: RegimeAnalysis | null; classical?: ClassicalAnalysis | null; multiTimeframe?: SchoolInput; wyckoff?: SchoolInput; vsa?: SchoolInput; divergence?: SchoolInput }) {
+	const candles = input.candles, latest = candles.at(-1), previous = candles.at(-2), change = latest && previous ? ((latest.close - previous.close) / Math.max(previous.close, 1e-9)) * 100 : null, indicators = input.indicators, rsi = numberAt(indicators, ['rsi']), derivedSR = input.supportResistance ?? (candles.length >= 30 ? analyzeSupportResistance(candles) : null), derivedFib = input.fibonacci ?? (candles.length >= 30 ? analyzeFibonacci(candles) : null), derivedRegime = input.regime ?? (candles.length >= 50 ? analyzeMarketRegime('unknown', candles) : null), regime = derivedRegime?.available ? derivedRegime : null
+	const trendScore = scoreFromDirection(indicators, ['up', 'buy', 'bullish'], ['down', 'sell', 'bearish']) ?? (change == null ? null : change > 0 ? 68 : change < 0 ? 32 : 50), momentumScore = rsi == null ? null : rsi >= 50 ? Math.min(95, 50 + (rsi - 50) * 1.5) : Math.max(5, 50 - (50 - rsi) * 1.5), volumeScore = latest?.volume == null ? null : latest.volume > (candles.slice(-21, -1).reduce((sum, item) => sum + item.volume, 0) / Math.max(candles.slice(-21, -1).length, 1)) ? 70 : 45, structureScore = scoreFromDirection(input.multiTimeframe ?? input.elliott, ['up', 'bullish', 'buy'], ['down', 'bearish', 'sell']), srScore = derivedSR?.available ? (derivedSR.nearest_support ? 70 : 50) : null, fibScore = derivedFib?.available ? (derivedFib.confluence_points.length ? 75 : 55) : null, elliottScore = input.elliott ? (input.elliott.available === false ? null : scoreFromDirection(input.elliott, ['up', 'bullish', 'buy'], ['down', 'bearish', 'sell']) ?? 60) : null, gannScore = input.gann ? scoreFromDirection(input.gann, ['up', 'bullish', 'buy'], ['down', 'bearish', 'sell']) ?? 60 : null, harmonicScore = input.harmonic.status === 'success' ? 75 : input.harmonic.status === 'insufficient_data' ? null : 50, classicalScore = input.classical?.available ? (input.classical.patterns?.some(pattern => String(pattern.direction ?? '').toLowerCase().includes('bull')) ? 72 : 55) : null, wyckoffScore = input.wyckoff ? scoreFromDirection(input.wyckoff, ['accumulation', 'markup', 'buy', 'bullish'], ['distribution', 'markdown', 'sell', 'bearish']) : null, vsaScore = input.vsa ? scoreFromDirection(input.vsa, ['buy', 'bullish', 'demand', 'supply'], ['sell', 'bearish']) : null, volatilityScore = derivedRegime?.available ? (derivedRegime.current_regime.regime === 'low_volatility' ? 70 : derivedRegime.current_regime.regime === 'high_volatility' ? 40 : 55) : null, divergenceScore = input.divergence ? scoreFromDirection(input.divergence, ['bullish', 'buy', 'up'], ['bearish', 'sell', 'down']) : null, regimeScore = regime?.current_regime.regime ? (regime.current_regime.regime.includes('up') || regime.current_regime.regime === 'accumulation' || regime.current_regime.regime === 'breakout' ? 75 : regime.current_regime.regime.includes('down') || regime.current_regime.regime === 'distribution' ? 25 : 50) : null
+	const schools = [school('Trend', trendScore, trendScore == null ? 'بيانات الاتجاه غير متاحة' : change != null ? `التغير الأخير ${round(change, 2)}%` : 'مؤشرات الاتجاه', 'indicators', regime), school('Momentum', momentumScore, rsi == null ? 'RSI غير متاح' : `RSI ${round(rsi, 1)}`, 'indicators', regime), school('Volume', volumeScore, volumeScore == null ? 'الحجم غير متاح' : volumeScore > 50 ? 'الحجم أعلى من متوسطه' : 'الحجم دون إشارة توسع', 'indicators', regime), school('Market Structure', structureScore, structureScore == null ? 'بنية السوق غير متاحة' : 'بنية مستخرجة من المصفوفة أو الموجة', 'multi-timeframe', regime), school('Support/Resistance', srScore, derivedSR?.nearest_support ? `دعم قريب ${derivedSR.nearest_support.level}` : 'لا يوجد دعم مؤكد قريب', 'support-resistance', regime), school('Fibonacci', fibScore, derivedFib?.confluence_points.length ? 'توجد نقاط التقاء Fibonacci' : 'لا توجد نقطة التقاء كافية', 'fibonacci', regime), school('Elliott Wave', elliottScore, elliottScore == null ? 'Elliott غير متاح' : 'نتيجة محرك Elliott', 'elliott', regime), school('Gann', gannScore, gannScore == null ? 'Gann غير متاح' : 'نتيجة محرك Gann', 'gann', regime), school('Harmonic', harmonicScore, harmonicScore == null ? 'لا يوجد نموذج هارمونيك مؤكد' : 'نموذج هارمونيك مؤكد', 'harmonic', regime), school('Classical Patterns', classicalScore, classicalScore == null ? 'الأنماط الكلاسيكية غير متاحة' : 'نتيجة محرك الأنماط الكلاسيكية', 'classical-patterns', regime), school('Wyckoff', wyckoffScore, wyckoffScore == null ? 'Wyckoff غير متاح' : 'نتيجة محرك Wyckoff', 'wyckoff', regime), school('VSA', vsaScore, vsaScore == null ? 'VSA غير متاح' : 'نتيجة محرك VSA', 'vsa', regime), school('Volatility', volatilityScore, volatilityScore == null ? 'التقلب غير متاح' : 'ATR وBollinger', 'indicators', regime), school('Divergence', divergenceScore, divergenceScore == null ? 'لا توجد بيانات Divergence' : 'نتيجة Divergence', 'multi-timeframe', regime), school('Market Regime', regimeScore, regime ? regime.current_regime.regimeAr : 'Market Regime غير متاح', 'market-regime', regime)]
+	const rawAvailable = schools.filter(item => item.score != null), rawTotal = rawAvailable.reduce((sum, item) => sum + item.adjusted_weight, 0), normalizedSchools = schools.map(item => ({ ...item, adjusted_weight: item.score == null ? 0 : round(item.adjusted_weight / Math.max(rawTotal, 1) * 100, 2) ?? 0 })), available = normalizedSchools.filter(item => item.score != null), totalAdjusted = available.reduce((sum, item) => sum + item.adjusted_weight, 0), bullishWeighted = available.reduce((sum, item) => sum + (item.score! >= 60 ? item.adjusted_weight : 0), 0), bearishWeighted = available.reduce((sum, item) => sum + (item.score! <= 40 ? item.adjusted_weight : 0), 0), neutralWeighted = Math.max(0, totalAdjusted - bullishWeighted - bearishWeighted), score = totalAdjusted ? available.reduce((sum, item) => sum + item.score! * item.adjusted_weight, 0) / totalAdjusted : 50, verdict = weightedVerdict(score), supporting = normalizedSchools.map(item => item.score != null && item.score >= 60 ? evidenceFor(item, true) : null).filter((item): item is string => item != null), contradicting = normalizedSchools.map(item => item.score != null && item.score <= 40 ? evidenceFor(item, false) : null).filter((item): item is string => item != null), missing = normalizedSchools.filter(item => item.score == null).map(item => `${item.nameEn}: ${item.reason}`), topSignals = [...available].sort((a, b) => Math.abs((b.score ?? 50) - 50) - Math.abs((a.score ?? 50) - 50)).slice(0, 3).map(item => ({ school: item.name, signal: item.signal, strength: Math.abs((item.score ?? 50) - 50) >= 25 ? 'strong' : 'moderate' })), dataQuality = { score: Math.round((available.length / normalizedSchools.length) * 100), candles_count: candles.length, sources_available: available.length, sources_missing: normalizedSchools.length - available.length, warnings: missing }
+	return { available: available.length > 0, symbol: input.symbol ?? null, fetched_at: new Date().toISOString(), bullish_confluence: round((bullishWeighted / Math.max(totalAdjusted, 1)) * 100) ?? 0, bearish_confluence: round((bearishWeighted / Math.max(totalAdjusted, 1)) * 100) ?? 0, neutral: round((neutralWeighted / Math.max(totalAdjusted, 1)) * 100) ?? 0, verdict, verdictAr: verdictAr(verdict), confidence: round(Math.min(0.99, (dataQuality.score / 100) * 0.6 + (1 - Math.abs((bullishWeighted - bearishWeighted) / Math.max(totalAdjusted, 1) - 0.5)) * 0.4), 2) ?? 0, schools: normalizedSchools, components: Object.fromEntries(normalizedSchools.map(item => [item.nameEn, item])), supporting_evidence: supporting, contradicting_evidence: contradicting, missing_data: missing, data_quality: dataQuality, top_signals: topSignals, risk_notes: normalizedSchools.filter(item => item.signal === 'SELL').slice(0, 3).map(item => `${item.name}: ${item.reason}`), disclaimer: 'درجة توافق الأدلة وليست احتمال ربح أو توصية استثمارية.' }
 }
 
-export function buildDecisionSupport(score: number, candles: Candle[]) {
-	const last = candles.at(-1)?.close ?? null
-	const atr = candles.length > 1 ? Math.abs((candles.at(-1)?.high ?? 0) - (candles.at(-1)?.low ?? 0)) : null
-	const bullish = score >= 60
-	const bearish = score <= 40
-	const type = bullish ? 'probable_bullish_setup' : bearish ? 'probable_bearish_setup' : 'no_confirmed_setup'
-	const stop = last != null && atr != null ? Number((last + (bullish ? -1 : 1) * atr * 1.5).toFixed(2)) : null
-	return {
-		recommendation: {
-			type,
-			condition: bullish ? 'إذا حافظ السعر على آخر دعم مع تأكيد الحجم' : bearish ? 'إذا كسر السعر آخر دعم بإغلاق مؤكد' : 'انتظار إشارة سعرية وحجمية أوضح',
-			entry_zone: last == null ? null : [Number((last * 0.995).toFixed(2)), Number((last * 1.005).toFixed(2))],
-			stop_loss: stop,
-			stop_reason: stop == null ? 'لا توجد شموع كافية' : 'آخر نطاق سعري مع هامش ATR تعليمي',
-			targets: last == null || atr == null ? [] : [1, 2, 3].map((multiple) => ({ price: Number((last + (bullish ? 1 : -1) * atr * multiple).toFixed(2)), basis: 'ATR range', rr: multiple })),
-			invalidation: stop == null ? 'غير متاح' : `يُبطل السيناريو عند ${stop}`,
-			risk_reward: 2,
-			validity: 'قصيرة الأجل تعليمية',
-		},
-		disclaimer: 'Decision Support تعليمي وليس توصية شراء أو بيع.',
-	}
-}
+export function buildDecisionSupport(score: number, candles: Candle[]) { const last = candles.at(-1)?.close ?? null, latest = candles.at(-1), range = latest == null ? null : Math.max(latest.high - latest.low, last! * 0.005), bullish = score >= 60, bearish = score <= 40, type = score >= 75 ? 'STRONG_BUY' : score >= 60 ? 'BUY' : score <= 30 ? 'STRONG_SELL' : score <= 40 ? 'SELL' : 'NEUTRAL', stop = last != null && range != null ? Number((last + (bullish ? -1 : 1) * range * 1.5).toFixed(2)) : null, targets = last == null || range == null ? [] : [1, 2, 3].map(multiple => ({ price: Number((last + (bullish ? 1 : -1) * range * multiple).toFixed(2)), basis: 'ATR/range', rr: multiple })); return { recommendation: { type, condition: bullish ? 'إذا حافظ السعر على الدعم مع تأكيد الحجم' : bearish ? 'إذا كسر السعر الدعم بإغلاق مؤكد' : 'انتظار توافق أدلة أقوى', entry_zone: last == null ? null : [Number((last * 0.995).toFixed(2)), Number((last * 1.005).toFixed(2))], stop_loss: stop, stop_reason: stop == null ? 'لا توجد بيانات كافية' : 'أسفل/أعلى آخر نطاق سعري مع هامش تقلب', targets, target_1: targets[0]?.price ?? null, target_2: targets[1]?.price ?? null, target_3: targets[2]?.price ?? null, invalidation: stop == null ? 'غير متاح' : `يُبطل السيناريو عند ${stop}`, risk_reward: bullish ? 2 : 1, timeframe: 'daily', holding_period: '5-15 days', validity: 'تحليل مشروط وليس توصية استثمارية' }, disclaimer: 'توافق الأدلة أداة تحليلية وليس ضماناً للربح أو توصية شراء أو بيع.' } }
