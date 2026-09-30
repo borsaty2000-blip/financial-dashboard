@@ -33,6 +33,11 @@ import {
 	buildDecisionSupport,
 	calculateConfluence,
 } from '../services/analysis/confluence.service.js'
+import {
+	runBacktest as runHistoricalBacktest,
+	STRATEGIES as BACKTEST_STRATEGIES,
+	type BacktestStrategy,
+} from '../services/analysis/backtesting.service.js'
 
 export const analysisRoutes = Router()
 analysisRoutes.use(analysisRateLimit)
@@ -962,5 +967,36 @@ analysisRoutes.get('/:symbol/harmonic', async (request, response) => {
 		return response.json({ status: data.status, data, source: series.source, candles_count: series.count, data_quality: series.data_quality })
 	} catch {
 		return response.status(502).json({ status: 'error', message: 'تعذر تنفيذ Harmonic' })
+	}
+})
+
+
+analysisRoutes.post('/:symbol/backtest', async (request, response) => {
+	try {
+		const body = (request.body ?? {}) as {
+			strategy?: unknown
+			from?: unknown
+			to?: unknown
+			commission?: unknown
+			slippage?: unknown
+			initialCapital?: unknown
+		}
+		const requested = typeof body.strategy === 'string' ? body.strategy : undefined
+		if (requested && !BACKTEST_STRATEGIES.includes(requested as BacktestStrategy))
+			return response.status(400).json({ status: 'error', message: 'الاستراتيجية المطلوبة غير مدعومة', supported_strategies: BACKTEST_STRATEGIES })
+		const series = await resolveAnalysisSeries(request)
+		if (series.candles.length < 30)
+			return response.status(422).json({ status: 'unavailable', message: 'يلزم توفر 30 شمعة تاريخية OHLCV على الأقل للاختبار', candles_count: series.count, source: series.source })
+		const result = runHistoricalBacktest(series.candles, {
+			strategy: requested as BacktestStrategy | undefined,
+			from: typeof body.from === 'string' ? body.from : undefined,
+			to: typeof body.to === 'string' ? body.to : undefined,
+			commission: body.commission == null ? undefined : Number(body.commission),
+			slippage: body.slippage == null ? undefined : Number(body.slippage),
+			initialCapital: body.initialCapital == null ? undefined : Number(body.initialCapital),
+		})
+		return response.json({ status: result.available ? 'success' : 'unavailable', ...result, symbol: series.symbol, market: queryMarket(request.query.market), source: series.source, candles_count: series.count, data_quality: series.data_quality })
+	} catch (error) {
+		return response.status(400).json({ status: 'error', message: error instanceof Error ? error.message : 'تعذر تنفيذ الاختبار التاريخي' })
 	}
 })
