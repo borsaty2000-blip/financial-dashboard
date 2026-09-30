@@ -10,21 +10,17 @@ analysisHealthRoutes.get('/analysis', async (_request, response) => {
 	const checks = await Promise.all(symbols.map(async (symbol) => {
 		try {
 			const result = await AnalysisOrchestrator.analyze(symbol, 'EGX' as CandleMarket)
-			return {
-				symbol,
-				integrity: result.integrity.score,
-				candles: result.candles.count,
-				elliott: result.elliott.available,
-				gann: result.gann.available,
-				harmonic: result.harmonic.available,
-				confluence: result.confluence.available,
-				recommendation: result.recommendation.available,
-				latency_ms: result.latency_ms,
-				cache_hit: result.cache_hit,
-				issues: result.integrity.issues,
-			}
+				return {
+					symbol,
+					integrity: result.integrity.score,
+					candles: result.candles.count,
+					engines: Object.fromEntries(Object.entries(result).filter(([key]) => ['elliott', 'gann', 'harmonic', 'wyckoff', 'vsa', 'classical_patterns', 'support_resistance', 'fibonacci', 'indicators', 'multi_timeframe', 'market_regime', 'divergence', 'confluence', 'recommendation', 'backtesting'].includes(key)).map(([key, value]) => [key, { available: (value as { available: boolean }).available, latency_ms: (value as { latency_ms: number }).latency_ms, error: (value as { error: string | null }).error }])),
+					latency_ms: result.execution_time_ms,
+					cache_hit: result.integrity.cache_hit,
+					issues: result.integrity.warnings,
+				}
 		} catch (error) {
-			return { symbol, integrity: 0, candles: 0, elliott: false, gann: false, harmonic: false, confluence: false, recommendation: false, latency_ms: 0, cache_hit: false, issues: [error instanceof Error ? error.message : 'health_check_failed'] }
+			return { symbol, integrity: 0, candles: 0, engines: {}, latency_ms: 0, cache_hit: false, issues: [error instanceof Error ? error.message : 'health_check_failed'] }
 		}
 	}))
 	const avgIntegrity = Math.round(checks.reduce((sum, item) => sum + item.integrity, 0) / checks.length)

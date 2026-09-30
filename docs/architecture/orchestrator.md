@@ -1,70 +1,104 @@
 # Analysis Orchestrator
 
 ## الغرض
-يوحّد `AnalysisOrchestrator` جلب الشموع، حمايتها، تشغيل المحركات، احتساب التوافق، وبناء مخرجات القرار في عقد واحد.
+
+يوحّد `AnalysisOrchestrator` دورة تحليل السهم في عقد واحد: جلب الشموع، تنظيفها عبر `QualityGuardian`، تشغيل محركات التحليل المستقلة، تطبيع النتائج، ثم حساب سلامة التنفيذ وإشارات مختصرة للواجهة.
+
+## المحركات المتكاملة
+
+يستخدم العقد خمسة عشر محركاً:
+
+1. Elliott MTF
+2. Gann
+3. Harmonic
+4. Wyckoff
+5. VSA
+6. Classical Patterns
+7. Support / Resistance
+8. Fibonacci
+9. Complete Indicators
+10. Multi-Timeframe Matrix
+11. Market Regime
+12. Divergence
+13. Confluence
+14. Recommendation
+15. Backtesting
+
+لا يستبدل الـ Orchestrator خوارزميات المحركات؛ يمرر لها شموعاً موحّدة ويعزل فشل أي محرك عن بقية النتائج.
 
 ## دورة التنفيذ
-1. تطبيع الرمز وبناء مفتاح `market:symbol`.
-2. جلب 250 شمعة يومية عبر `CandlesService`.
-3. تمرير الشموع إلى `QualityGuardian` بحد أدنى 30 شمعة.
-4. حذف التكرارات والقيم غير الصالحة ونطاقات OHLC غير المنطقية دون اختلاق بيانات.
-5. تشغيل Elliott وGann وHarmonic وIndicators بالتوازي بمهلات مستقلة.
-6. بناء Confluence وRecommendation من الأدلة المتاحة.
-7. تخزين النتيجة لمدة خمس دقائق لكل سوق ورمز.
-
-## عقد النتيجة
-كل محرك يعيد `available`, `data`, `latency_ms`، و`reason` عند عدم التوفر. ويشمل العقد `candles`, `integrity`, `latency_ms`, و`cache_hit`.
-
-## Integrity Score
-تُحسب الدرجة من ست طبقات: Elliott وGann وHarmonic وIndicators وConfluence وRecommendation.
 
 ```text
-integrity = round(available_engines / 6 * 100)
+CandlesService → QualityGuardian → Promise.allSettled(12 engines)
+                                  → Divergence adapter
+                                  → Confluence
+                                  → Recommendation
+                                  → normalized CompleteAnalysis
 ```
 
-أقل من 30 شمعة صالحة يوقف التحليل ويعيد درجة 0. توفر الطبقات الست يعيد 100. الدرجة ليست احتمال ربح ولا توصية استثمارية.
+- كل محرك يعمل داخل `safeEngine` بمهلة مستقلة.
+- محركات Python لها مهلة 12 ثانية.
+- المحركات الحسابية لها مهلة 8 ثوانٍ.
+- Backtesting له مهلة 20 ثانية.
+- فشل أو انتهاء مهلة محرك ينتج `available: false` و`error` و`data_quality.status: unavailable`، ولا يمنع تسليم بقية العقد.
+
+## جودة البيانات
+
+قبل التحليل، يمر المصدر عبر `QualityGuardian`:
+
+- إزالة التواريخ المكررة دون اختلاق شموع.
+- رفض نطاق OHLC غير الصحيح.
+- ترتيب السلسلة زمنياً.
+- فرض حد أدنى قدره 30 شمعة.
+- الاحتفاظ بـ `source` و`data_quality` والتحذيرات في العقد النهائي.
+
+لا تُنشأ أسعار أو شموع بديلة عند نقص البيانات. إذا لم تتوافر سلسلة صالحة، يعيد Orchestrator عقداً منظماً لكل المحركات مع `integrity.score = 0`.
+
+## Integrity Score
+
+```text
+score = round(engines_ok / engines_total × 100)
+```
+
+في الإصدار الحالي `engines_total = 15`. المحرك يُحتسب ناجحاً فقط عندما تكون نتيجته متاحة فعلياً؛ أما النتيجة الفارغة أو التي انتهت مهلتها فتظهر في `warnings/issues` ولا تُحتسب.
+
+## Cache
+
+- المفتاح: `MARKET:SYMBOL`.
+- مدة التخزين: **5 دقائق** (`300000ms`).
+- الطلب الثاني خلال المدة يعيد النتيجة نفسها مع `cache_hit: true` و`execution_time_ms: 0`.
+- `AnalysisOrchestrator.clearCache(symbol, market)` لمسح رمز محدد، و`clearCache()` لمسح الكل.
 
 ## المسارات
-- `GET /api/stock/:symbol/full?market=EGX|TASI`: يعيد نتائج Orchestrator الكاملة، أو `unavailable` عند عدم كفاية الشموع.
-- `GET /api/health/analysis`: يفحص COMI وABUK وEAST وHRHO وTMGH ويعرض السلامة والزمن وتوفر المحركات والمشكلات.
 
-الحالة العامة في لوحة الصحة: `healthy` من 80 فأعلى، `degraded` من 60 إلى 79، و`unhealthy` دون 60.
+### التقرير الكامل
+
+`GET /api/stock/:symbol/full?market=EGX`
+
+يعيد السعر، الشموع، سلامة البيانات، نتائج المحركات الخمسة عشر، إشارات `top_signals`، زمن التنفيذ، والتحذيرات.
+
+### تشخيص خفيف
+
+`GET /api/stock/:symbol/debug?market=EGX`
+
+يعيد حالة كل محرك وزمنه وخطأه دون إعادة أجسام البيانات الكبيرة، ويصلح للمراقبة الآلية.
+
+### لوحة الصحة
+
+`GET /api/health/analysis`
+
+تفحص الرموز الأساسية وتعيد `avg_integrity` وحالة كل محرك لكل رمز. الحالة `healthy` تعني متوسط سلامة لا يقل عن 80.
 
 ## الاختبارات
-يغطي `server/orchestrator.contract.test.ts` جودة الشموع، التكرارات، القيم غير الصالحة، البيانات القديمة، وحدود التوافق. تغطي اختبارات الخادم مسارات الصحة والتحليل، وتغطي اختبارات Python المحركات الحسابية.
 
-## العرض العام
-تظل الإفصاحات القانونية للمستخدم النهائي. أما تفاصيل المهلات والأخطاء الداخلية فتظهر في السجلات وحقول التشخيص، لا كعبارات تقنية في الواجهة.
+يغطي `server/tests/orchestrator-integration.test.ts` 28 حالة تشمل:
 
-## الملفات المرجعية
-- `server/src/services/analysis/orchestrator.ts`
-- `server/src/services/market/quality-guardian.ts`
-- `server/src/routes/stock.routes.ts`
-- `server/src/routes/analysis-health.routes.ts`
-- `server/orchestrator.contract.test.ts`
-- `docs/qa/stability-baseline.md`
+- عدد المحركات وتفرّد أسمائها.
+- عزل الفشل والمهلات.
+- عقد COMI وABUK واختلاف المدخلات.
+- cache لمدة خمس دقائق ومسح cache.
+- جودة المصدر وحالة كل محرك.
+- اكتمال عقد debug.
+- التعامل مع أقل من 30 شمعة.
 
-## آخر تحقق
-اختبار محلي لـ COMI وABUK أعاد HTTP 200 ودرجة سلامة 100 وتوفر المحركات الستة. وأعاد Health Dashboard حالة `healthy`. baseline: 59 استجابة HTTP 200 من أصل 60 طلباً، مع حالة واحدة غير 200 موثقة في QA.
-
-[سجل baseline](../qa/stability-baseline.md)
-[خطة القبول](../qa/acceptance-runbook.md)
-[سجل التعديلات](../qa/implementation-log.md)
-[تقرير الجاهزية](../qa/production-readiness-report.md)
-[تقرير المصادقة](../qa/validation-report.md)
-[تقرير التدقيق](../qa/final-audit-report.md)
-[تقرير الإصدار](../qa/release-report.md)
-[تقرير التحقق](../qa/final-verification-report.md)
-[تقرير الجودة](../qa/final-quality-report.md)
-[تقرير السلامة](../qa/final-integrity-report.md)
-[تقرير الأداء](../qa/performance-report.md)
-[تقرير التشغيل](../qa/operations-report.md)
-[تقرير المراقبة](../qa/monitoring-report.md)
-[تقرير الصحة](../qa/health-report.md)
-[تقرير العقد](../qa/contract-review-report.md)
-[تقرير Orchestrator](../qa/orchestrator-results-report.md)
-[تقرير المحركات](../qa/engine-verification-report.md)
-[تقرير البيانات](../qa/data-integrity-report.md)
-[تقرير الإطلاق](../qa/launch-report.md)
-[تقرير التسليم](../qa/final-handoff-report.md)
-[تقرير الإغلاق](../qa/closure-report.md)
+هذه النتائج كمية مبنية على البيانات المتاحة وليست ضماناً للأداء المستقبلي أو توصية استثمارية.

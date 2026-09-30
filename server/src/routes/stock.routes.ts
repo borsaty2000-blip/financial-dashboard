@@ -66,18 +66,43 @@ stockRoutes.get('/:symbol/full', async (request, response) => {
 			status: 'success',
 			symbol,
 			market,
-			price: result.indicators.data?.current_price ?? null,
+			price: result.price,
 			integrity: result.integrity,
 			candles: result.candles,
+			fetched_at: result.fetched_at,
+			execution_time_ms: result.execution_time_ms,
 			elliott: result.elliott,
 			gann: result.gann,
 			harmonic: result.harmonic,
+			wyckoff: result.wyckoff,
+			vsa: result.vsa,
+			classical_patterns: result.classical_patterns,
+			support_resistance: result.support_resistance,
+			fibonacci: result.fibonacci,
+			indicators: result.indicators,
+			multi_timeframe: result.multi_timeframe,
+			market_regime: result.market_regime,
+			divergence: result.divergence,
 			confluence: result.confluence,
 			recommendation: result.recommendation,
+			backtesting: result.backtesting,
+			top_signals: result.top_signals,
 			latency_ms: result.latency_ms,
 		})
 	} catch {
 		return response.status(502).json({ status: 'error', symbol, message: 'تعذر إكمال التحليل الموحد حالياً' })
+	}
+})
+
+stockRoutes.get('/:symbol/debug', async (request, response) => {
+	const symbol = request.params.symbol.trim().toUpperCase()
+	const market = (request.query.market === 'TASI' ? 'TASI' : marketFor(symbol)) as CandleMarket
+	try {
+		const result = await AnalysisOrchestrator.analyze(symbol, market)
+		const engineNames = ['elliott', 'gann', 'harmonic', 'wyckoff', 'vsa', 'classical_patterns', 'support_resistance', 'fibonacci', 'indicators', 'multi_timeframe', 'market_regime', 'divergence', 'confluence', 'recommendation', 'backtesting'] as const
+		return response.json({ status: 'success', symbol, market, integrity: result.integrity, execution_time_ms: result.execution_time_ms, engines: Object.fromEntries(engineNames.map(name => [name, { available: result[name].available, latency_ms: result[name].latency_ms, error: result[name].error }])) })
+	} catch (error) {
+		return response.status(502).json({ status: 'error', symbol, message: error instanceof Error ? error.message : 'تعذر إنشاء تقرير التشخيص' })
 	}
 })
 
