@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../lib/api'
-import { useLivePrice } from '../hooks/useLivePrice'
+import { useLivePrice, type LivePrice } from '../hooks/useLivePrice'
 import TradingViewStockChart from '../components/TradingViewStockChart'
 import { StockSectionBoundary } from '../components/StockSectionBoundary'
 import { BrilliantSummary } from '../components/Analysis/BrilliantSummary'
@@ -89,6 +89,12 @@ type ConfluenceAnalysis = {
 
 type EngineStatus = {
 	python_engine?: { live?: boolean; status?: string; engines?: string[] }
+}
+
+function freshnessLabel(quote: LivePrice | null) {
+	if (quote?.freshness === 'live') return 'محدّث الآن'
+	if (quote?.dataQuality === 'historical' || quote?.freshness === 'cached') return 'تاريخي'
+	return 'محدّث اليوم'
 }
 
 export function StockDetailPage({
@@ -285,14 +291,14 @@ export function StockDetailPage({
 						{market === 'TASI' ? 'السعودية · SAR' : 'مصر · EGP'}
 					</span>
 					<h1>
-						<span className="stock-company-name">{displayCompanyName ?? 'اسم الشركة غير متاح'}</span>
+						<span className="stock-company-name">{displayCompanyName ?? normalized}</span>
 						<small className="stock-symbol-label" dir="ltr">{normalized}</small>
 					</h1>
 				</div>
 				<div className="stock-header-quote" aria-label="السعر والتغير">
 					<span>السعر الحالي</span>
 						<strong>
-							{formatEnglishNumber(livePrice?.price ?? stats.last?.close) ?? 'غير متاح'}
+								{formatEnglishNumber(livePrice?.price ?? stats.last?.close) ?? '—'}
 						</strong>
 					<b
 						className={
@@ -313,8 +319,7 @@ export function StockDetailPage({
 						<span
 							className={`quote-status-dot ${livePrice?.freshness === 'live' ? 'is-live' : 'is-delayed'}`}
 						/>
-							{livePrice?.freshness === 'live' ? 'حي' : 'متأخر'} ·{' '}
-							{livePrice?.source ?? 'بيانات تاريخية'}
+							{freshnessLabel(livePrice)}
 					</small>
 				</div>
 				<div className="stock-header-actions">
@@ -337,9 +342,9 @@ export function StockDetailPage({
 				</div>
 				</header>
 				<section className="analysis-card data-quality-strip" aria-label="بيانات السعر">
-					<div><span className="eyebrow">السعر</span><strong>{formatEnglishNumber(livePrice?.price ?? stats.last?.close)}</strong><small>{livePrice?.freshness === 'live' ? 'حي' : 'متأخر'}</small></div>
-					<div><span className="eyebrow">آخر إغلاق</span><strong>{formatEnglishNumber(stats.last?.close)}</strong><small>{stats.last?.date ?? 'آخر جلسة'}</small></div>
-					<div><span className="eyebrow">المصدر</span><strong>{livePrice?.source ?? data?.data_quality?.provider ?? 'بيانات السوق'}</strong><small>بيانات السوق المتاحة</small></div>
+						<div><span className="eyebrow">السعر</span><strong>{formatEnglishNumber(livePrice?.price ?? stats.last?.close) ?? '—'}</strong></div>
+						<div><span className="eyebrow">التغير</span><strong>{formatEnglishPercent(livePrice?.changePercent ?? stats.changePercent)}</strong></div>
+						<div><span className="eyebrow">آخر تحديث</span><strong>{freshnessLabel(livePrice)}</strong></div>
 				</section>
 				{loading && (
 				<div className="stock-detail-skeleton">
@@ -387,14 +392,7 @@ export function StockDetailPage({
 									</div>
 									<span className="muted">شموع · حجم · RSI · MACD</span>
 								</div>
-															<div
-																className={`engine-status ${engineStatus?.live ? 'is-live' : 'is-unavailable'}`}
-															>
-																<span aria-hidden="true" />
-																	{engineStatus?.live
-																	? 'التحليل متاح'
-													: 'لا تتوفر قراءة موثوقة لهذا الرمز حالياً'}
-								</div>
+										{engineStatus?.live && <div className="engine-status is-live"><span aria-hidden="true" />التحليل متاح</div>}
 									<StockSectionBoundary label="الرسم السعري">
 										<TradingViewStockChart
 											candles={data.candles}
@@ -479,7 +477,7 @@ export function StockDetailPage({
 						</p>
 						</section>
 						</StockSectionBoundary>}
-					<StockSectionBoundary label="تحليل Gann">
+						{stockAnalysis.data?.gann.available && gann && <StockSectionBoundary label="تحليل Gann">
 						<section className="analysis-card gann-analysis-panel" aria-label="تحليل Gann">
 							<div className="panel-title">
 								<div><span className="eyebrow">الزوايا والدورات · {normalized}</span><h2>تحليل Gann السعري والزمني</h2></div>
@@ -518,9 +516,9 @@ export function StockDetailPage({
 							) : gannError ? (
 								<div className="analysis-error" role="alert">تعذر تحميل تحليل Gann: {gannError}<button className="link-button" type="button" onClick={() => setRetryKey((key) => key + 1)}>إعادة المحاولة</button></div>
 							) : <p>جاري تحميل الزوايا والمستويات الزمنية...</p>}
-								<p className="analysis-disclaimer">إخلاء مسؤولية: هذه مستويات احتمالية وليست توصية شراء أو بيع.</p>
-						</section>
-					</StockSectionBoundary>
+									<p className="analysis-disclaimer">إخلاء مسؤولية: هذه مستويات احتمالية وليست توصية شراء أو بيع.</p>
+							</section>
+						</StockSectionBoundary>}
 							</>
 						) : (
 							<section className="decision-tab-content">

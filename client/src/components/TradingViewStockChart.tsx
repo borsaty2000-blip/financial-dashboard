@@ -84,7 +84,6 @@ export default function TradingViewStockChart({ candles, symbol, market, analysi
   const [frameId, setFrameId] = useState<FrameId>(FRAMES.some((frame) => frame.id === defaultFrame) ? defaultFrame : '1D')
   const [chartCandles, setChartCandles] = useState<Candle[]>(() => validCandles(candles))
   const [loading, setLoading] = useState(false)
-  const [frameError, setFrameError] = useState('')
   const [scale, setScale] = useState<'linear' | 'log'>(() => readStorage(storageKey(symbol, 'scale'), 'linear') === 'log' ? 'log' : 'linear')
   const [visibility, setVisibility] = useState<Visibility>(() => { try { return { ...defaultVisibility, ...JSON.parse(readStorage(storageKey(symbol, 'overlays'), '{}')) } } catch { return defaultVisibility } })
   const activeFrame = FRAMES.find((frame) => frame.id === frameId) ?? FRAMES[6]
@@ -93,15 +92,14 @@ export default function TradingViewStockChart({ candles, symbol, market, analysi
   useEffect(() => {
     let cancelled = false
     const loadFrame = async () => {
-      setFrameError('')
       if (!activeFrame.available) { setChartCandles([]); return }
       if (activeFrame.id === '1D') { setChartCandles(validCandles(candles)); return }
       setLoading(true)
       try {
         const result = await api<CandleResponse>(`/api/market/candles/${symbol}?market=${market}&days=${activeFrame.days}&interval=${activeFrame.interval}`, { suppressToast: true })
         const normalized = validCandles(result?.candles ?? result?.data?.candles ?? [])
-        if (!cancelled) { setChartCandles(normalized); if (!normalized.length) setFrameError('البيانات غير متوفرة لهذا الفريم') }
-      } catch { if (!cancelled) { setChartCandles([]); setFrameError('البيانات غير متوفرة لهذا الفريم') } } finally { if (!cancelled) setLoading(false) }
+        if (!cancelled) setChartCandles(normalized)
+      } catch { if (!cancelled) setChartCandles([]) } finally { if (!cancelled) setLoading(false) }
     }
     void loadFrame(); return () => { cancelled = true }
   }, [activeFrame, candles, market, symbol])
@@ -136,7 +134,7 @@ export default function TradingViewStockChart({ candles, symbol, market, analysi
   }, [analysis, closes, safeCandles, scale, times, visibility])
 
   useEffect(() => { const onKeyDown = (event: KeyboardEvent) => { if (event.key === '+' || event.key === '=') chartRef.current?.timeScale().scrollToRealTime(); if (event.key === '-') chartRef.current?.timeScale().fitContent() }; window.addEventListener('keydown', onKeyDown); return () => window.removeEventListener('keydown', onKeyDown) }, [])
-  const chooseFrame = (frame: Frame) => { setFrameError(''); setFrameId(frame.id) }
+  const chooseFrame = (frame: Frame) => { setFrameId(frame.id) }
   const toggle = (key: keyof Visibility) => setVisibility((current) => ({ ...current, [key]: !current[key] }))
 
   return <div className="tradingview-stock-chart">
@@ -144,8 +142,6 @@ export default function TradingViewStockChart({ candles, symbol, market, analysi
     <div className="chart-overlay-toolbar" role="group" aria-label="مؤشرات ومستويات الشارت">{overlayKeys.map(([key, label]) => <button key={key} type="button" className={visibility[key] ? 'is-active' : ''} onClick={() => toggle(key)} aria-pressed={visibility[key]}>{label}</button>)}</div>
     <div className="chart-tool-toolbar" role="group" aria-label="أدوات الشارت"><button type="button" onClick={() => chartRef.current?.timeScale().fitContent()}>ملاءمة</button><button type="button" onClick={() => chartRef.current?.timeScale().scrollToRealTime()}>آخر شمعة</button><button type="button" className={scale === 'log' ? 'is-active' : ''} onClick={() => setScale((value) => value === 'log' ? 'linear' : 'log')}>{scale === 'log' ? 'لوغاريتمي' : 'خطي'}</button><button type="button" className={visibility.volume ? 'is-active' : ''} onClick={() => toggle('volume')}>الحجم</button><span className="chart-shortcut-hint">+ / − للتكبير والملاءمة</span></div>
     {loading && <div className="chart-frame-status">جاري تحميل بيانات {activeFrame.label}...</div>}
-    {!loading && !activeFrame.available && <div className="chart-frame-status chart-frame-status--empty"><strong>البيانات intraday غير متاحة للأسهم المصرية حالياً</strong><span>يمكنك استخدام الفريم اليومي بدلاً من ذلك.</span><button type="button" onClick={() => setFrameId('1D')}>استخدم الفريم اليومي بدلاً</button></div>}
-    {!loading && activeFrame.available && !safeCandles.length && <div className="chart-frame-status chart-frame-status--empty">{frameError || 'البيانات غير متوفرة لهذا الفريم'}</div>}
     <div ref={chartContainerRef} className={`tradingview-chart-canvas ${safeCandles.length < 2 ? 'is-empty' : ''}`} aria-label="رسم الشموع السعري" />
   </div>
 }
