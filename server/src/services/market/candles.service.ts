@@ -28,7 +28,7 @@ export type CandlesResponse = {
 }
 type CacheEntry = { expires: number; value: CandlesResponse }
 const cache = new Map<string, CacheEntry>()
-const CACHE_TTL = 60_000
+const cacheTtl = (interval: string) => interval === '1d' ? 86_400_000 : 60_000
 
 const quoteMetadata = (freshness: Freshness, updatedAt: string | null) => {
 	const ageMinutes = updatedAt
@@ -89,7 +89,7 @@ const response = (
 		market,
 		interval,
 		candles,
-		source,
+		source: 'market',
 		fetched_at: fetchedAt,
 		count: candles.length,
 		...freshness,
@@ -157,9 +157,9 @@ export class CandlesService {
 					}
 			if (market === 'CRYPTO') {
 				try {
-					const value = response(resolved, market, interval, await fetchBinanceCandles(resolved, interval, days), 'Binance')
-					if (value.candles.length) {
-						cache.set(cacheKey, { value, expires: Date.now() + CACHE_TTL })
+						const value = response(resolved, market, interval, await fetchBinanceCandles(resolved, interval, days), 'Binance')
+						if (value.candles.length) {
+							cache.set(cacheKey, { value, expires: Date.now() + cacheTtl(interval) })
 						return value
 					}
 				} catch (error) {
@@ -169,9 +169,9 @@ export class CandlesService {
 			if (market === 'COMMODITIES') {
 				const yahooSymbols: Record<string, string> = { XAUUSD: 'GC=F', XAGUSD: 'SI=F', WTI: 'CL=F', BRENT: 'BZ=F' }
 				try {
-					const value = response(resolved, market, interval, await fetchYahooCandles(yahooSymbols[resolved] ?? resolved, interval, days), 'Yahoo Finance')
-					if (value.candles.length) {
-						cache.set(cacheKey, { value, expires: Date.now() + CACHE_TTL })
+						const value = response(resolved, market, interval, await fetchYahooCandles(yahooSymbols[resolved] ?? resolved, interval, days), 'Yahoo Finance')
+						if (value.candles.length) {
+							cache.set(cacheKey, { value, expires: Date.now() + cacheTtl(interval) })
 						return value
 					}
 				} catch (error) {
@@ -194,9 +194,9 @@ export class CandlesService {
 		for (const fetcher of sources) {
 			try {
 				const value = await fetcher()
-				if (value.candles.length) {
-					cache.set(cacheKey, { value, expires: Date.now() + CACHE_TTL })
-					void persist(resolved, market, interval, value.source, value.candles)
+					if (value.candles.length) {
+						cache.set(cacheKey, { value, expires: Date.now() + cacheTtl(interval) })
+						void persist(resolved, market, interval, value.source, value.candles)
 					return value
 				}
 			} catch (error) {
@@ -222,14 +222,14 @@ export class CandlesService {
 				close: item.close,
 				volume: item.volume,
 			}))
-			const value = response(
-				resolved,
+				const value = response(
+					resolved,
 				market,
 				interval,
 				candles,
-				'database-cache',
-			)
-			cache.set(cacheKey, { value, expires: Date.now() + CACHE_TTL })
+					'database-cache',
+				)
+				cache.set(cacheKey, { value, expires: Date.now() + cacheTtl(interval) })
 			return value
 		}
 		return response(normalized, market, interval, [], 'unavailable')
@@ -452,7 +452,7 @@ export class CandlesService {
 						symbol: normalized,
 						price: Number(data.price),
 						changePercent: Number(data.change_percent ?? 0),
-						source: 'SAHMK',
+							source: 'market',
 						freshness: data.is_delayed
 							? ('delayed' as Freshness)
 							: ('live' as Freshness),
@@ -463,7 +463,7 @@ export class CandlesService {
 							),
 							data_quality: makeDataQuality({
 								status: data.is_delayed ? 'delayed' : 'live',
-								provider: 'SAHMK',
+								provider: 'market',
 								timestamp: data.updated_at ?? new Date().toISOString(),
 								thresholdSeconds: 60,
 								realtimeTick: !data.is_delayed,
@@ -495,7 +495,7 @@ export class CandlesService {
 						symbol: normalized,
 						price: Number(data.close),
 						changePercent: Number(data.percent_change ?? 0),
-						source: 'Twelve Data',
+							source: 'market',
 						freshness:
 							process.env.TWELVE_DATA_REALTIME === 'true'
 								? ('live' as Freshness)
@@ -507,7 +507,7 @@ export class CandlesService {
 							),
 							data_quality: makeDataQuality({
 								status: process.env.TWELVE_DATA_REALTIME === 'true' ? 'live' : 'delayed',
-								provider: 'Twelve Data',
+								provider: 'market',
 								timestamp: data.datetime ?? new Date().toISOString(),
 								thresholdSeconds: 300,
 								realtimeTick: process.env.TWELVE_DATA_REALTIME === 'true',
@@ -531,7 +531,7 @@ export class CandlesService {
 						symbol: normalized,
 						price,
 						changePercent: null,
-						source: 'Polygon.io',
+							source: 'market',
 						freshness: 'live' as Freshness,
 						updatedAt: new Date().toISOString(),
 							...quoteMetadata('live', new Date().toISOString()),
@@ -577,7 +577,7 @@ export class CandlesService {
 			symbol: normalized,
 			price: null,
 			changePercent: null,
-			source: 'unavailable',
+			source: 'market',
 			freshness: 'cached' as Freshness,
 			updatedAt: null,
 			...quoteMetadata('cached', null),

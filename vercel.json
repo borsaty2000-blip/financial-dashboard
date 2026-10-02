@@ -12,6 +12,12 @@
       "includeFiles": "server/python-services/**"
     }
   },
+  "crons": [
+    {
+      "path": "/api/cron/refresh-daily",
+      "schedule": "0 17 * * 0-4"
+    }
+  ],
   "rewrites": [
     { "source": "/api/python/(.*)", "destination": "/api/python/$1" },
     { "source": "/api/(.*)", "destination": "/api/index.ts" },

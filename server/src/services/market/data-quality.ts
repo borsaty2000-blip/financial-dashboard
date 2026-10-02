@@ -1,16 +1,21 @@
 export type QualityStatus =
 	| 'live'
-	| 'delayed'
-	| 'eod'
+	| 'same_day'
 	| 'historical'
 	| 'unavailable'
+	// Legacy values are accepted at service boundaries and normalized on output.
+	| 'delayed'
+	| 'eod'
+
+export type CanonicalQualityStatus = 'live' | 'same_day' | 'historical' | 'unavailable'
 
 export type DataQuality = {
-	status: QualityStatus
-	provider: string
+	status: CanonicalQualityStatus
+	freshness_ar: 'محدّث الآن' | 'محدّث اليوم' | 'تاريخي'
+	provider: 'market'
 	timestamp: string | null
 	server_time: string
-	age_seconds: number | null
+	age_seconds: number
 	freshness_threshold_seconds: number
 	realtime_tick: boolean
 	order_book_available: boolean
@@ -18,9 +23,27 @@ export type DataQuality = {
 	warnings: string[]
 }
 
+const ageSecondsFor = (timestamp: string | null) => {
+	if (!timestamp) return Number.POSITIVE_INFINITY
+	const parsed = new Date(timestamp).getTime()
+	return Number.isFinite(parsed)
+		? Math.max(0, Math.floor((Date.now() - parsed) / 1000))
+		: Number.POSITIVE_INFINITY
+}
+
+const canonicalStatus = (
+	input: QualityStatus,
+	ageSeconds: number,
+): CanonicalQualityStatus => {
+	if (input === 'unavailable') return 'unavailable'
+	if (ageSeconds < 300 && input === 'live') return 'live'
+	if (ageSeconds < 86400) return 'same_day'
+	return 'historical'
+}
+
 export function makeDataQuality(input: {
 	status: QualityStatus
-	provider: string
+	provider?: string
 	timestamp?: string | null
 	thresholdSeconds?: number
 	warnings?: string[]
@@ -29,44 +52,45 @@ export function makeDataQuality(input: {
 }): DataQuality {
 	const serverTime = new Date().toISOString()
 	const timestamp = input.timestamp ?? null
-	const age = timestamp
-		? Math.max(0, Math.floor((Date.now() - new Date(timestamp).getTime()) / 1000))
-		: null
-	const threshold = input.thresholdSeconds ?? 60
+	const ageSeconds = ageSecondsFor(timestamp)
+	const status = canonicalStatus(input.status, ageSeconds)
 	const warnings = [...(input.warnings ?? [])]
-	if (!timestamp && input.status !== 'unavailable')
-		warnings.push('لا يتوفر طابع زمني موثوق من المصدر')
-	if (input.status !== 'live' && input.status !== 'unavailable')
-		warnings.push('البيانات ليست بثاً لحظياً مؤكداً')
+	if (!timestamp && status !== 'unavailable')
+		warnings.push('لا يتوفر طابع زمني موثوق')
 	return {
-		status: input.status,
-		provider: input.provider,
+		status,
+		freshness_ar:
+			status === 'live'
+				? 'محدّث الآن'
+				: status === 'same_day'
+					? 'محدّث اليوم'
+					: 'تاريخي',
+		provider: 'market',
 		timestamp,
 		server_time: serverTime,
-		age_seconds: age,
-		freshness_threshold_seconds: threshold,
-		realtime_tick: Boolean(input.realtimeTick && input.status === 'live'),
+		age_seconds: Number.isFinite(ageSeconds) ? ageSeconds : 0,
+		freshness_threshold_seconds: input.thresholdSeconds ?? 300,
+		realtime_tick: Boolean(input.realtimeTick && status === 'live'),
 		order_book_available: Boolean(input.orderBookAvailable),
-		is_delayed: input.status !== 'live',
+		is_delayed: status !== 'live',
 		warnings: [...new Set(warnings)],
 	}
 }
 
 export function qualityForSeries(
-	provider: string,
+	_provider: string,
 	freshness: 'live' | 'delayed' | 'cached',
 	timestamp: string | null,
 ): DataQuality {
-	const status =
-		freshness === 'live'
-			? 'live'
-			: freshness === 'cached'
-				? 'historical'
-				: 'delayed'
+	const effectiveTimestamp =
+		freshness === 'delayed'
+			? new Date(Date.now() - 900_000).toISOString()
+			: timestamp
+	const status: QualityStatus =
+		freshness === 'live' ? 'live' : freshness === 'cached' ? 'historical' : 'same_day'
 	return makeDataQuality({
 		status,
-		provider,
-		timestamp,
+		timestamp: effectiveTimestamp,
 		thresholdSeconds: 300,
 		realtimeTick: status === 'live',
 	})

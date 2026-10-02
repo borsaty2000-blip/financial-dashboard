@@ -12,7 +12,7 @@ import { analyzeFibonacci } from './fibonacci.service.js'
 import { analyzeMultiTimeframe, type Timeframe } from './multi-timeframe.service.js'
 import { analyzeMarketRegime } from './market-regime.service.js'
 import { runBacktest } from './backtesting.service.js'
-import type { QualityStatus } from '../market/data-quality.js'
+import { makeDataQuality } from '../market/data-quality.js'
 
 const CACHE_TTL_MS = 5 * 60 * 1000
 const LONG_ENGINE_TIMEOUT_MS = 12_000
@@ -20,12 +20,7 @@ const STANDARD_ENGINE_TIMEOUT_MS = 8_000
 const BACKTEST_TIMEOUT_MS = 20_000
 export const ANALYSIS_ENGINE_NAMES = ['elliott', 'gann', 'harmonic', 'wyckoff', 'vsa', 'classical_patterns', 'support_resistance', 'fibonacci', 'indicators', 'multi_timeframe', 'market_regime', 'divergence', 'confluence', 'recommendation', 'backtesting'] as const
 
-type DataQuality = {
-	status: QualityStatus
-	provider: string
-	timestamp: string
-	warnings: string[]
-}
+type DataQuality = ReturnType<typeof makeDataQuality>
 
 export type EngineResult<T = unknown> = {
 	available: boolean
@@ -71,8 +66,8 @@ const asRecord = (value: unknown): Record<string, unknown> | null => value && ty
 const asNumber = (value: unknown, fallback = 0) => typeof value === 'number' && Number.isFinite(value) ? value : fallback
 
 function qualityFor(source: string, timestamp: string, warnings: string[] = [], available = true): DataQuality {
-	const status: DataQuality['status'] = !available ? 'unavailable' : source === 'database-cache' ? 'historical' : ['Yahoo Finance', 'Stooq', 'SAHMK historical'].includes(source) ? 'delayed' : 'live'
-	return { status, provider: source || 'unavailable', timestamp, warnings: [...warnings] }
+	const status = !available ? 'unavailable' : source === 'database-cache' ? 'historical' : ['Yahoo Finance', 'Stooq', 'SAHMK historical'].includes(source) ? 'same_day' : 'live'
+	return makeDataQuality({ status, provider: source, timestamp, warnings, realtimeTick: status === 'live' })
 }
 
 function aggregate(candles: Candle[], size: number): Candle[] {
