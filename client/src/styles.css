@@ -7475,6 +7475,141 @@ textarea {
 	height: 82px;
 }
 
+.tradingview-stock-chart {
+	background: #131722;
+	border: 1px solid #2a2e39;
+	border-radius: 12px;
+	overflow: hidden;
+	color: #d1d4dc;
+}
+.chart-frame-toolbar,
+.chart-overlay-toolbar,
+.chart-tool-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	overflow-x: auto;
+	padding: 9px 10px;
+	background: #131722;
+	border-bottom: 1px solid #2a2e39;
+	scrollbar-width: thin;
+}
+.chart-frame-toolbar button,
+.chart-overlay-toolbar button,
+.chart-tool-toolbar button {
+	flex: 0 0 auto;
+	min-width: 42px;
+	border: 1px solid #434651;
+	border-radius: 5px;
+	background: #1e222d;
+	color: #d1d4dc;
+	padding: 6px 9px;
+	font-family: 'JetBrains Mono', monospace;
+	font-size: 11px;
+	cursor: pointer;
+	transition: 150ms ease;
+}
+.chart-frame-toolbar button:hover,
+.chart-overlay-toolbar button:hover,
+.chart-tool-toolbar button:hover,
+.chart-tool-toolbar button.is-active {
+	border-color: #089981;
+	background: #263b3a;
+	color: #ffffff;
+}
+.chart-frame-toolbar button.is-active {
+	border-color: #089981;
+	background: #089981;
+	color: #ffffff;
+	font-weight: 700;
+}
+.chart-overlay-toolbar {
+	background: #171a21;
+	border-bottom-color: #2a2e39;
+}
+.chart-overlay-toolbar button {
+	min-width: auto;
+	font-family: inherit;
+	font-size: 11px;
+}
+.chart-overlay-toolbar button.is-active {
+	border-color: #f59e0b;
+	background: #3a2e1d;
+	color: #fff7ed;
+}
+.chart-tool-toolbar {
+	justify-content: flex-start;
+	background: #171a21;
+	border-bottom-color: #2a2e39;
+}
+.chart-tool-toolbar button {
+	min-width: auto;
+	font-family: inherit;
+}
+.chart-shortcut-hint {
+	margin-inline-start: auto;
+	flex: 0 0 auto;
+	color: #787b86;
+	font-size: 11px;
+}
+.tradingview-chart-canvas {
+	width: 100%;
+	min-height: 350px;
+	direction: ltr;
+}
+.tradingview-chart-canvas.is-empty {
+	min-height: 120px;
+}
+.chart-frame-status {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	min-height: 54px;
+	padding: 14px;
+	background: #171a21;
+	color: #d1d4dc;
+	font-size: 13px;
+	text-align: center;
+}
+.chart-frame-status--empty {
+	flex-direction: column;
+	min-height: 150px;
+	color: #b8bbc4;
+}
+.chart-frame-status--empty strong {
+	color: #f0f3fa;
+}
+.chart-frame-status--empty button {
+	border: 1px solid #089981;
+	border-radius: 5px;
+	background: #089981;
+	color: #ffffff;
+	padding: 8px 12px;
+	cursor: pointer;
+}
+@media (max-width: 640px) {
+	.chart-frame-toolbar,
+	.chart-overlay-toolbar,
+	.chart-tool-toolbar {
+		padding: 8px;
+		gap: 4px;
+	}
+	.chart-frame-toolbar button,
+	.chart-overlay-toolbar button,
+	.chart-tool-toolbar button {
+		min-width: 38px;
+		padding: 6px 7px;
+		font-size: 10px;
+	}
+	.chart-shortcut-hint {
+		display: none;
+	}
+	.tradingview-chart-canvas {
+		min-height: 350px;
+	}
+}
+
 /* Unified identity pass: charcoal utility surfaces, white content surfaces, no stray cyan blocks. */
 .borsaty-why,
 .section-activity-bar {

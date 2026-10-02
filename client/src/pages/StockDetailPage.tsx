@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../lib/api'
 import { useLivePrice } from '../hooks/useLivePrice'
-import ProfessionalStockChart from '../components/ProfessionalStockChart'
+import TradingViewStockChart from '../components/TradingViewStockChart'
 import { StockSectionBoundary } from '../components/StockSectionBoundary'
 import { BrilliantSummary } from '../components/Analysis/BrilliantSummary'
 import { formatEnglishNumber, formatEnglishPercent } from '../lib/format'
@@ -396,7 +396,12 @@ export function StockDetailPage({
 													: 'لا تتوفر قراءة موثوقة لهذا الرمز حالياً'}
 								</div>
 									<StockSectionBoundary label="الرسم السعري">
-										<ProfessionalStockChart candles={data.candles} />
+										<TradingViewStockChart
+											candles={data.candles}
+											symbol={normalized}
+											market={market}
+											analysis={stockAnalysis.data ?? undefined}
+										/>
 									</StockSectionBoundary>
 							</section>
 					{stockAnalysis.data?.elliott.available && elliottMtf && <StockSectionBoundary label="تحليل Elliott">
