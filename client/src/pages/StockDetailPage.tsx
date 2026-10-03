@@ -55,10 +55,11 @@ type ElliottFrame = {
 	}
 	invalidation_level?: { level?: number }
 	invalidation?: { level?: number; distance_pct?: number; reason?: string }
-	relationships?: Record<
-		string,
-		{ value?: number; ratio?: number; valid?: boolean }
-	>
+		relationships?: Record<
+			string,
+			{ value?: number; ratio?: number; valid?: boolean; label?: string; expected_range?: string }
+		>
+		waves?: Array<{ index?: number; date?: string; end_date?: string; number?: string; label?: string; wave?: string; direction?: string }>
 	confidence_percent?: number
 }
 
@@ -402,80 +403,33 @@ export function StockDetailPage({
 										/>
 									</StockSectionBoundary>
 							</section>
-					{stockAnalysis.data?.elliott.available && elliottMtf && <StockSectionBoundary label="تحليل Elliott">
-				<section
-					className="analysis-card elliott-mtf-panel"
-								aria-label="تحليل Elliott متعدد الأطر"
-							>
+						{stockAnalysis.data?.elliott.available && elliottMtf && <StockSectionBoundary label="تحليل Elliott">
+							<section className="analysis-card elliott-mtf-panel" aria-label="تحليل Elliott متعدد الأطر">
 								<div className="panel-title">
-									<div>
-										<span className="eyebrow">هيكل الموجات · {normalized}</span>
-										<h2>Elliott Wave متعدد الأطر الزمنية</h2>
-									</div>
-									<strong>
-										{elliottMtf?.consensus?.direction === 'up'
-											? 'ميل صاعد'
-											: elliottMtf?.consensus?.direction === 'down'
-												? 'ميل هابط'
-												: 'توافق غير حاسم'}
+									<div><span className="eyebrow">هيكل الموجات · {normalized}</span><h2>Elliott Wave متعدد الأطر الزمنية</h2></div>
+									<strong className={elliottMtf.consensus?.direction === 'up' ? 'up' : elliottMtf.consensus?.direction === 'down' ? 'down' : 'neutral'}>
+										{elliottMtf.consensus?.direction === 'up' ? 'ميل صاعد' : elliottMtf.consensus?.direction === 'down' ? 'ميل هابط' : 'توافق جانبي'}
 									</strong>
 								</div>
-									<div className="elliott-mtf-grid">
-										{Object.entries(elliottMtf.by_timeframe ?? {}).filter(([, frame]) => frame.available !== false).map(
-										([key, frame]) => (
-											<article key={key} className="elliott-mtf-card">
-												<span>{frame.timeframe_ar}</span>
-																<>
-														<strong>
-																	الموجة {typeof frame.current_wave === 'object' && frame.current_wave !== null
-																		? frame.current_wave.label ?? frame.current_wave.number ?? '—'
-																		: frame.current_wave ?? '—'} ·{' '}
-															{frame.direction === 'up'
-																? 'صاعد'
-																: frame.direction === 'down'
-																	? 'هابط'
-																	: 'جانبي'}
-														</strong>
-														<small>{frame.wave_personality}</small>
-															<small>الثقة {formatEnglishPercent(frame.confidence)}</small>
-														<small>
-															هدف 1:{' '}
-															{formatEnglishNumber(
-																typeof frame.targets?.target_1 === 'object'
-																	? frame.targets.target_1.price
-																	: frame.targets?.target_1,
-															)}{' '}
-															· هدف 2:{' '}
-															{formatEnglishNumber(
-																typeof frame.targets?.target_2 === 'object'
-																	? frame.targets.target_2.price
-																	: frame.targets?.target_2,
-															)}{' '}
-															· إبطال:{' '}
-															{formatEnglishNumber(
-																frame.invalidation?.level ??
-																	frame.invalidation_level?.level,
-															)}
-														</small>
-											{frame.relationships?.wave2_retracement?.valid ? (
-															<small>
-																Fibonacci 2:{' '}
-																{formatEnglishNumber(
-																	frame.relationships.wave2_retracement.value,
-																)}
-																% ·{' '}
-																					متوافق
-															</small>
-														) : null}
-																</>
-											</article>
-										),
-									)}
-									</div>
-										<p className="analysis-disclaimer">
-										إخلاء مسؤولية: هذه مخرجات تحليلية احتمالية وليست توصية شراء أو بيع.
-						</p>
-						</section>
+								<div className="elliott-table-scroll">
+									<table className="elliott-mtf-table">
+										<thead><tr><th>الفريم</th><th>الموجة</th><th>الاتجاه</th><th>الثقة</th><th>الهدف 1</th><th>الهدف 2</th><th>الإبطال</th></tr></thead>
+										<tbody>{Object.entries(elliottMtf.by_timeframe ?? {}).map(([key, frame]) => {
+											const wave = typeof frame.current_wave === 'object' && frame.current_wave ? frame.current_wave.label ?? (frame.current_wave.number ? `الموجة ${frame.current_wave.number}` : '—') : frame.current_wave ?? '—'
+											const direction = frame.direction === 'up' ? 'صاعد' : frame.direction === 'down' ? 'هابط' : 'جانبي'
+											const target = (value: number | { price?: number } | undefined) => typeof value === 'object' ? value?.price : value
+											return <tr key={key} className={frame.available === false ? 'is-unavailable' : undefined}><td className="tf-name">{frame.timeframe_ar || key}</td><td className="wave-label">{wave}</td><td className={frame.direction === 'up' ? 'up' : frame.direction === 'down' ? 'down' : 'neutral'}>{direction}</td><td className="confidence">{frame.confidence == null ? '—' : `${Math.round(frame.confidence * 100)}%`}</td><td className="target">{formatEnglishNumber(target(frame.targets?.target_1))}</td><td className="target">{formatEnglishNumber(target(frame.targets?.target_2))}</td><td className="invalidation">{formatEnglishNumber(frame.invalidation?.level ?? frame.invalidation_level?.level)}</td></tr>
+										})}</tbody>
+									</table>
+								</div>
+								<div className="elliott-insights">
+									<div className="insight"><span>شخصية الموجة</span><strong>{elliottMtf.by_timeframe?.daily?.wave_personality || '—'}</strong></div>
+									{elliottMtf.by_timeframe?.daily?.alternate_count && <div className="insight alternate"><span>العد البديل</span><strong>الموجة {typeof elliottMtf.by_timeframe.daily.alternate_count === 'object' ? elliottMtf.by_timeframe.daily.alternate_count.wave ?? '—' : elliottMtf.by_timeframe.daily.alternate_count}</strong></div>}
+									{elliottMtf.consensus && <div className="insight consensus"><span>الإجماع</span><strong className={elliottMtf.consensus.direction === 'up' ? 'up' : elliottMtf.consensus.direction === 'down' ? 'down' : 'neutral'}>{elliottMtf.consensus.direction === 'up' ? 'صاعد' : elliottMtf.consensus.direction === 'down' ? 'هابط' : 'جانبي'} ({Math.round((elliottMtf.consensus.confidence ?? 0) * 100)}%)</strong></div>}
+								</div>
+								{elliottMtf.by_timeframe?.daily?.relationships && <div className="fib-relationships"><h4>علاقات فيبوناتشي</h4><div className="fib-grid">{Object.entries(elliottMtf.by_timeframe.daily.relationships).map(([key, rel]) => <div key={key} className={`fib-item ${rel.valid ? 'valid' : 'invalid'}`}><div className="fib-label">{rel.label ?? key}</div><div className="fib-value"><span className="number">{formatEnglishNumber(rel.value ?? rel.ratio)}</span><span className="expected">{rel.expected_range ?? '—'}</span></div><div className={`fib-status ${rel.valid ? 'ok' : 'warn'}`}>{rel.valid ? '✓ متوافق' : '⚠ يحتاج تحقق'}</div></div>)}</div></div>}
+								<p className="analysis-disclaimer">إخلاء مسؤولية: هذه مخرجات تحليلية احتمالية وليست توصية شراء أو بيع.</p>
+							</section>
 						</StockSectionBoundary>}
 						{stockAnalysis.data?.gann.available && gann && <StockSectionBoundary label="تحليل Gann">
 						<section className="analysis-card gann-analysis-panel" aria-label="تحليل Gann">

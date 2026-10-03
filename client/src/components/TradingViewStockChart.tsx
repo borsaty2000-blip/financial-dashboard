@@ -76,6 +76,19 @@ const collectNumbers = (value: unknown, keys: RegExp, output: number[] = []): nu
   }
   return [...new Set(output)].filter((value) => value > 0)
 }
+const unwrapElliott = (value: any) => {
+  let data = value?.data ?? value
+  if (data?.data?.by_timeframe) data = data.data
+  if (data?.by_timeframe) return data
+  return null
+}
+const waveColor = (wave: string) => {
+  const label = wave.toUpperCase()
+  if (['1', '3', '5'].includes(label)) return '#089981'
+  if (['2', '4'].includes(label)) return '#f39c12'
+  if (['A', 'B', 'C'].includes(label)) return '#2962ff'
+  return '#38bdf8'
+}
 
 export default function TradingViewStockChart({ candles, symbol, market, analysis }: Props) {
   const chartContainerRef = useRef<HTMLDivElement>(null)
@@ -127,7 +140,7 @@ export default function TradingViewStockChart({ candles, symbol, market, analysi
     if (visibility.fibonacci) collectNumbers(analysis?.fibonacci, /23|38|50|61|78|level|retracement|extension/i).slice(0, 8).forEach((price, index) => addPriceLine(price, `Fib ${index + 1}`, '#a78bfa'))
     if (visibility.tradingLevels) { const recommendation = analysis?.recommendation; const entry = numeric(recommendation?.entry) ?? (Array.isArray(recommendation?.entry_zone) ? numeric(recommendation.entry_zone[0]) : null); const stop = numeric(recommendation?.stop_loss); const targets: number[] = Array.isArray(recommendation?.targets) ? recommendation.targets.map((target: any): number | null => numeric(target?.price) ?? numeric(target)).filter((value: number | null): value is number => value != null) : []; if (entry != null) addPriceLine(entry, `دخول ${entry.toFixed(2)}`, '#089981'); if (stop != null) addPriceLine(stop, `وقف ${stop.toFixed(2)}`, '#F23645'); targets.slice(0, 3).forEach((target: number, index: number) => addPriceLine(target, `هدف ${index + 1}: ${target.toFixed(2)}`, '#089981')) }
     if (visibility.gannFan) { const low = Math.min(...safeCandles.map((candle) => candle.low)); const anglePrices = collectNumbers(analysis?.gann, /price|angle/i).slice(0, 9); anglePrices.forEach((price, index) => { if (times.length > 1) chart.addSeries(LineSeries, { color: index === 0 ? '#f59e0b' : '#f59e0b88', lineWidth: 1 }).setData([{ time: times[0], value: low }, { time: times.at(-1) as Time, value: price }]) }) }
-    if (visibility.elliott) { const pivots = (analysis?.elliott?.pivots ?? analysis?.elliott?.labels ?? []) as any[]; const markers = pivots.flatMap((pivot) => { const index = typeof pivot?.index === 'number' ? pivot.index : safeCandles.findIndex((candle) => candle.date === pivot?.date); const label = String(pivot?.label ?? pivot?.wave ?? pivot?.number ?? ''); return index >= 0 && label ? [{ time: times[index], position: 'aboveBar' as const, shape: 'circle' as const, color: '#38bdf8', text: label }] : [] }); if (markers.length) createSeriesMarkers(candleSeries, markers) }
+    if (visibility.elliott) { const elliottData = unwrapElliott(analysis?.elliott); const waves = (elliottData?.by_timeframe?.daily?.waves ?? []) as any[]; const markers = waves.flatMap((wave) => { const index = typeof wave?.index === 'number' ? wave.index : safeCandles.findIndex((candle) => candle.date === (wave?.end_date ?? wave?.date)); const label = String(wave?.label ?? wave?.number ?? wave?.wave ?? ''); const direction = String(wave?.direction ?? '').toLowerCase(); return index >= 0 && label ? [{ time: times[index], position: direction === 'down' ? 'belowBar' as const : 'aboveBar' as const, shape: direction === 'down' ? 'arrowUp' as const : 'arrowDown' as const, color: waveColor(label), text: label, size: 2 }] : [] }); if (markers.length) createSeriesMarkers(candleSeries, markers) }
     chart.timeScale().fitContent()
     const observer = new ResizeObserver(() => chart.applyOptions({ width: container.clientWidth })); observer.observe(container)
     return () => { observer.disconnect(); chart.remove(); chartRef.current = null }

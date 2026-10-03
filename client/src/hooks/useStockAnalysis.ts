@@ -34,6 +34,13 @@ function unwrap(value: unknown): any {
   return first ?? null
 }
 
+export function unwrapElliott(value: unknown): any {
+  const unwrapped = unwrap(value)
+  if (unwrapped?.by_timeframe) return unwrapped
+  if (unwrapped?.data?.by_timeframe) return unwrapped.data
+  return unwrapped
+}
+
 function normalizeEngine(value: unknown) {
   const envelope = (value ?? {}) as EngineEnvelope
   const nested = envelope.data as { source?: string } | undefined
@@ -59,7 +66,10 @@ function normalizeResponse(json: any, symbol: string, market: string): StockAnal
       available: Number(candles.count ?? 0) > 0,
       data_quality: candles.data_quality,
     },
-    elliott: normalizeEngine(json.elliott),
+    elliott: {
+      ...normalizeEngine(json.elliott),
+      data: unwrapElliott(json.elliott),
+    },
     gann: normalizeEngine(json.gann),
     harmonic: normalizeEngine(json.harmonic),
     confluence: normalizeEngine(json.confluence),
