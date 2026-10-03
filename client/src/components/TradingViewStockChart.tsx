@@ -33,7 +33,7 @@ const overlayKeys: Array<[keyof Visibility, string]> = [
   ['sma20', 'SMA20'], ['sma50', 'SMA50'], ['sma200', 'SMA200'], ['ema9', 'EMA9'], ['bollinger', 'Bollinger'],
   ['vwap', 'VWAP'], ['fibonacci', 'Fibonacci'], ['gannFan', 'Gann Fan'], ['elliott', 'Elliott Labels'], ['tradingLevels', 'Buy/SL/TP'],
 ]
-const defaultVisibility: Visibility = { sma20: false, sma50: false, sma200: false, ema9: false, bollinger: false, vwap: false, fibonacci: false, gannFan: false, elliott: false, tradingLevels: false, volume: true }
+const defaultVisibility: Visibility = { sma20: false, sma50: false, sma200: false, ema9: false, bollinger: false, vwap: false, fibonacci: false, gannFan: false, elliott: true, tradingLevels: false, volume: true }
 const storageKey = (symbol: string, key: string) => `borsaty-chart:${symbol}:${key}`
 const readStorage = (key: string, fallback: string) => typeof window === 'undefined' ? fallback : window.localStorage.getItem(key) ?? fallback
 const numeric = (value: unknown) => typeof value === 'number' && Number.isFinite(value) ? value : null
