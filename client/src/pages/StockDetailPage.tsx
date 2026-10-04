@@ -416,9 +416,11 @@ export function StockDetailPage({
 										<thead><tr><th>الفريم</th><th>الموجة</th><th>الاتجاه</th><th>الثقة</th><th>الهدف 1</th><th>الهدف 2</th><th>الإبطال</th></tr></thead>
 										<tbody>{Object.entries(elliottMtf.by_timeframe ?? {}).map(([key, frame]) => {
 											const wave = typeof frame.current_wave === 'object' && frame.current_wave ? frame.current_wave.label ?? (frame.current_wave.number ? `الموجة ${frame.current_wave.number}` : '—') : frame.current_wave ?? '—'
-											const direction = frame.direction === 'up' ? 'صاعد' : frame.direction === 'down' ? 'هابط' : 'جانبي'
+											const rawDirection = frame.direction ?? (frame.current_wave && typeof frame.current_wave === 'object' ? frame.current_wave.direction : undefined)
+											const direction = rawDirection === 'up' ? 'صاعد' : rawDirection === 'down' ? 'هابط' : 'جانبي'
+											const timeframeLabel = frame.timeframe_ar ?? ({ daily: 'يومي', weekly: 'أسبوعي', monthly: 'شهري' } as Record<string, string>)[key] ?? key
 											const target = (value: number | { price?: number } | undefined) => typeof value === 'object' ? value?.price : value
-											return <tr key={key} className={frame.available === false ? 'is-unavailable' : undefined}><td className="tf-name">{frame.timeframe_ar || key}</td><td className="wave-label">{wave}</td><td className={frame.direction === 'up' ? 'up' : frame.direction === 'down' ? 'down' : 'neutral'}>{direction}</td><td className="confidence">{frame.confidence == null ? '—' : `${Math.round(frame.confidence * 100)}%`}</td><td className="target">{formatEnglishNumber(target(frame.targets?.target_1))}</td><td className="target">{formatEnglishNumber(target(frame.targets?.target_2))}</td><td className="invalidation">{formatEnglishNumber(frame.invalidation?.level ?? frame.invalidation_level?.level)}</td></tr>
+											return <tr key={key} className={frame.available === false ? 'is-unavailable' : undefined}><td className="tf-name">{timeframeLabel}</td><td className="wave-label">{wave}</td><td className={rawDirection === 'up' ? 'up' : rawDirection === 'down' ? 'down' : 'neutral'}>{direction}</td><td className="confidence">{frame.confidence == null ? '—' : `${Math.round(frame.confidence * 100)}%`}</td><td className="target">{formatEnglishNumber(target(frame.targets?.target_1))}</td><td className="target">{formatEnglishNumber(target(frame.targets?.target_2))}</td><td className="invalidation">{formatEnglishNumber(frame.invalidation?.level ?? frame.invalidation_level?.level)}</td></tr>
 										})}</tbody>
 									</table>
 								</div>
