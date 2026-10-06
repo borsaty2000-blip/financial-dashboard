@@ -36,6 +36,7 @@ type CompanyResponse = { nameAr?: string }
 type ElliottFrame = {
 	available?: boolean
 	availability_reason?: string
+	availability_reason_ar?: string
 	timeframe_ar?: string
 	current_wave?: {
 		number?: string
@@ -65,7 +66,8 @@ type ElliottFrame = {
 
 type ElliottMtfData = {
 	by_timeframe?: Record<string, ElliottFrame>
-	consensus?: { direction?: string; confidence?: number }
+	consensus?: { direction?: string; confidence?: number; confidence_pct?: number; score?: number; explanation_ar?: string }
+	conflicts?: Array<{ type?: string; severity?: string; message_ar?: string }>
 	disclaimer?: string
 	source?: string
 }
@@ -219,6 +221,15 @@ export function StockDetailPage({
 			(companyName && companyName.toUpperCase() !== normalized
 				? companyName
 				: undefined)
+		const dailyFrame = elliottMtf?.by_timeframe?.daily
+		const dailyWaveNumber = typeof dailyFrame?.current_wave === 'object' && dailyFrame.current_wave
+			? dailyFrame.current_wave.number ?? ''
+			: String(dailyFrame?.current_wave ?? '')
+		const currentPrice = livePrice?.price ?? stats.last?.close
+		const dailyInvalidation = dailyFrame?.invalidation?.level ?? dailyFrame?.invalidation_level?.level
+		const invalidationDistancePct = dailyInvalidation != null && currentPrice
+			? (Math.abs(currentPrice - dailyInvalidation) / currentPrice) * 100
+			: null
 		const recommendation = stockAnalysis.data?.recommendation.data?.recommendation ?? stockAnalysis.data?.recommendation.data
 
 	const addToWatchlist = async () => {
@@ -420,16 +431,19 @@ export function StockDetailPage({
 											const direction = rawDirection === 'up' ? 'صاعد' : rawDirection === 'down' ? 'هابط' : 'جانبي'
 											const timeframeLabel = frame.timeframe_ar ?? ({ daily: 'يومي', weekly: 'أسبوعي', monthly: 'شهري' } as Record<string, string>)[key] ?? key
 											const target = (value: number | { price?: number } | undefined) => typeof value === 'object' ? value?.price : value
-											return <tr key={key} className={frame.available === false ? 'is-unavailable' : undefined}><td className="tf-name">{timeframeLabel}</td><td className="wave-label">{wave}</td><td className={rawDirection === 'up' ? 'up' : rawDirection === 'down' ? 'down' : 'neutral'}>{direction}</td><td className="confidence">{frame.confidence == null ? '—' : `${Math.round(frame.confidence * 100)}%`}</td><td className="target">{formatEnglishNumber(target(frame.targets?.target_1))}</td><td className="target">{formatEnglishNumber(target(frame.targets?.target_2))}</td><td className="invalidation">{formatEnglishNumber(frame.invalidation?.level ?? frame.invalidation_level?.level)}</td></tr>
+											return <tr key={key} className={frame.available === false ? 'is-unavailable' : undefined}><td className="tf-name">{timeframeLabel}</td><td className="wave-label">{frame.available === false ? 'غير متاح' : wave}</td><td className={rawDirection === 'up' ? 'up' : rawDirection === 'down' ? 'down' : 'neutral'}>{frame.available === false ? '—' : direction}</td><td className="confidence">{frame.available === false ? (frame.availability_reason_ar ?? 'بيانات غير كافية') : frame.confidence == null ? '—' : `${Math.round(frame.confidence * 100)}%`}</td><td className="target">{formatEnglishNumber(frame.available === false ? undefined : target(frame.targets?.target_1))}</td><td className="target">{formatEnglishNumber(frame.available === false ? undefined : target(frame.targets?.target_2))}</td><td className="invalidation">{formatEnglishNumber(frame.available === false ? undefined : frame.invalidation?.level ?? frame.invalidation_level?.level)}</td></tr>
 										})}</tbody>
 									</table>
 								</div>
 								<div className="elliott-insights">
 									<div className="insight"><span>شخصية الموجة</span><strong>{elliottMtf.by_timeframe?.daily?.wave_personality || '—'}</strong></div>
 									{elliottMtf.by_timeframe?.daily?.alternate_count && <div className="insight alternate"><span>العد البديل</span><strong>الموجة {typeof elliottMtf.by_timeframe.daily.alternate_count === 'object' ? elliottMtf.by_timeframe.daily.alternate_count.wave ?? '—' : elliottMtf.by_timeframe.daily.alternate_count}</strong></div>}
-									{elliottMtf.consensus && <div className="insight consensus"><span>الإجماع</span><strong className={elliottMtf.consensus.direction === 'up' ? 'up' : elliottMtf.consensus.direction === 'down' ? 'down' : 'neutral'}>{elliottMtf.consensus.direction === 'up' ? 'صاعد' : elliottMtf.consensus.direction === 'down' ? 'هابط' : 'جانبي'} ({Math.round((elliottMtf.consensus.confidence ?? 0) * 100)}%)</strong></div>}
-								</div>
-								{elliottMtf.by_timeframe?.daily?.relationships && <div className="fib-relationships"><h4>علاقات فيبوناتشي</h4><div className="fib-grid">{Object.entries(elliottMtf.by_timeframe.daily.relationships).map(([key, rel]) => <div key={key} className={`fib-item ${rel.valid ? 'valid' : 'invalid'}`}><div className="fib-label">{rel.label ?? key}</div><div className="fib-value"><span className="number">{formatEnglishNumber(rel.value ?? rel.ratio)}</span><span className="expected">{rel.expected_range ?? '—'}</span></div><div className={`fib-status ${rel.valid ? 'ok' : 'warn'}`}>{rel.valid ? '✓ متوافق' : '⚠ يحتاج تحقق'}</div></div>)}</div></div>}
+										{elliottMtf.consensus && <div className="insight consensus"><span>الإجماع الموزون</span><strong className={elliottMtf.consensus.direction === 'up' ? 'up' : elliottMtf.consensus.direction === 'down' ? 'down' : 'neutral'}>{elliottMtf.consensus.direction === 'up' ? 'صاعد' : elliottMtf.consensus.direction === 'down' ? 'هابط' : 'مختلط'} ({elliottMtf.consensus.confidence_pct ?? Math.round((elliottMtf.consensus.confidence ?? 0) * 100)}%)</strong></div>}
+									</div>
+										{elliottMtf.consensus?.explanation_ar && <p className="muted">{elliottMtf.consensus.explanation_ar}</p>}
+										{elliottMtf.conflicts?.map((conflict) => <div key={`${conflict.type}-${conflict.severity}`} className="analysis-warning">{conflict.message_ar ?? 'يوجد تعارض بين الأطر الزمنية'}</div>)}
+										{invalidationDistancePct != null && invalidationDistancePct > 0 && invalidationDistancePct < 1 && <div className="analysis-warning warning-critical"><strong>تحذير: مسافة الإبطال ضيقة جداً</strong><p>السعر الحالي على مسافة {invalidationDistancePct.toFixed(2)}% فقط من مستوى الإبطال ({formatEnglishNumber(dailyInvalidation)}).</p></div>}
+								{elliottMtf.by_timeframe?.daily?.relationships && <div className="fib-relationships"><h4>علاقات فيبوناتشي المرتبطة بالموجة الحالية</h4><div className="fib-grid">{Object.entries(elliottMtf.by_timeframe.daily.relationships).filter(([key]) => key !== 'wave5_extension' || ['4', '5', 'C'].includes(dailyWaveNumber)).map(([key, rel]) => <div key={key} className={`fib-item ${rel.valid ? 'valid' : 'invalid'}`}><div className="fib-label">{rel.label ?? key}</div><div className="fib-value"><span className="number">{formatEnglishNumber(rel.value ?? rel.ratio)}</span><span className="expected">{rel.expected_range ?? '—'}</span></div><div className={`fib-status ${rel.valid ? 'ok' : 'warn'}`}>{rel.valid ? '✓ متوافق' : '⚠ يحتاج تحقق'}</div></div>)}</div></div>}
 								<p className="analysis-disclaimer">إخلاء مسؤولية: هذه مخرجات تحليلية احتمالية وليست توصية شراء أو بيع.</p>
 							</section>
 						</StockSectionBoundary>}

@@ -165,7 +165,15 @@ export async function analyzeElliottMTF(
 			const computedFrames = Object.entries(candlesByTf).reduce<
 			Record<string, Record<string, unknown>>
 		>((frames, [timeframe, frameCandles]) => {
-			if (frameCandles.length < 30) return frames
+				if (frameCandles.length < 30) {
+					frames[timeframe] = {
+						available: false,
+						timeframe,
+						timeframe_ar: timeframe === 'monthly' ? 'شهري' : timeframe === 'weekly' ? 'أسبوعي' : timeframe === '4h' ? '4 ساعات' : 'يومي',
+						availability_reason_ar: 'عدد الشموع غير كافٍ (يحتاج 30 على الأقل)',
+					}
+					return frames
+				}
 			const result = enrichFallback(
 				analyzeElliottFallback(frameCandles.map((item) => item.close)),
 				timeframe,
@@ -194,7 +202,12 @@ export async function analyzeElliottMTF(
 							: timeframe === '4h'
 								? 1
 								: 2,
-				current_wave: wave,
+					current_wave: {
+						number: wave,
+						direction,
+						current_price: result.current_wave?.current_price,
+						label: `الموجة ${wave}`,
+					},
 				direction,
 				confidence: result.confidence ?? 0,
 				confidence_percent: result.confidence_percent ?? 0,
@@ -215,22 +228,33 @@ export async function analyzeElliottMTF(
 			}
 			return frames
 		}, {})
-			const daily = computedFrames.daily ?? {}
-		const dailyDirection = String(daily.direction ?? 'unknown')
-		return {
+				const weights: Record<string, number> = { monthly: 0.2, weekly: 0.3, daily: 0.5, '4h': 0.1, hourly: 0.05 }
+				const details = Object.entries(computedFrames).filter(([, frame]) => frame.available).map(([timeframe, frame]) => {
+					const direction = String(frame.direction ?? 'sideways')
+					const confidence = Number(frame.confidence ?? 0)
+					const weight = weights[timeframe] ?? 0
+					return { timeframe, direction, confidence, weight, contribution: (direction === 'up' ? 1 : direction === 'down' ? -1 : 0) * confidence * weight }
+				})
+				const weightTotal = details.reduce((sum, item) => sum + item.weight, 0)
+				const score = weightTotal ? details.reduce((sum, item) => sum + item.contribution, 0) / weightTotal : 0
+				const consensusDirection = score > 0.15 ? 'up' : score < -0.15 ? 'down' : 'mixed'
+				return {
 				status: 'computed',
 				source: 'computed',
 				engine_mode: 'computed',
 			data: {
 					by_timeframe: computedFrames,
-				consensus: {
-					direction: dailyDirection,
-					confidence: daily.confidence ?? 0,
-					agreement: 1,
-						timeframes: Object.keys(computedFrames).length,
-				},
-				dominant_direction: dailyDirection,
-				dominant_confidence: daily.confidence ?? 0,
+					consensus: {
+						direction: consensusDirection,
+						confidence: Math.abs(score),
+						confidence_pct: Math.round(Math.abs(score) * 100),
+						score,
+						details,
+						agreement: details.length ? details.filter((item) => item.direction === consensusDirection).length / details.length : 0,
+						timeframes: details.length,
+					},
+					dominant_direction: consensusDirection,
+					dominant_confidence: Math.abs(score),
 					disclaimer:
 						'النتيجة مبنية على الأطر المتاحة وقت التحليل وتحتاج مراجعة بيانات المصدر.',
 			},
