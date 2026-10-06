@@ -128,7 +128,7 @@ export function StockDetailPage({
 		const [confluenceError, setConfluenceError] = useState('')
 		const [engineStatus, setEngineStatus] =
 			useState<EngineStatus['python_engine']>()
-		const livePrice = useLivePrice(normalized, market)
+			const { quote: livePrice, refresh: refreshLivePrice } = useLivePrice(normalized, market)
 		const stockAnalysis = useStockAnalysis(normalized, market)
 
 		useEffect(() => {
@@ -335,6 +335,9 @@ export function StockDetailPage({
 					</small>
 				</div>
 				<div className="stock-header-actions">
+					<button className="secondary-button" onClick={refreshLivePrice} type="button">
+						تحديث السعر
+					</button>
 					<button className="secondary-button" onClick={listen}>
 						{isPlaying ? 'إيقاف الصوت' : 'استمع للتحليل'}
 					</button>

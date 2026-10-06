@@ -13,65 +13,57 @@ export type LivePrice = {
 }
 
 type Market = 'EGX' | 'TASI' | 'GLOBAL'
-const LIVE_POLL_INTERVAL_MS = 5_000
-const DELAYED_POLL_INTERVAL_MS = 30_000
+const AUTO_REFRESH_MS = 180_000
 
-const quoteUrl = (symbol: string, market: Market) => {
+const quoteUrl = (symbol: string, market: Market, force = false) => {
 	const base = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/u, '')
-	return `${base}/api/market/quote/${encodeURIComponent(symbol)}?market=${market}`
+	const path = force ? `/api/market/quote/${encodeURIComponent(symbol)}/refresh` : `/api/market/quote/${encodeURIComponent(symbol)}`
+	return `${base}${path}?market=${market}`
 }
 
 export const useLivePrice = (symbol: string, market: Market = 'EGX') => {
 	const [quote, setQuote] = useState<LivePrice | null>(null)
+	const [refreshNonce, setRefreshNonce] = useState(0)
 
 	useEffect(() => {
 		let active = true
 		let timer: number | undefined
 		let loading = false
-		let lastFreshness: LivePrice['freshness'] = 'delayed'
 
-		const load = async () => {
+		const load = async (force = false) => {
 			if (!active || loading || document.visibilityState === 'hidden') return
 			loading = true
 			const controller = new AbortController()
 			const timeout = window.setTimeout(() => controller.abort(), 12_000)
 			try {
-				const response = await fetch(quoteUrl(symbol, market), {
-					headers: { accept: 'application/json' },
+				const response = await fetch(quoteUrl(symbol, market, force), {
+					headers: { accept: 'application/json', ...(force ? { 'cache-control': 'no-cache' } : {}) },
 					signal: controller.signal,
+					cache: force ? 'no-store' : 'default',
 				})
 				if (!response.ok) return
 				const value = (await response.json()) as LivePrice
-				if (active && value.price != null) {
-					lastFreshness = value.freshness
-					setQuote(value)
-				}
+				if (active && value.price != null) setQuote(value)
 			} catch {
-				/* Keep the last verified quote; historical data remains visible. */
+				/* Keep the last verified quote when a source is temporarily unavailable. */
 			} finally {
 				loading = false
 				window.clearTimeout(timeout)
-				if (active) {
-					const interval =
-						lastFreshness === 'live'
-							? LIVE_POLL_INTERVAL_MS
-							: DELAYED_POLL_INTERVAL_MS
-					timer = window.setTimeout(() => void load(), interval)
-				}
+				if (active) timer = window.setTimeout(() => void load(true), AUTO_REFRESH_MS)
 			}
 		}
 
 		const onVisibilityChange = () => {
-			if (document.visibilityState === 'visible') void load()
+			if (document.visibilityState === 'visible') void load(true)
 		}
-		void load()
+		void load(refreshNonce > 0)
 		document.addEventListener('visibilitychange', onVisibilityChange)
 		return () => {
 			active = false
 			if (timer !== undefined) window.clearTimeout(timer)
 			document.removeEventListener('visibilitychange', onVisibilityChange)
 		}
-	}, [symbol, market])
+	}, [symbol, market, refreshNonce])
 
-	return quote
+	return { quote, refresh: () => setRefreshNonce((value) => value + 1) }
 }

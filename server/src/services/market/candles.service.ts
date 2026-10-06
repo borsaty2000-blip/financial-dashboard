@@ -28,7 +28,20 @@ export type CandlesResponse = {
 }
 type CacheEntry = { expires: number; value: CandlesResponse }
 const cache = new Map<string, CacheEntry>()
-const cacheTtl = (interval: string) => interval === '1d' ? 86_400_000 : 60_000
+const quoteCache = new Map<string, { expires: number; value: any }>()
+const cacheTtl = (interval: string) => (interval === '1d' ? 86_400_000 : 60_000)
+const quoteCacheTtl = (market: CandleMarket) => {
+	const now = new Date()
+	const egyptHour = now.getUTCHours() + 2
+	const isWeekday = [0, 1, 2, 3, 4].includes(now.getUTCDay())
+	const isMarketHours =
+		market === 'EGX'
+			? isWeekday && egyptHour >= 10 && egyptHour < 16
+			: market === 'TASI'
+				? isWeekday && egyptHour >= 10 && egyptHour < 15
+				: true
+	return isMarketHours ? 3 * 60_000 : 30 * 60_000
+}
 
 const quoteMetadata = (freshness: Freshness, updatedAt: string | null) => {
 	const ageMinutes = updatedAt
@@ -145,47 +158,80 @@ export class CandlesService {
 			market === 'EGX' ? await resolveEgyptSymbol(normalized) : normalized
 		const cacheKey = `candles:${market}:${resolved}:${interval}:${days}`
 		const cached = cache.get(cacheKey)
-			if (cached && cached.expires > Date.now())
-					return {
-					...cached.value,
-					freshness: 'cached',
-					data_quality: qualityForSeries(
-						cached.value.source,
-						'cached',
-						cached.value.fetched_at,
-						),
-					}
-			if (market === 'CRYPTO') {
-				try {
-						const value = response(resolved, market, interval, await fetchBinanceCandles(resolved, interval, days), 'Binance')
-						if (value.candles.length) {
-							cache.set(cacheKey, { value, expires: Date.now() + cacheTtl(interval) })
-						return value
-					}
-				} catch (error) {
-					console.warn('Binance candles failed:', error instanceof Error ? error.message : error)
-				}
+		if (cached && cached.expires > Date.now())
+			return {
+				...cached.value,
+				freshness: 'cached',
+				data_quality: qualityForSeries(
+					cached.value.source,
+					'cached',
+					cached.value.fetched_at,
+				),
 			}
-			if (market === 'COMMODITIES') {
-				const yahooSymbols: Record<string, string> = { XAUUSD: 'GC=F', XAGUSD: 'SI=F', WTI: 'CL=F', BRENT: 'BZ=F' }
-				try {
-						const value = response(resolved, market, interval, await fetchYahooCandles(yahooSymbols[resolved] ?? resolved, interval, days), 'Yahoo Finance')
-						if (value.candles.length) {
-							cache.set(cacheKey, { value, expires: Date.now() + cacheTtl(interval) })
-						return value
-					}
-				} catch (error) {
-					console.warn('Commodity candles failed:', error instanceof Error ? error.message : error)
+		if (market === 'CRYPTO') {
+			try {
+				const value = response(
+					resolved,
+					market,
+					interval,
+					await fetchBinanceCandles(resolved, interval, days),
+					'Binance',
+				)
+				if (value.candles.length) {
+					cache.set(cacheKey, {
+						value,
+						expires: Date.now() + cacheTtl(interval),
+					})
+					return value
 				}
+			} catch (error) {
+				console.warn(
+					'Binance candles failed:',
+					error instanceof Error ? error.message : error,
+				)
 			}
-			const sources: Array<() => Promise<CandlesResponse>> = [
-				...(market === 'TASI'
-					? [() => this.fetchSahmk(resolved, market, interval, days)]
-					: []),
-				() => this.fetchTwelveData(resolved, market, interval, days),
-				...(market !== 'TASI'
-					? [() => this.fetchSahmk(resolved, market, interval, days)]
-					: []),
+		}
+		if (market === 'COMMODITIES') {
+			const yahooSymbols: Record<string, string> = {
+				XAUUSD: 'GC=F',
+				XAGUSD: 'SI=F',
+				WTI: 'CL=F',
+				BRENT: 'BZ=F',
+			}
+			try {
+				const value = response(
+					resolved,
+					market,
+					interval,
+					await fetchYahooCandles(
+						yahooSymbols[resolved] ?? resolved,
+						interval,
+						days,
+					),
+					'Yahoo Finance',
+				)
+				if (value.candles.length) {
+					cache.set(cacheKey, {
+						value,
+						expires: Date.now() + cacheTtl(interval),
+					})
+					return value
+				}
+			} catch (error) {
+				console.warn(
+					'Commodity candles failed:',
+					error instanceof Error ? error.message : error,
+				)
+			}
+		}
+		const sources: Array<() => Promise<CandlesResponse>> = [
+			...(market === 'TASI'
+				? [() => this.fetchSahmk(resolved, market, interval, days)]
+				: []),
+			() => this.fetchTwelveData(resolved, market, interval, days),
+			...(market !== 'TASI'
+				? [() => this.fetchSahmk(resolved, market, interval, days)]
+				: []),
 			() => this.fetchPolygon(resolved, market, days),
 			() => this.fetchYahoo(resolved, market, interval, days),
 			() => this.fetchStooq(resolved, market, interval, days),
@@ -194,9 +240,12 @@ export class CandlesService {
 		for (const fetcher of sources) {
 			try {
 				const value = await fetcher()
-					if (value.candles.length) {
-						cache.set(cacheKey, { value, expires: Date.now() + cacheTtl(interval) })
-						void persist(resolved, market, interval, value.source, value.candles)
+				if (value.candles.length) {
+					cache.set(cacheKey, {
+						value,
+						expires: Date.now() + cacheTtl(interval),
+					})
+					void persist(resolved, market, interval, value.source, value.candles)
 					return value
 				}
 			} catch (error) {
@@ -222,14 +271,14 @@ export class CandlesService {
 				close: item.close,
 				volume: item.volume,
 			}))
-				const value = response(
-					resolved,
+			const value = response(
+				resolved,
 				market,
 				interval,
 				candles,
-					'database-cache',
-				)
-				cache.set(cacheKey, { value, expires: Date.now() + cacheTtl(interval) })
+				'database-cache',
+			)
+			cache.set(cacheKey, { value, expires: Date.now() + cacheTtl(interval) })
 			return value
 		}
 		return response(normalized, market, interval, [], 'unavailable')
@@ -441,34 +490,43 @@ export class CandlesService {
 
 	static async getQuote(symbol: string, market: CandleMarket = 'EGX') {
 		const normalized = symbol.trim().toUpperCase()
+		const cacheKey = `quote:${market}:${normalized}`
+		const cached = quoteCache.get(cacheKey)
+		if (cached && cached.expires > Date.now()) return cached.value
+		const saveQuote = (value: any) => {
+			quoteCache.set(cacheKey, {
+				value,
+				expires: Date.now() + quoteCacheTtl(market),
+			})
+			return value
+		}
+
 		if (market === 'TASI' && process.env.SAHMK_API_KEY) {
 			try {
 				const data = await requestJson(
 					`https://api.sahmk.sa/api/v1/quote/${encodeURIComponent(normalized)}/`,
 					{ headers: { 'X-API-Key': process.env.SAHMK_API_KEY } },
 				)
-				if (Number.isFinite(Number(data?.price)))
-					return {
+				if (Number.isFinite(Number(data?.price))) {
+					const updatedAt = data.updated_at ?? new Date().toISOString()
+					const freshness = data.is_delayed ? 'delayed' : 'live'
+					return saveQuote({
 						symbol: normalized,
 						price: Number(data.price),
 						changePercent: Number(data.change_percent ?? 0),
-							source: 'market',
-						freshness: data.is_delayed
-							? ('delayed' as Freshness)
-							: ('live' as Freshness),
-						updatedAt: data.updated_at ?? new Date().toISOString(),
-							...quoteMetadata(
-								data.is_delayed ? 'delayed' : 'live',
-								data.updated_at ?? new Date().toISOString(),
-							),
-							data_quality: makeDataQuality({
-								status: data.is_delayed ? 'delayed' : 'live',
-								provider: 'market',
-								timestamp: data.updated_at ?? new Date().toISOString(),
-								thresholdSeconds: 60,
-								realtimeTick: !data.is_delayed,
-							}),
-					}
+						source: 'market',
+						freshness,
+						updatedAt,
+						...quoteMetadata(freshness, updatedAt),
+						data_quality: makeDataQuality({
+							status: freshness,
+							provider: 'market',
+							timestamp: updatedAt,
+							thresholdSeconds: 60,
+							realtimeTick: freshness === 'live',
+						}),
+					})
+				}
 			} catch (error) {
 				console.warn(
 					'SAHMK quote source failed:',
@@ -476,6 +534,7 @@ export class CandlesService {
 				)
 			}
 		}
+
 		if (process.env.TWELVE_DATA_API_KEY) {
 			try {
 				const providerSymbol =
@@ -490,29 +549,27 @@ export class CandlesService {
 				const data = await requestJson(
 					`https://api.twelvedata.com/quote?${params}`,
 				)
-				if (Number.isFinite(Number(data?.close)))
-					return {
+				if (Number.isFinite(Number(data?.close))) {
+					const updatedAt = data.datetime ?? new Date().toISOString()
+					const freshness =
+						process.env.TWELVE_DATA_REALTIME === 'true' ? 'live' : 'delayed'
+					return saveQuote({
 						symbol: normalized,
 						price: Number(data.close),
 						changePercent: Number(data.percent_change ?? 0),
-							source: 'market',
-						freshness:
-							process.env.TWELVE_DATA_REALTIME === 'true'
-								? ('live' as Freshness)
-								: ('delayed' as Freshness),
-						updatedAt: data.datetime ?? new Date().toISOString(),
-							...quoteMetadata(
-								process.env.TWELVE_DATA_REALTIME === 'true' ? 'live' : 'delayed',
-								data.datetime ?? new Date().toISOString(),
-							),
-							data_quality: makeDataQuality({
-								status: process.env.TWELVE_DATA_REALTIME === 'true' ? 'live' : 'delayed',
-								provider: 'market',
-								timestamp: data.datetime ?? new Date().toISOString(),
-								thresholdSeconds: 300,
-								realtimeTick: process.env.TWELVE_DATA_REALTIME === 'true',
-							}),
-					}
+						source: 'market',
+						freshness,
+						updatedAt,
+						...quoteMetadata(freshness, updatedAt),
+						data_quality: makeDataQuality({
+							status: freshness,
+							provider: 'market',
+							timestamp: updatedAt,
+							thresholdSeconds: 300,
+							realtimeTick: freshness === 'live',
+						}),
+					})
+				}
 			} catch (error) {
 				console.warn(
 					'Twelve Data quote source failed:',
@@ -520,72 +577,102 @@ export class CandlesService {
 				)
 			}
 		}
-		if (process.env.POLYGON_API_KEY) {
-			try {
-				const data = await requestJson(
-					`https://api.polygon.io/v2/last/trade/${encodeURIComponent(normalized)}?apiKey=${encodeURIComponent(process.env.POLYGON_API_KEY)}`,
-				)
-				const price = Number(data?.results?.p)
-				if (Number.isFinite(price) && price > 0)
-					return {
-						symbol: normalized,
-						price,
-						changePercent: null,
-							source: 'market',
-						freshness: 'live' as Freshness,
-						updatedAt: new Date().toISOString(),
-							...quoteMetadata('live', new Date().toISOString()),
-							data_quality: makeDataQuality({
-								status: 'live',
-								provider: 'Polygon.io',
-								timestamp: new Date().toISOString(),
-								thresholdSeconds: 60,
-								realtimeTick: true,
-							}),
-					}
-			} catch (error) {
-				console.warn(
-					'Polygon quote source failed:',
-					error instanceof Error ? error.message : error,
-				)
+
+		try {
+			const suffix = market === 'EGX' ? '.CA' : market === 'TASI' ? '.SR' : ''
+			const data = await requestJson(
+				`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(`${normalized}${suffix}`)}?interval=5m&range=1d`,
+			)
+			const result = data?.chart?.result?.[0]
+			const timestamps: number[] = result?.timestamp ?? []
+			const closes: Array<number | null> =
+				result?.indicators?.quote?.[0]?.close ?? []
+			let lastIndex = -1
+			for (let index = timestamps.length - 1; index >= 0; index -= 1) {
+				if (
+					Number.isFinite(Number(closes[index])) &&
+					Number(closes[index]) > 0
+				) {
+					lastIndex = index
+					break
+				}
 			}
+			if (lastIndex >= 0) {
+				const price = Number(closes[lastIndex])
+				const previousClose = Number(
+					result?.meta?.chartPreviousClose ?? result?.meta?.previousClose,
+				)
+				const updatedAt = new Date(timestamps[lastIndex] * 1000).toISOString()
+				return saveQuote({
+					symbol: normalized,
+					price,
+					changePercent:
+						Number.isFinite(previousClose) && previousClose > 0
+							? ((price - previousClose) / previousClose) * 100
+							: null,
+					source: 'market',
+					freshness: 'delayed',
+					updatedAt,
+					...quoteMetadata('delayed', updatedAt),
+					data_quality: makeDataQuality({
+						status: 'same_day',
+						provider: 'market',
+						timestamp: updatedAt,
+						thresholdSeconds: 300,
+						realtimeTick: false,
+					}),
+				})
+			}
+		} catch (error) {
+			console.warn(
+				'Yahoo intraday quote failed:',
+				error instanceof Error ? error.message : error,
+			)
 		}
+
 		try {
 			const candles = await this.getCandles(normalized, market, '1d', 2)
 			const last = candles.candles.at(-1)
 			const previous = candles.candles.at(-2)
 			if (last)
-				return {
+				return saveQuote({
 					symbol: normalized,
 					price: last.close,
 					changePercent: previous
 						? ((last.close - previous.close) / previous.close) * 100
 						: null,
-					source: candles.source,
+					source: 'market',
 					freshness: candles.freshness,
 					updatedAt: candles.fetched_at,
-						...quoteMetadata(candles.freshness, candles.fetched_at),
-						data_quality: candles.data_quality,
-				}
+					...quoteMetadata(candles.freshness, candles.fetched_at),
+					data_quality: candles.data_quality,
+				})
 		} catch (error) {
 			console.warn(
 				'Candle quote fallback failed:',
 				error instanceof Error ? error.message : error,
 			)
 		}
-		return {
+
+		return saveQuote({
 			symbol: normalized,
 			price: null,
 			changePercent: null,
 			source: 'market',
-			freshness: 'cached' as Freshness,
+			freshness: 'cached',
 			updatedAt: null,
 			...quoteMetadata('cached', null),
 			data_quality: makeDataQuality({
 				status: 'unavailable',
 				provider: 'unavailable',
-				warnings: ['تعذر الحصول على سعر من مزود موثوق'],
+				warnings: ['تعذر الحصول على سعر موثوق'],
 			}),
-		}
+		})
+	}
+
+	static invalidateQuoteCache(symbol?: string, market?: CandleMarket) {
+		if (symbol && market)
+			quoteCache.delete(`quote:${market}:${symbol.toUpperCase()}`)
+		else quoteCache.clear()
 	}
 }
