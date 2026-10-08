@@ -623,15 +623,70 @@ export class CandlesService {
 					}),
 				})
 			}
-		} catch (error) {
-			console.warn(
-				'Yahoo intraday quote failed:',
-				error instanceof Error ? error.message : error,
-			)
-		}
+			} catch (error) {
+				console.warn(
+					'Yahoo intraday quote failed:',
+					error instanceof Error ? error.message : error,
+				)
+			}
 
-		try {
-			const candles = await this.getCandles(normalized, market, '1d', 2)
+			// Yahoo may expose EGX as a daily series even when its intraday
+			// endpoint returns no valid ticks. Prefer that fresh daily close
+			// over an older database candle before using the final fallback.
+			try {
+				const suffix = market === 'EGX' ? '.CA' : market === 'TASI' ? '.SR' : ''
+				const data = await requestJson(
+					`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(`${normalized}${suffix}`)}?interval=1d&range=5d`,
+				)
+				const result = data?.chart?.result?.[0]
+				const timestamps: number[] = result?.timestamp ?? []
+				const closes: Array<number | null> =
+					result?.indicators?.quote?.[0]?.close ?? []
+				let lastIndex = -1
+				for (let index = timestamps.length - 1; index >= 0; index -= 1) {
+					if (
+						Number.isFinite(Number(closes[index])) &&
+						Number(closes[index]) > 0
+					) {
+						lastIndex = index
+						break
+					}
+				}
+				if (lastIndex >= 0) {
+					const price = Number(closes[lastIndex])
+					const previousClose = Number(
+						result?.meta?.chartPreviousClose ?? result?.meta?.previousClose,
+					)
+					const updatedAt = new Date(timestamps[lastIndex] * 1000).toISOString()
+					return saveQuote({
+						symbol: normalized,
+						price,
+						changePercent:
+							Number.isFinite(previousClose) && previousClose > 0
+								? ((price - previousClose) / previousClose) * 100
+								: null,
+						source: 'market',
+						freshness: 'delayed',
+						updatedAt,
+						...quoteMetadata('delayed', updatedAt),
+						data_quality: makeDataQuality({
+							status: 'same_day',
+							provider: 'market',
+							timestamp: updatedAt,
+							thresholdSeconds: 300,
+							realtimeTick: false,
+						}),
+					})
+				}
+			} catch (error) {
+				console.warn(
+					'Yahoo daily quote failed:',
+					error instanceof Error ? error.message : error,
+				)
+			}
+
+			try {
+				const candles = await this.getCandles(normalized, market, '1d', 2)
 			const last = candles.candles.at(-1)
 			const previous = candles.candles.at(-2)
 			if (last)

@@ -51,3 +51,42 @@ test('quote cache uses a separate key for each market', async () => {
 	assert.doesNotThrow(() => CandlesService.invalidateQuoteCache('ABUK', 'EGX'))
 	assert.doesNotThrow(() => CandlesService.invalidateQuoteCache('ABUK', 'TASI'))
 })
+
+test('quote uses a fresh Yahoo daily close before database fallback', async () => {
+	const originalFetch = globalThis.fetch
+	const originalTwelve = process.env.TWELVE_DATA_API_KEY
+	const originalPolygon = process.env.POLYGON_API_KEY
+	delete process.env.TWELVE_DATA_API_KEY
+	delete process.env.POLYGON_API_KEY
+	let calls = 0
+	const timestamp = Math.floor(Date.now() / 1000) - 300
+	globalThis.fetch = async (input) => {
+		calls += 1
+		const url = String(input)
+		const isIntraday = url.includes('interval=5m')
+		return new Response(JSON.stringify({
+			chart: {
+				result: [{
+					timestamp: isIntraday ? [] : [timestamp],
+					indicators: { quote: [{ close: isIntraday ? [] : [91.25] }] },
+					meta: { chartPreviousClose: 90.25 },
+				}],
+			},
+		}), { status: 200, headers: { 'content-type': 'application/json' } })
+	}
+
+	try {
+		CandlesService.invalidateQuoteCache('ABUK', 'EGX')
+		const quote = await CandlesService.getQuote('ABUK', 'EGX')
+		assert.equal(quote.price, 91.25)
+		assert.equal(quote.changePercent, ((91.25 - 90.25) / 90.25) * 100)
+		assert.equal(calls, 2)
+	} finally {
+		globalThis.fetch = originalFetch
+		if (originalTwelve === undefined) delete process.env.TWELVE_DATA_API_KEY
+		else process.env.TWELVE_DATA_API_KEY = originalTwelve
+		if (originalPolygon === undefined) delete process.env.POLYGON_API_KEY
+		else process.env.POLYGON_API_KEY = originalPolygon
+		CandlesService.invalidateQuoteCache()
+	}
+})
