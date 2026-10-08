@@ -7,7 +7,7 @@ function LegalPage({ title, children }: LegalProps) {
 		<main className="legal-page" dir="rtl">
 			<header className="legal-header">
 				<a href="/">borsatyai</a>
-				<span>منصة التحليل المالي التعليمية</span>
+				<span>منصة التحليل المالي العربية</span>
 			</header>
 			<article className="legal-card">
 				<h1>{title}</h1>
@@ -242,7 +242,7 @@ export function AboutPage() {
 		<LegalPage title="عن borsatyai">
 			<h2>من نحن</h2>
 			<p>
-				borsatyai منصة عربية تعليمية للتحليل المالي ومتابعة الأسواق، تجمع
+					borsatyai منصة عربية للتحليل المالي ومتابعة الأسواق، تجمع
 				المؤشرات والأدوات في تجربة واضحة للمستثمر العربي.
 			</p>
 			<h2>هدفنا</h2>

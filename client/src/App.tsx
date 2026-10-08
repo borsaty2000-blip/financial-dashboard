@@ -144,9 +144,10 @@ function RoutedApp() {
 	if (path === '/analysis/elliott')
 		return <AnalysisOverviewPage engine="elliott" />
 	if (path === '/analysis/gann') return <AnalysisOverviewPage engine="gann" />
-	if (path === '/markets/egx') return <PublicHomePage focus="EGX" />
-	if (path === '/markets/tasi') return <PublicHomePage focus="TASI" />
-	if (path === '/strategies' || path === '/strategy-builder')
+		if (path === '/markets/egx') return <PublicHomePage focus="EGX" />
+		if (path === '/markets/tasi') return <PublicHomePage focus="TASI" />
+		if (path === '/equities' || path === '/stocks') return <PublicHomePage focus="EGX" />
+		if (path === '/strategies' || path === '/strategy-builder')
 		return (
 			<Suspense
 				fallback={

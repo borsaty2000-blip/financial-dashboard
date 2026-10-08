@@ -914,8 +914,8 @@ function PublicFooter() {
 		<footer className="borsaty-public-footer">
 			<div className="borsaty-public-footer__intro">
 				<img src="/branding/borsatyai-logo.png" alt="BorsatyAI" />
-				<p>منصة عربية تعليمية لمتابعة الأسواق والتحليل المالي.</p>
-				<span>بيانات السوق · التحليل التعليمي · تجربة RTL</span>
+					<p>منصة عربية لمتابعة الأسواق والتحليل المالي.</p>
+					<span>بيانات السوق · التحليل المتقدم · تجربة RTL</span>
 			</div>
 			<div className="borsaty-public-footer__columns">
 				{columns.map((column) => (
