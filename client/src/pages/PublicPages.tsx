@@ -958,7 +958,7 @@ function PublicPromoBanner() {
 			<div className="borsaty-promo-banner__viewport">
 				<div className="borsaty-promo-banner__track">
 					<strong>
-						منصة عربية متقدمة تجمع متابعة الأسواق والتحليل التعليمي في مساحة
+							منصة عربية متقدمة تجمع متابعة الأسواق والتحليل المتقدم في مساحة
 						واحدة
 					</strong>
 					<span>مؤشرات فنية</span>
@@ -1055,7 +1055,7 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 						<span className="borsaty-kicker">منصة التحليل المالي العربية</span>
 						<h1>{heroTitle}</h1>
 						<p>
-							اجمع متابعة السوق، التحليل الفني التعليمي، الاختبار التاريخي ومنشئ
+							اجمع متابعة السوق، التحليل الفني المتقدم، الاختبار التاريخي ومنشئ
 							الاستراتيجيات في مساحة عربية واحدة مصممة لمصر والسعودية.
 						</p>
 						<div className="borsaty-hero__actions">
@@ -1075,7 +1075,7 @@ export function PublicHomePage({ focus }: { focus?: 'EGX' | 'TASI' }) {
 						<div className="borsaty-hero__chips">
 							<span>EGX وTASI</span>
 							<span>Elliott وGann</span>
-							<span>اختبار تاريخي تعليمي</span>
+						<span>اختبار تاريخي قابل للتحقق</span>
 						</div>
 					</div>
 					<div
