@@ -488,11 +488,16 @@ export class CandlesService {
 		return response(symbol, market, '1d', candles, 'Finnhub')
 	}
 
-	static async getQuote(symbol: string, market: CandleMarket = 'EGX') {
+	static async getQuote(
+		symbol: string,
+		market: CandleMarket = 'EGX',
+		options: { force?: boolean } = {},
+	) {
 		const normalized = symbol.trim().toUpperCase()
+		const force = options.force === true
 		const cacheKey = `quote:${market}:${normalized}`
 		const cached = quoteCache.get(cacheKey)
-		if (cached && cached.expires > Date.now()) return cached.value
+		if (!force && cached && cached.expires > Date.now()) return cached.value
 		const saveQuote = (value: any) => {
 			quoteCache.set(cacheKey, {
 				value,
@@ -599,11 +604,13 @@ export class CandlesService {
 			}
 			if (lastIndex >= 0) {
 				const price = Number(closes[lastIndex])
-				const previousClose = Number(
-					result?.meta?.chartPreviousClose ?? result?.meta?.previousClose,
-				)
-				const updatedAt = new Date(timestamps[lastIndex] * 1000).toISOString()
-				return saveQuote({
+					const previousClose = Number(
+						result?.meta?.chartPreviousClose ?? result?.meta?.previousClose,
+					)
+					const updatedAt = new Date(timestamps[lastIndex] * 1000).toISOString()
+					if (force && Date.now() - new Date(updatedAt).getTime() > 36 * 60 * 60 * 1000)
+						throw new Error('Yahoo intraday quote is older than the force-refresh window')
+					return saveQuote({
 					symbol: normalized,
 					price,
 					changePercent:
@@ -658,6 +665,8 @@ export class CandlesService {
 						result?.meta?.chartPreviousClose ?? result?.meta?.previousClose,
 					)
 					const updatedAt = new Date(timestamps[lastIndex] * 1000).toISOString()
+					if (force && Date.now() - new Date(updatedAt).getTime() > 36 * 60 * 60 * 1000)
+						throw new Error('Yahoo daily quote is older than the force-refresh window')
 					return saveQuote({
 						symbol: normalized,
 						price,
@@ -686,6 +695,7 @@ export class CandlesService {
 			}
 
 			try {
+				if (force) throw new Error('Database fallback disabled for force refresh')
 				const candles = await this.getCandles(normalized, market, '1d', 2)
 			const last = candles.candles.at(-1)
 			const previous = candles.candles.at(-2)

@@ -90,3 +90,35 @@ test('quote uses a fresh Yahoo daily close before database fallback', async () =
 		CandlesService.invalidateQuoteCache()
 	}
 })
+
+test('force refresh refuses an old Yahoo close and database fallback', async () => {
+	const originalFetch = globalThis.fetch
+	const originalTwelve = process.env.TWELVE_DATA_API_KEY
+	const originalPolygon = process.env.POLYGON_API_KEY
+	delete process.env.TWELVE_DATA_API_KEY
+	delete process.env.POLYGON_API_KEY
+	const oldTimestamp = Math.floor(Date.now() / 1000) - 3 * 86400
+	globalThis.fetch = async () => new Response(JSON.stringify({
+		chart: {
+			result: [{
+				timestamp: [oldTimestamp],
+				indicators: { quote: [{ close: [86.5] }] },
+				meta: { chartPreviousClose: 86.0 },
+			}],
+		},
+	}), { status: 200, headers: { 'content-type': 'application/json' } })
+
+	try {
+		CandlesService.invalidateQuoteCache('ABUK', 'EGX')
+		const quote = await CandlesService.getQuote('ABUK', 'EGX', { force: true })
+		assert.equal(quote.price, null)
+		assert.equal(quote.data_quality.status, 'unavailable')
+	} finally {
+		globalThis.fetch = originalFetch
+		if (originalTwelve === undefined) delete process.env.TWELVE_DATA_API_KEY
+		else process.env.TWELVE_DATA_API_KEY = originalTwelve
+		if (originalPolygon === undefined) delete process.env.POLYGON_API_KEY
+		else process.env.POLYGON_API_KEY = originalPolygon
+		CandlesService.invalidateQuoteCache()
+	}
+})
