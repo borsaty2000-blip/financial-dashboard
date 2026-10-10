@@ -89,9 +89,14 @@ marketRoutes.get('/quote/:symbol/refresh', async (request, response) => {
 	CandlesService.invalidateQuoteCache(request.params.symbol, market)
 	response.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate')
 	response.setHeader('Pragma', 'no-cache')
-	return response.json(
-		await CandlesService.getQuote(request.params.symbol, market, { force: true }),
-	)
+	const quote = await CandlesService.getQuote(request.params.symbol, market, {
+		force: true,
+	})
+	return response.json({
+		...quote,
+		refreshed_at: new Date().toISOString(),
+		cache_bypassed: true,
+	})
 })
 
 marketRoutes.get('/candles/:symbol', async (request, response) => {
