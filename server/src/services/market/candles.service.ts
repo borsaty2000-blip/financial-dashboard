@@ -106,7 +106,12 @@ const response = (
 		fetched_at: fetchedAt,
 		count: candles.length,
 		...freshness,
-		data_quality: qualityForSeries(source, freshness.freshness, fetchedAt),
+		data_quality: qualityForSeries(
+			source,
+			freshness.freshness,
+			fetchedAt,
+			market,
+		),
 	}
 }
 
@@ -147,6 +152,24 @@ async function persist(
 }
 
 export class CandlesService {
+	private static computeChange(
+		price: number,
+		candles: Array<{ close: number }>,
+	): number | null {
+		if (!Number.isFinite(price) || candles.length < 2) return null
+		const today = candles[candles.length - 1]
+		const yesterday = candles[candles.length - 2]
+		if (
+			!today ||
+			!yesterday ||
+			!Number.isFinite(yesterday.close) ||
+			yesterday.close === 0
+		)
+			return null
+		if (Math.abs(price - yesterday.close) < 0.001) return 0
+		return ((price - yesterday.close) / yesterday.close) * 100
+	}
+
 	static async getCandles(
 		symbol: string,
 		market: CandleMarket = 'EGX',
@@ -166,6 +189,7 @@ export class CandlesService {
 					cached.value.source,
 					'cached',
 					cached.value.fetched_at,
+					market,
 				),
 			}
 		if (market === 'CRYPTO') {
@@ -529,6 +553,7 @@ export class CandlesService {
 							timestamp: updatedAt,
 							thresholdSeconds: 60,
 							realtimeTick: freshness === 'live',
+							market,
 						}),
 					})
 				}
@@ -572,6 +597,7 @@ export class CandlesService {
 							timestamp: updatedAt,
 							thresholdSeconds: 300,
 							realtimeTick: freshness === 'live',
+							market,
 						}),
 					})
 				}
@@ -602,21 +628,26 @@ export class CandlesService {
 					break
 				}
 			}
-			if (lastIndex >= 0) {
+			const validCloses = closes
+				.filter(
+					(close): close is number =>
+						Number.isFinite(Number(close)) && Number(close) > 0,
+				)
+				.map((close) => ({ close: Number(close) }))
+			if (lastIndex >= 0 && validCloses.length >= 2) {
 				const price = Number(closes[lastIndex])
-					const previousClose = Number(
-						result?.meta?.chartPreviousClose ?? result?.meta?.previousClose,
+				const updatedAt = new Date(timestamps[lastIndex] * 1000).toISOString()
+				if (
+					force &&
+					Date.now() - new Date(updatedAt).getTime() > 36 * 60 * 60 * 1000
+				)
+					throw new Error(
+						'Yahoo intraday quote is older than the force-refresh window',
 					)
-					const updatedAt = new Date(timestamps[lastIndex] * 1000).toISOString()
-					if (force && Date.now() - new Date(updatedAt).getTime() > 36 * 60 * 60 * 1000)
-						throw new Error('Yahoo intraday quote is older than the force-refresh window')
-					return saveQuote({
+				return saveQuote({
 					symbol: normalized,
 					price,
-					changePercent:
-						Number.isFinite(previousClose) && previousClose > 0
-							? ((price - previousClose) / previousClose) * 100
-							: null,
+					changePercent: CandlesService.computeChange(price, validCloses),
 					source: 'market',
 					freshness: 'delayed',
 					updatedAt,
@@ -627,76 +658,83 @@ export class CandlesService {
 						timestamp: updatedAt,
 						thresholdSeconds: 300,
 						realtimeTick: false,
+						market,
 					}),
 				})
 			}
-			} catch (error) {
-				console.warn(
-					'Yahoo intraday quote failed:',
-					error instanceof Error ? error.message : error,
-				)
-			}
+		} catch (error) {
+			console.warn(
+				'Yahoo intraday quote failed:',
+				error instanceof Error ? error.message : error,
+			)
+		}
 
-			// Yahoo may expose EGX as a daily series even when its intraday
-			// endpoint returns no valid ticks. Prefer that fresh daily close
-			// over an older database candle before using the final fallback.
-			try {
-				const suffix = market === 'EGX' ? '.CA' : market === 'TASI' ? '.SR' : ''
-				const data = await requestJson(
-					`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(`${normalized}${suffix}`)}?interval=1d&range=5d`,
-				)
-				const result = data?.chart?.result?.[0]
-				const timestamps: number[] = result?.timestamp ?? []
-				const closes: Array<number | null> =
-					result?.indicators?.quote?.[0]?.close ?? []
-				let lastIndex = -1
-				for (let index = timestamps.length - 1; index >= 0; index -= 1) {
-					if (
-						Number.isFinite(Number(closes[index])) &&
-						Number(closes[index]) > 0
-					) {
-						lastIndex = index
-						break
-					}
+		// Yahoo may expose EGX as a daily series even when its intraday
+		// endpoint returns no valid ticks. Prefer that fresh daily close
+		// over an older database candle before using the final fallback.
+		try {
+			const suffix = market === 'EGX' ? '.CA' : market === 'TASI' ? '.SR' : ''
+			const data = await requestJson(
+				`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(`${normalized}${suffix}`)}?interval=1d&range=5d`,
+			)
+			const result = data?.chart?.result?.[0]
+			const timestamps: number[] = result?.timestamp ?? []
+			const closes: Array<number | null> =
+				result?.indicators?.quote?.[0]?.close ?? []
+			let lastIndex = -1
+			for (let index = timestamps.length - 1; index >= 0; index -= 1) {
+				if (
+					Number.isFinite(Number(closes[index])) &&
+					Number(closes[index]) > 0
+				) {
+					lastIndex = index
+					break
 				}
-				if (lastIndex >= 0) {
-					const price = Number(closes[lastIndex])
-					const previousClose = Number(
-						result?.meta?.chartPreviousClose ?? result?.meta?.previousClose,
+			}
+			if (lastIndex >= 0) {
+				const price = Number(closes[lastIndex])
+				const validCloses = closes
+					.filter(
+						(close): close is number =>
+							Number.isFinite(Number(close)) && Number(close) > 0,
 					)
-					const updatedAt = new Date(timestamps[lastIndex] * 1000).toISOString()
-					if (force && Date.now() - new Date(updatedAt).getTime() > 36 * 60 * 60 * 1000)
-						throw new Error('Yahoo daily quote is older than the force-refresh window')
-					return saveQuote({
-						symbol: normalized,
-						price,
-						changePercent:
-							Number.isFinite(previousClose) && previousClose > 0
-								? ((price - previousClose) / previousClose) * 100
-								: null,
-						source: 'market',
-						freshness: 'delayed',
-						updatedAt,
-						...quoteMetadata('delayed', updatedAt),
-						data_quality: makeDataQuality({
-							status: 'same_day',
-							provider: 'market',
-							timestamp: updatedAt,
-							thresholdSeconds: 300,
-							realtimeTick: false,
-						}),
-					})
-				}
-			} catch (error) {
-				console.warn(
-					'Yahoo daily quote failed:',
-					error instanceof Error ? error.message : error,
+					.map((close) => ({ close: Number(close) }))
+				const updatedAt = new Date(timestamps[lastIndex] * 1000).toISOString()
+				if (
+					force &&
+					Date.now() - new Date(updatedAt).getTime() > 36 * 60 * 60 * 1000
 				)
+					throw new Error(
+						'Yahoo daily quote is older than the force-refresh window',
+					)
+				return saveQuote({
+					symbol: normalized,
+					price,
+					changePercent: CandlesService.computeChange(price, validCloses),
+					source: 'market',
+					freshness: 'delayed',
+					updatedAt,
+					...quoteMetadata('delayed', updatedAt),
+					data_quality: makeDataQuality({
+						status: 'same_day',
+						provider: 'market',
+						timestamp: updatedAt,
+						thresholdSeconds: 300,
+						realtimeTick: false,
+						market,
+					}),
+				})
 			}
+		} catch (error) {
+			console.warn(
+				'Yahoo daily quote failed:',
+				error instanceof Error ? error.message : error,
+			)
+		}
 
-			try {
-				if (force) throw new Error('Database fallback disabled for force refresh')
-				const candles = await this.getCandles(normalized, market, '1d', 2)
+		try {
+			if (force) throw new Error('Database fallback disabled for force refresh')
+			const candles = await this.getCandles(normalized, market, '1d', 2)
 			const last = candles.candles.at(-1)
 			const previous = candles.candles.at(-2)
 			if (last)

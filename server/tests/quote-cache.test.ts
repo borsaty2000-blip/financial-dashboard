@@ -12,15 +12,20 @@ test('quote cache reuses a validated intraday quote until invalidated', async ()
 	const timestamp = Math.floor(Date.now() / 1000) - 60
 	globalThis.fetch = async () => {
 		calls += 1
-		return new Response(JSON.stringify({
-			chart: {
-				result: [{
-					timestamp: [timestamp - 300, timestamp],
-					indicators: { quote: [{ close: [89.5, 90.5] }] },
-					meta: { chartPreviousClose: 88.5 },
-				}],
-			},
-		}), { status: 200, headers: { 'content-type': 'application/json' } })
+		return new Response(
+			JSON.stringify({
+				chart: {
+					result: [
+						{
+							timestamp: [timestamp - 300, timestamp],
+							indicators: { quote: [{ close: [89.5, 90.5] }] },
+							meta: { chartPreviousClose: 88.5 },
+						},
+					],
+				},
+			}),
+			{ status: 200, headers: { 'content-type': 'application/json' } },
+		)
 	}
 
 	try {
@@ -28,7 +33,7 @@ test('quote cache reuses a validated intraday quote until invalidated', async ()
 		const first = await CandlesService.getQuote('ABUK', 'EGX')
 		const second = await CandlesService.getQuote('ABUK', 'EGX')
 		assert.equal(first.price, 90.5)
-		assert.equal(first.changePercent, ((90.5 - 88.5) / 88.5) * 100)
+		assert.equal(first.changePercent, ((90.5 - 89.5) / 89.5) * 100)
 		assert.equal(second.price, first.price)
 		assert.equal(calls, 1)
 
@@ -64,15 +69,22 @@ test('quote uses a fresh Yahoo daily close before database fallback', async () =
 		calls += 1
 		const url = String(input)
 		const isIntraday = url.includes('interval=5m')
-		return new Response(JSON.stringify({
-			chart: {
-				result: [{
-					timestamp: isIntraday ? [] : [timestamp],
-					indicators: { quote: [{ close: isIntraday ? [] : [91.25] }] },
-					meta: { chartPreviousClose: 90.25 },
-				}],
-			},
-		}), { status: 200, headers: { 'content-type': 'application/json' } })
+		return new Response(
+			JSON.stringify({
+				chart: {
+					result: [
+						{
+							timestamp: isIntraday ? [] : [timestamp - 86400, timestamp],
+							indicators: {
+								quote: [{ close: isIntraday ? [] : [90.25, 91.25] }],
+							},
+							meta: { chartPreviousClose: 90.25 },
+						},
+					],
+				},
+			}),
+			{ status: 200, headers: { 'content-type': 'application/json' } },
+		)
 	}
 
 	try {
@@ -98,15 +110,21 @@ test('force refresh refuses an old Yahoo close and database fallback', async () 
 	delete process.env.TWELVE_DATA_API_KEY
 	delete process.env.POLYGON_API_KEY
 	const oldTimestamp = Math.floor(Date.now() / 1000) - 3 * 86400
-	globalThis.fetch = async () => new Response(JSON.stringify({
-		chart: {
-			result: [{
-				timestamp: [oldTimestamp],
-				indicators: { quote: [{ close: [86.5] }] },
-				meta: { chartPreviousClose: 86.0 },
-			}],
-		},
-	}), { status: 200, headers: { 'content-type': 'application/json' } })
+	globalThis.fetch = async () =>
+		new Response(
+			JSON.stringify({
+				chart: {
+					result: [
+						{
+							timestamp: [oldTimestamp],
+							indicators: { quote: [{ close: [86.5] }] },
+							meta: { chartPreviousClose: 86.0 },
+						},
+					],
+				},
+			}),
+			{ status: 200, headers: { 'content-type': 'application/json' } },
+		)
 
 	try {
 		CandlesService.invalidateQuoteCache('ABUK', 'EGX')
